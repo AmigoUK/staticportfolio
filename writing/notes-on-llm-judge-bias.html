@@ -4,7 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.bunny.net; font-src 'self' https://fonts.bunny.net; img-src 'self'; script-src 'self'; base-uri 'self'; frame-ancestors 'none';" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Notes on LLM-judge bias — John Doe</title>
+  <meta property="og:type" content="article" />
   <meta name="description" content="What survives a paired test of judge models against human raters." />
   <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
@@ -78,7 +81,7 @@
 
           <p>For now: use multiple judges from different families, randomize position, control for length, and don't trust a metric where the judge can't show its work.</p>
 
-          <p style="margin-top: var(--space-5);"><a class="btn btn-ghost" href="./">← All writing</a></p>
+          <p class="back-link"><a class="btn btn-ghost" href="./">← All writing</a></p>
         </div>
       </section>
     </article>

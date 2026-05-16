@@ -4,7 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.bunny.net; font-src 'self' https://fonts.bunny.net; img-src 'self'; script-src 'self'; base-uri 'self'; frame-ancestors 'none';" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Agent Tool Router — John Doe</title>
+  <meta property="og:type" content="article" />
   <meta name="description" content="Latency-aware routing across specialist tools for an internal copilot." />
   <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
@@ -66,7 +69,7 @@
         <h2>What surprised me</h2>
         <p>The classifier didn't need to be perfect. Even at 78% top-1 accuracy, having the right tool in the top-2 shortlist 96% of the time was enough — the agent could pick correctly from a small set, but struggled when given everything. The lesson generalizes: constraining the action space is often a bigger win than improving the policy.</p>
 
-        <p style="margin-top: var(--space-5);"><a class="btn btn-ghost" href="./">← All work</a></p>
+        <p class="back-link"><a class="btn btn-ghost" href="./">← All work</a></p>
       </div>
     </section>
   </main>

@@ -4,8 +4,24 @@
   const STORAGE_KEY = "jd.theme";
   const root = document.documentElement;
 
+  function readStored() {
+    try {
+      return localStorage.getItem(STORAGE_KEY);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function writeStored(value) {
+    try {
+      localStorage.setItem(STORAGE_KEY, value);
+    } catch (_) {
+      /* Safari private mode and storage-disabled browsers throw — ignore */
+    }
+  }
+
   function resolveInitial() {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = readStored();
     if (stored === "light" || stored === "dark") return stored;
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   }
@@ -26,13 +42,13 @@
     if (!btn) return;
     btn.addEventListener("click", function () {
       const next = root.dataset.theme === "dark" ? "light" : "dark";
-      localStorage.setItem(STORAGE_KEY, next);
+      writeStored(next);
       applyTheme(next);
     });
   });
 
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
-    if (!localStorage.getItem(STORAGE_KEY)) {
+    if (!readStored()) {
       applyTheme(e.matches ? "dark" : "light");
     }
   });

@@ -27,6 +27,8 @@
   --radius-lg: 14px;
 
   --transition: 160ms ease;
+
+  --fg-on-accent: #ffffff;
 }
 
 :root[data-theme="light"] {

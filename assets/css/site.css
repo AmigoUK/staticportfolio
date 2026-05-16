@@ -192,9 +192,17 @@ code {
 }
 .btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--fg-on-accent);
 }
-.btn-primary:hover { background: var(--accent-hover); color: #fff; text-decoration: none; }
+.btn-primary:hover { background: var(--accent-hover); color: var(--fg-on-accent); text-decoration: none; }
+a[aria-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.back-link {
+  margin-top: var(--space-5);
+}
 .btn-ghost {
   border-color: var(--border);
   color: var(--fg);

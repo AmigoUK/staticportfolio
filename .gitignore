@@ -4,3 +4,7 @@ Thumbs.db
 *~
 .idea/
 .vscode/
+
+# Audit artifacts (working files from /AuditProject)
+.audit/
+RAPORT_AUDYTU.md

@@ -4,7 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.bunny.net; font-src 'self' https://fonts.bunny.net; img-src 'self'; script-src 'self'; base-uri 'self'; frame-ancestors 'none';" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Why most RAG evals are broken — John Doe</title>
+  <meta property="og:type" content="article" />
   <meta name="description" content="Faithfulness scoring without span-grounding is closer to vibes than measurement." />
   <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
@@ -83,7 +86,7 @@
 
           <p>The eval is the contract between the model and the people who depend on it. A loose contract favors whoever benefits from the model looking good. A tight contract favors users. Pick one.</p>
 
-          <p style="margin-top: var(--space-5);"><a class="btn btn-ghost" href="./">← All writing</a></p>
+          <p class="back-link"><a class="btn btn-ghost" href="./">← All writing</a></p>
         </div>
       </section>
     </article>
