@@ -99,6 +99,57 @@ code {
 .hero {
   padding-block: var(--space-8) var(--space-7);
 }
+.hero-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  margin-bottom: var(--space-4);
+  border: 2px solid var(--border);
+  display: block;
+}
+
+/* ------- About portrait ------- */
+.about-portrait {
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  margin: 0 0 var(--space-5) 0;
+  display: block;
+}
+
+/* ------- Card cover (work index) ------- */
+.card-cover {
+  width: calc(100% + var(--space-4) * 2);
+  margin: calc(var(--space-4) * -1) calc(var(--space-4) * -1) var(--space-4);
+  aspect-ratio: 16 / 9;
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  border-bottom: 1px solid var(--border);
+  object-fit: cover;
+  display: block;
+  background: var(--accent-subtle);
+}
+
+/* ------- Work detail banner ------- */
+.work-banner {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  margin-block: var(--space-5) var(--space-3);
+  display: block;
+  object-fit: cover;
+}
+
+/* dark theme softens the cream-based placeholders */
+:root[data-theme="dark"] .hero-avatar,
+:root[data-theme="dark"] .about-portrait,
+:root[data-theme="dark"] .card-cover,
+:root[data-theme="dark"] .work-banner {
+  filter: brightness(0.85) saturate(0.9);
+}
 .hero .eyebrow {
   font-family: var(--font-mono);
   font-size: var(--fs-xs);

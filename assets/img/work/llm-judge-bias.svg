@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="LLM Judge Bias Study cover (placeholder)">
+  <rect width="640" height="360" fill="#EDE9FE"/>
+  <!-- paired-bar comparison evoking A/B judge study -->
+  <g>
+    <rect x="340" y="140" width="40" height="92" fill="#7C3AED" opacity="0.55"/>
+    <rect x="390" y="100" width="40" height="132" fill="#7C3AED" opacity="0.75"/>
+    <rect x="440" y="170" width="40" height="62" fill="#7C3AED" opacity="0.55"/>
+    <rect x="490" y="120" width="40" height="112" fill="#7C3AED" opacity="0.75"/>
+    <rect x="540" y="160" width="40" height="72" fill="#7C3AED" opacity="0.55"/>
+    <line x1="335" y1="232" x2="590" y2="232" stroke="#7C3AED" stroke-width="2" opacity="0.6"/>
+  </g>
+  <text x="40"  y="280" font-family="ui-monospace,monospace" font-size="13" font-weight="600" fill="#5A5A5A" letter-spacing="2">PROJECT · 04</text>
+  <text x="40"  y="316" font-family="ui-sans-serif,system-ui,sans-serif" font-size="26" font-weight="700" fill="#111">LLM-Judge Bias Study</text>
+  <text x="600" y="340" font-family="ui-monospace,monospace" font-size="11" fill="#8A8A8A" text-anchor="end" letter-spacing="2">COVER · PLACEHOLDER</text>
+</svg>

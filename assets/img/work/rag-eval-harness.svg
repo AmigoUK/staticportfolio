@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="RAG Eval Harness cover (placeholder)">
+  <rect width="640" height="360" fill="#EDE9FE"/>
+  <!-- grid of squares evoking a benchmark matrix -->
+  <g fill="#7C3AED" opacity="0.18">
+    <rect x="40"  y="60"  width="44" height="44" rx="4"/>
+    <rect x="100" y="60"  width="44" height="44" rx="4"/>
+    <rect x="160" y="60"  width="44" height="44" rx="4"/>
+    <rect x="220" y="60"  width="44" height="44" rx="4"/>
+    <rect x="40"  y="120" width="44" height="44" rx="4"/>
+    <rect x="100" y="120" width="44" height="44" rx="4"/>
+    <rect x="160" y="120" width="44" height="44" rx="4"/>
+    <rect x="40"  y="180" width="44" height="44" rx="4"/>
+    <rect x="100" y="180" width="44" height="44" rx="4"/>
+  </g>
+  <g fill="#7C3AED" opacity="0.55">
+    <rect x="220" y="120" width="44" height="44" rx="4"/>
+    <rect x="160" y="180" width="44" height="44" rx="4"/>
+    <rect x="220" y="180" width="44" height="44" rx="4"/>
+  </g>
+  <text x="40"  y="280" font-family="ui-monospace,monospace" font-size="13" font-weight="600" fill="#5A5A5A" letter-spacing="2">PROJECT · 01</text>
+  <text x="40"  y="316" font-family="ui-sans-serif,system-ui,sans-serif" font-size="26" font-weight="700" fill="#111">RAG Eval Harness</text>
+  <text x="600" y="340" font-family="ui-monospace,monospace" font-size="11" fill="#8A8A8A" text-anchor="end" letter-spacing="2">COVER · PLACEHOLDER</text>
+</svg>
