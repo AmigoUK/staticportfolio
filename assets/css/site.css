@@ -105,6 +105,7 @@ code {
   border-radius: 50%;
   margin-bottom: var(--space-4);
   border: 2px solid var(--border);
+  object-fit: cover;
   display: block;
 }
 
@@ -116,6 +117,7 @@ code {
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   margin: 0 0 var(--space-5) 0;
+  object-fit: cover;
   display: block;
 }
 
@@ -143,12 +145,12 @@ code {
   object-fit: cover;
 }
 
-/* dark theme softens the cream-based placeholders */
+/* dark theme softens photo brightness to match the deep-ink background */
 :root[data-theme="dark"] .hero-avatar,
 :root[data-theme="dark"] .about-portrait,
 :root[data-theme="dark"] .card-cover,
 :root[data-theme="dark"] .work-banner {
-  filter: brightness(0.85) saturate(0.9);
+  filter: brightness(0.92);
 }
 .hero .eyebrow {
   font-family: var(--font-mono);
