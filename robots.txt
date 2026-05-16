@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://linuxserv1.tailc29352.ts.net/staticportfolio/sitemap.xml

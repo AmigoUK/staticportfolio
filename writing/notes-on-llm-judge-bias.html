@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Notes on LLM-judge bias — John Doe</title>
+  <meta name="description" content="What survives a paired test of judge models against human raters." />
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=geist:400,500,700|geist-mono:400,500&amp;display=swap" />
+  <link rel="stylesheet" href="../assets/css/reset.css" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/site.css" />
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a href="../" class="brand">John Doe<span>.</span></a>
+      <nav class="nav" aria-label="Primary">
+        <a href="../work/">Work</a>
+        <a href="./" aria-current="page">Writing</a>
+        <a href="../about.html">About</a>
+        <a href="../now.html">Now</a>
+        <a href="../contact.html">Contact</a>
+        <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <article>
+      <section class="page-head">
+        <div class="wrap">
+          <p class="eyebrow">Writing · Eval</p>
+          <h1>Notes on LLM-judge bias: what survives a paired test</h1>
+          <p class="article-meta"><time datetime="2026-02-08">Feb 8, 2026</time> · 11 min read</p>
+        </div>
+      </section>
+
+      <section class="prose-body">
+        <div class="wrap">
+          <p>Over the back half of 2025 I ran a sustained comparison of three frontier judge models (GPT-4o, Claude Sonnet 4.6, and Gemini 2.5 Pro) against a panel of three human raters, on a held-out set of 2,400 single-turn QA pairs from four domains. This isn't a paper; it's a long working note. Numbers are approximate and the dataset is going up on GitHub when I'm done arguing with a reviewer.</p>
+
+          <h2>The setup</h2>
+          <ul>
+            <li>Each QA pair was scored by all three judges and by three humans, blind to each other.</li>
+            <li>Scoring rubric was a 5-point scale with anchored descriptions, plus a "would you actually trust this answer" yes/no.</li>
+            <li>Position randomized when the judge saw paired answers (the most common eval mode in industry).</li>
+            <li>2,400 pairs sounds like a lot but is barely enough for the cross-cuts I wanted to do; the public release will be 12k.</li>
+          </ul>
+
+          <h2>Three biases survived statistical scrutiny</h2>
+
+          <h3>1. Length bias is real and large</h3>
+          <p>All three judges preferred longer answers, controlling for content quality. The effect was strongest in Gemini, weakest in Claude, but never small. A 30%-longer answer with identical factual content was ~14 points more likely to win a paired comparison. Humans showed a smaller version of this (~5 points), but the human effect mostly disappeared when raters were told to "weight content over presentation."</p>
+
+          <h3>2. Position bias is real and asymmetric</h3>
+          <p>When the same answer was presented as A or B, judges varied their score. GPT-4o slightly favored position A (4 points); Gemini and Claude slightly favored position B. Always randomize, and report results averaged across orderings.</p>
+
+          <h3>3. Self-preference is real but smaller than people claim</h3>
+          <p>The much-cited "judges prefer their own outputs" effect was present but modest in this dataset: roughly 6–8 points across all three judges. Notably, GPT-4o did not show the strongest self-preference; Gemini did. The takeaway isn't "never use a judge from the same family as the generator," but "always disclose it and quantify it."</p>
+
+          <h2>Three biases didn't survive</h2>
+
+          <ul>
+            <li><strong>Sycophancy on rationale.</strong> Asking the judge to explain before scoring (vs. score first) didn't change scores meaningfully in this dataset, contradicting some earlier work. Possibly an artifact of newer models being better calibrated.</li>
+            <li><strong>Refusal bias.</strong> Judges did not systematically punish answers that politely declined out-of-scope questions, once we controlled for length. This was the most useful finding for the day job.</li>
+            <li><strong>"First number wins."</strong> The hypothesis that judges anchor on the first numerical claim in an answer didn't hold under paired analysis.</li>
+          </ul>
+
+          <h2>The headline finding I keep coming back to</h2>
+          <p>Inter-judge agreement (across the three frontier models) was higher than inter-human agreement on the same task. That sounds great until you realize what it means: the judges agree with each other more than humans do, because they share systematic biases that humans don't share. <em>High inter-rater agreement isn't a quality signal when the raters were trained on overlapping corpora.</em></p>
+
+          <p>For now: use multiple judges from different families, randomize position, control for length, and don't trust a metric where the judge can't show its work.</p>
+
+          <p style="margin-top: var(--space-5);"><a class="btn btn-ghost" href="./">← All writing</a></p>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <footer class="site-credit">
+    <a href="mailto:dev@attv.uk">dev@attv.uk</a>
+    <span class="sep">·</span>
+    <span>Project &amp; Development: Tomasz &lsquo;Amigo&rsquo; Lewandowski</span>
+    <span class="sep">·</span>
+    <a href="https://www.attv.uk" target="_blank" rel="noreferrer noopener">www.attv.uk</a>
+    <span class="sep">·</span>
+    <a href="https://github.com/AmigoUK/staticportfolio" target="_blank" rel="noreferrer noopener">GitHub</a>
+  </footer>
+</body>
+</html>

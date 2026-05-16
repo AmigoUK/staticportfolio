@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Work — John Doe</title>
+  <meta name="description" content="Selected projects by John Doe — LLM evaluation, fine-tuning, retrieval, and agents." />
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=geist:400,500,700|geist-mono:400,500&amp;display=swap" />
+  <link rel="stylesheet" href="../assets/css/reset.css" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/site.css" />
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a href="../" class="brand">John Doe<span>.</span></a>
+      <nav class="nav" aria-label="Primary">
+        <a href="./" aria-current="page">Work</a>
+        <a href="../writing/">Writing</a>
+        <a href="../about.html">About</a>
+        <a href="../now.html">Now</a>
+        <a href="../contact.html">Contact</a>
+        <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-head">
+      <div class="wrap">
+        <h1>Work</h1>
+        <p class="lede">Selected projects from the last two years — most LLM-adjacent, a few from before the wave that I still maintain.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="card-grid">
+          <a class="card" href="rag-eval-harness.html">
+            <p class="kicker">Open source · Eval</p>
+            <h3>RAG Eval Harness</h3>
+            <p>A reproducible benchmark suite for retrieval-augmented systems, focused on faithfulness and citation precision. 12 datasets, judge-model agnostic.</p>
+            <div class="tags"><span class="tag">Python</span><span class="tag">Ragas</span><span class="tag">MLflow</span><span class="tag">pytest</span></div>
+          </a>
+          <a class="card" href="fine-tuning-llama-domain.html">
+            <p class="kicker">Client work · Fine-tuning</p>
+            <h3>Fine-tuning Llama-3 for a regulated domain</h3>
+            <p>Adapted Llama-3-8B for medical-device documentation Q&amp;A under HIPAA constraints. PEFT + DPO + structured eval. Customer reports 28% fewer escalations to humans.</p>
+            <div class="tags"><span class="tag">PyTorch</span><span class="tag">LoRA</span><span class="tag">DPO</span><span class="tag">vLLM</span></div>
+          </a>
+          <a class="card" href="agent-tool-router.html">
+            <p class="kicker">Internal tool · Agents</p>
+            <h3>Agent Tool Router</h3>
+            <p>Latency-aware router that picks between 7 specialist tools for an internal copilot. Cut p95 by 41% vs. baseline ReAct loop, with no measurable loss of task success.</p>
+            <div class="tags"><span class="tag">LangGraph</span><span class="tag">OpenTelemetry</span><span class="tag">Modal</span></div>
+          </a>
+          <a class="card" href="#" aria-disabled="true">
+            <p class="kicker">Research · Bias</p>
+            <h3>LLM-as-Judge Bias Study</h3>
+            <p>Empirical study of position bias and self-preference in GPT-4o and Claude as judges. Open dataset, replication notebook, and one ongoing argument with a reviewer.</p>
+            <div class="tags"><span class="tag">Observable</span><span class="tag">pandas</span><span class="tag">notebooks</span></div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-credit">
+    <a href="mailto:dev@attv.uk">dev@attv.uk</a>
+    <span class="sep">·</span>
+    <span>Project &amp; Development: Tomasz &lsquo;Amigo&rsquo; Lewandowski</span>
+    <span class="sep">·</span>
+    <a href="https://www.attv.uk" target="_blank" rel="noreferrer noopener">www.attv.uk</a>
+    <span class="sep">·</span>
+    <a href="https://github.com/AmigoUK/staticportfolio" target="_blank" rel="noreferrer noopener">GitHub</a>
+  </footer>
+</body>
+</html>

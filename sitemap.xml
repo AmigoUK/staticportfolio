@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/work/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/work/rag-eval-harness.html</loc><priority>0.8</priority></url>
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/work/fine-tuning-llama-domain.html</loc><priority>0.8</priority></url>
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/work/agent-tool-router.html</loc><priority>0.8</priority></url>
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/writing/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/writing/why-most-rag-evals-are-broken.html</loc><priority>0.7</priority></url>
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/writing/notes-on-llm-judge-bias.html</loc><priority>0.7</priority></url>
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/about.html</loc><priority>0.6</priority></url>
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/now.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://linuxserv1.tailc29352.ts.net/staticportfolio/contact.html</loc><priority>0.5</priority></url>
+</urlset>

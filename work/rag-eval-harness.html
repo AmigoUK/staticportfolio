@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>RAG Eval Harness — John Doe</title>
+  <meta name="description" content="A reproducible benchmark suite for retrieval-augmented systems." />
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=geist:400,500,700|geist-mono:400,500&amp;display=swap" />
+  <link rel="stylesheet" href="../assets/css/reset.css" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/site.css" />
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a href="../" class="brand">John Doe<span>.</span></a>
+      <nav class="nav" aria-label="Primary">
+        <a href="./" aria-current="page">Work</a>
+        <a href="../writing/">Writing</a>
+        <a href="../about.html">About</a>
+        <a href="../now.html">Now</a>
+        <a href="../contact.html">Contact</a>
+        <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-head">
+      <div class="wrap">
+        <p class="eyebrow">Open source · Eval infrastructure</p>
+        <h1>RAG Eval Harness</h1>
+        <p class="lede">A reproducible benchmark suite for retrieval-augmented systems, focused on faithfulness and citation precision. 12 public datasets, judge-model agnostic.</p>
+        <p class="article-meta">2024 — present · MIT licensed · <a href="https://github.com/" rel="noopener">GitHub</a></p>
+      </div>
+    </section>
+
+    <section class="prose-body">
+      <div class="wrap">
+        <h2>The problem</h2>
+        <p>Most public RAG benchmarks measure whether the right document was retrieved, then declare success. That's the easy half. The hard half is what the model does with the right document — does it actually use it, does it cite correctly, and does it abstain when the document doesn't support the question?</p>
+
+        <h2>What the harness does</h2>
+        <ul>
+          <li>Wraps 12 retrieval datasets (HotpotQA, MuSiQue, FreshQA, BEIR subsets, four domain-specific corpora I curated) behind one interface.</li>
+          <li>Computes faithfulness with <strong>span-grounded</strong> scoring — every claim in the generated answer must map to a character span in a retrieved document. Hand-waved "supportedness" scores are explicitly excluded.</li>
+          <li>Computes citation precision and recall separately. Many systems game citation recall by citing everything.</li>
+          <li>Judge-model agnostic — works with OpenAI, Anthropic, local vLLM, or a deterministic rule-based judge.</li>
+          <li>Outputs MLflow runs by default, with a Phoenix tracing exporter for span-level inspection.</li>
+        </ul>
+
+        <h2>Numbers, since you'd ask</h2>
+        <p>Currently used by three production teams I know of (one telecom, one fintech, one regulatory). It catches a class of regressions traditional metrics miss — most recently: a 19% drop in citation precision after a prompt-template change that <em>improved</em> ROUGE.</p>
+
+        <h2>What's next</h2>
+        <p>A non-LLM faithfulness scorer (NLI-based, runs on a 400M-param model) so teams can evaluate every PR without paying per token. That's the chapter I'm writing right now.</p>
+
+        <p style="margin-top: var(--space-5);"><a class="btn btn-ghost" href="./">← All work</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-credit">
+    <a href="mailto:dev@attv.uk">dev@attv.uk</a>
+    <span class="sep">·</span>
+    <span>Project &amp; Development: Tomasz &lsquo;Amigo&rsquo; Lewandowski</span>
+    <span class="sep">·</span>
+    <a href="https://www.attv.uk" target="_blank" rel="noreferrer noopener">www.attv.uk</a>
+    <span class="sep">·</span>
+    <a href="https://github.com/AmigoUK/staticportfolio" target="_blank" rel="noreferrer noopener">GitHub</a>
+  </footer>
+</body>
+</html>

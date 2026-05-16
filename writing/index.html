@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Writing — John Doe</title>
+  <meta name="description" content="Notes and longer-form writing on LLM evaluation, retrieval, and ML engineering." />
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate" type="application/rss+xml" title="John Doe — Writing" href="feed.xml" />
+  <link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=geist:400,500,700|geist-mono:400,500&amp;display=swap" />
+  <link rel="stylesheet" href="../assets/css/reset.css" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/site.css" />
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a href="../" class="brand">John Doe<span>.</span></a>
+      <nav class="nav" aria-label="Primary">
+        <a href="../work/">Work</a>
+        <a href="./" aria-current="page">Writing</a>
+        <a href="../about.html">About</a>
+        <a href="../now.html">Now</a>
+        <a href="../contact.html">Contact</a>
+        <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-head">
+      <div class="wrap">
+        <h1>Writing</h1>
+        <p class="lede">Notes on LLM eval, retrieval, and the parts of ML engineering nobody romanticizes. Updated when I have something I'd actually argue for. <a href="feed.xml">RSS</a>.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <ul class="post-list">
+          <li>
+            <a href="why-most-rag-evals-are-broken.html">
+              <time datetime="2026-04-22">2026-04-22</time>
+              <h3>Why most RAG evals are broken (and the one fix that helps)</h3>
+              <p class="dek">Faithfulness scoring without span-grounding is closer to vibes than measurement. Here's the one thing I do differently now.</p>
+            </a>
+          </li>
+          <li>
+            <a href="notes-on-llm-judge-bias.html">
+              <time datetime="2026-02-08">2026-02-08</time>
+              <h3>Notes on LLM-judge bias: what survives a paired test</h3>
+              <p class="dek">Six months of A/B-ing judge models against human raters. The findings aren't flattering — for any of them.</p>
+            </a>
+          </li>
+          <li>
+            <a href="#" aria-disabled="true">
+              <time datetime="2025-11-14">2025-11-14</time>
+              <h3>The cheapest eval is the one you didn't need to run</h3>
+              <p class="dek">A short note on caching judge calls, deduping near-identical eval inputs, and other unsexy savings.</p>
+            </a>
+          </li>
+          <li>
+            <a href="#" aria-disabled="true">
+              <time datetime="2025-08-30">2025-08-30</time>
+              <h3>Stop benchmarking on MMLU</h3>
+              <p class="dek">It correlates with what you care about less than you think.</p>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-credit">
+    <a href="mailto:dev@attv.uk">dev@attv.uk</a>
+    <span class="sep">·</span>
+    <span>Project &amp; Development: Tomasz &lsquo;Amigo&rsquo; Lewandowski</span>
+    <span class="sep">·</span>
+    <a href="https://www.attv.uk" target="_blank" rel="noreferrer noopener">www.attv.uk</a>
+    <span class="sep">·</span>
+    <a href="https://github.com/AmigoUK/staticportfolio" target="_blank" rel="noreferrer noopener">GitHub</a>
+  </footer>
+</body>
+</html>

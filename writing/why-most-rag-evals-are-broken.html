@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Why most RAG evals are broken — John Doe</title>
+  <meta name="description" content="Faithfulness scoring without span-grounding is closer to vibes than measurement." />
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.bunny.net" crossorigin />
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=geist:400,500,700|geist-mono:400,500&amp;display=swap" />
+  <link rel="stylesheet" href="../assets/css/reset.css" />
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/site.css" />
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a href="../" class="brand">John Doe<span>.</span></a>
+      <nav class="nav" aria-label="Primary">
+        <a href="../work/">Work</a>
+        <a href="./" aria-current="page">Writing</a>
+        <a href="../about.html">About</a>
+        <a href="../now.html">Now</a>
+        <a href="../contact.html">Contact</a>
+        <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <article>
+      <section class="page-head">
+        <div class="wrap">
+          <p class="eyebrow">Writing · Eval</p>
+          <h1>Why most RAG evals are broken (and the one fix that helps)</h1>
+          <p class="article-meta"><time datetime="2026-04-22">Apr 22, 2026</time> · 8 min read</p>
+        </div>
+      </section>
+
+      <section class="prose-body">
+        <div class="wrap">
+          <p>I've watched four teams in the last year ship a RAG system that "passes the eval" and then quietly start losing customer trust over the next two months. Every time, the same thing was true: the eval measured something that <em>correlated</em> with quality without <em>measuring</em> quality.</p>
+
+          <p>The villain is almost always the same metric: faithfulness scored by asking a judge model whether the generated answer is "supported by" the retrieved context. It sounds reasonable. It produces nice green numbers. It also fails to catch the bug you care about most.</p>
+
+          <h2>What the typical eval does</h2>
+          <p>Generate an answer. Send the answer plus the retrieved context to a judge model. Ask: "is this answer supported by the context? Score 1–5." Average across the eval set.</p>
+
+          <p>This catches gross hallucination — an answer that's wildly off the context will get scored 1 or 2. But it misses three failure modes that hurt in production:</p>
+
+          <ol>
+            <li><strong>Subtle stitching.</strong> The answer is mostly grounded but slips one unsupported claim into a list. The judge averages over the whole answer and gives it a 4.</li>
+            <li><strong>Confidence calibration.</strong> The answer pulls correctly from context but states a probable-but-not-stated conclusion as a fact. Judges struggle here.</li>
+            <li><strong>Citation drift.</strong> The answer cites document A while actually paraphrasing document B. The text reads "supported." It isn't.</li>
+          </ol>
+
+          <h2>The fix that helps</h2>
+          <p>Score faithfulness at the <strong>claim level</strong>, with <strong>span grounding</strong>. Concretely:</p>
+
+          <ol>
+            <li>Decompose the generated answer into atomic claims (a sentence-segmenter plus a coreference-resolved claim extractor; small model, deterministic).</li>
+            <li>For each claim, require the judge to return a <em>character span</em> in one of the retrieved documents that supports it — not just a yes/no.</li>
+            <li>If no span supports a claim, that claim fails. The aggregate score is the fraction of claims that ground.</li>
+          </ol>
+
+          <p>Three things change once you do this. First, scores get noticeably worse — usually 15–25 points lower than the old metric. That's not regression, that's the previous metric having lied to you. Second, you can now point at <em>which</em> sentence broke. Third, the metric becomes legible to non-engineers — product can read a failed eval and know what went wrong.</p>
+
+          <h2>What about cost?</h2>
+          <p>Span-grounded judging is more expensive per evaluation than vibe-supportedness — usually 2–3× the tokens. Two mitigations:</p>
+
+          <ul>
+            <li>You don't need a frontier model for span grounding. A 7B fine-tuned NLI model does most of the work; reserve the expensive judge for adjudicating disagreements.</li>
+            <li>Cache aggressively. The same retrieved context, same question, same model version → same eval result. Most eval runs in CI are 80%+ cache hits if you let them be.</li>
+          </ul>
+
+          <h2>The hard part</h2>
+          <p>The hard part of this isn't technical. It's social. You'll show your team that the "92% faithful" system they shipped last quarter is actually 71% faithful by a real metric. People will be unhappy with you. The right move is to share the methodology before showing the new numbers, frame it as "the previous metric was generous, here's a tighter one we should adopt going forward," and resist the urge to retro-grade old projects.</p>
+
+          <p>The eval is the contract between the model and the people who depend on it. A loose contract favors whoever benefits from the model looking good. A tight contract favors users. Pick one.</p>
+
+          <p style="margin-top: var(--space-5);"><a class="btn btn-ghost" href="./">← All writing</a></p>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <footer class="site-credit">
+    <a href="mailto:dev@attv.uk">dev@attv.uk</a>
+    <span class="sep">·</span>
+    <span>Project &amp; Development: Tomasz &lsquo;Amigo&rsquo; Lewandowski</span>
+    <span class="sep">·</span>
+    <a href="https://www.attv.uk" target="_blank" rel="noreferrer noopener">www.attv.uk</a>
+    <span class="sep">·</span>
+    <a href="https://github.com/AmigoUK/staticportfolio" target="_blank" rel="noreferrer noopener">GitHub</a>
+  </footer>
+</body>
+</html>
