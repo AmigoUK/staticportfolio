@@ -15,6 +15,7 @@ import adminFontsRoutes from "./routes/admin-fonts.js";
 import adminMediaRoutes from "./routes/admin-media.js";
 import adminPagesEditRoutes from "./routes/admin-pages-edit.js";
 import adminWorkRoutes from "./routes/admin-work.js";
+import adminWritingRoutes from "./routes/admin-writing.js";
 import adminPublishRoutes from "./routes/admin-publish.js";
 import { seedPresets } from "./services/themes.js";
 import { seedDefaults } from "./services/settings.js";
@@ -114,6 +115,7 @@ export async function buildServer() {
   await app.register(adminMediaRoutes);
   await app.register(adminPagesEditRoutes);
   await app.register(adminWorkRoutes);
+  await app.register(adminWritingRoutes);
   await app.register(adminPublishRoutes);
   await app.register(adminPagesRoutes);
 

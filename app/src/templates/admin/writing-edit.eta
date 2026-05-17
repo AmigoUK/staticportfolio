@@ -1,0 +1,55 @@
+<% layout("/layouts/admin-base", { title: (it.mode === "new" ? "New post" : "Edit: " + it.post.title), user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<section class="page">
+  <header class="page-head">
+    <p class="back-crumb"><a href="<%= it.adminBase %>/writing/">← Writing</a></p>
+    <h1><%= it.mode === "new" ? "New post" : "Edit post" %></h1>
+  </header>
+
+  <form method="post" action="<%= it.mode === "new" ? it.adminBase + "/writing/new" : it.adminBase + "/writing/" + it.post.id %>">
+    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+
+    <label class="form-row">
+      <span>Slug (kebab-case; becomes /writing/{slug}.html)</span>
+      <input type="text" name="slug" required pattern="[a-z0-9](?:[a-z0-9-]{0,80}[a-z0-9])?" value="<%= it.post.slug %>" />
+    </label>
+
+    <label class="form-row">
+      <span>Title</span>
+      <input type="text" name="title" required maxlength="200" value="<%= it.post.title %>" />
+    </label>
+
+    <label class="form-row">
+      <span>Dek (one-sentence summary; shown on the post list and as the lede)</span>
+      <textarea name="dek" rows="2" maxlength="500"><%= it.post.dek || '' %></textarea>
+    </label>
+
+    <label class="form-row">
+      <span>Meta description</span>
+      <input type="text" name="meta_description" maxlength="500" value="<%= it.post.meta_description || '' %>" />
+    </label>
+
+    <label class="form-row">
+      <span>Body — rich text. Output is sanitized server-side.</span>
+      <textarea name="body_html" data-rte rows="24"><%= it.post.body_html || '' %></textarea>
+    </label>
+
+    <fieldset class="form-section">
+      <legend>Publication</legend>
+      <label class="form-row">
+        <span>Published date (YYYY-MM-DD; shown in the post list and RSS)</span>
+        <input type="date" name="published_at" value="<%= (it.post.published_at || '').slice(0,10) %>" />
+      </label>
+      <label class="form-row form-row-inline">
+        <input type="checkbox" name="published" value="1" <%= it.post.published ? "checked" : "" %> />
+        <span>Published (uncheck to keep as a draft, hidden from /writing/)</span>
+      </label>
+    </fieldset>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><%= it.mode === "new" ? "Create" : "Save" %></button>
+      <a class="btn btn-ghost" href="<%= it.adminBase %>/writing/">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<script src="<%= it.adminBase %>/static/mini-rte.js"></script>

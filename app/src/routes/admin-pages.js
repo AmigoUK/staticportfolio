@@ -15,13 +15,4 @@ export default async function adminPagesRoutes(app) {
     });
   });
 
-  for (const slug of ["writing"]) {
-    app.get(`${ADMIN_BASE}/${slug}/`, { preHandler: gate }, async (_req, reply) => {
-      const csrfToken = await reply.generateCsrf();
-      reply.type("text/html; charset=utf-8");
-      return `<!doctype html><meta charset="utf-8"><title>${slug}</title>
-<p>Section "${slug}" lands in a later checkpoint. Token: <code>${csrfToken.slice(0, 12)}…</code></p>
-<p><a href="${ADMIN_BASE}/">back to dashboard</a></p>`;
-    });
-  }
 }
