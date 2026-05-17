@@ -13,6 +13,7 @@ export const DEFAULT_SETTINGS = {
   "social.calendar": "https://cal.com/",
   "menu.style": "underline-slide",
   "featured.style": "star-prefix",
+  "analytics.ga_id": "",
 };
 
 export function seedDefaults() {

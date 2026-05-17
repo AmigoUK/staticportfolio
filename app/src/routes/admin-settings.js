@@ -19,6 +19,7 @@ export default async function adminSettingsRoutes(app) {
       settings: { ...DEFAULT_SETTINGS, ...getAllSettings() },
       editableKeys: EDITABLE_KEYS,
       flash: req.query.msg || null,
+      error: req.query.err || null,
     });
   });
 
@@ -29,6 +30,15 @@ export default async function adminSettingsRoutes(app) {
       if (Object.prototype.hasOwnProperty.call(body, key)) {
         updates[key] = String(body[key]).slice(0, 1000);
       }
+    }
+    // Validate Google Analytics ID specifically: empty OR G-XXXXXXX format.
+    if (Object.prototype.hasOwnProperty.call(updates, "analytics.ga_id")) {
+      const gaId = updates["analytics.ga_id"].trim().toUpperCase();
+      if (gaId !== "" && !/^G-[A-Z0-9]{4,12}$/.test(gaId)) {
+        reply.redirect(`${ADMIN_BASE}/settings/?err=${encodeURIComponent("Google Analytics ID must be empty or in the form G-XXXXXXXXXX (4–12 letters/digits).")}`);
+        return reply;
+      }
+      updates["analytics.ga_id"] = gaId;
     }
     setMultipleSettings(updates);
     reply.redirect(`${ADMIN_BASE}/settings/?msg=saved`);

@@ -8,6 +8,9 @@
   <% if (it.flash === "saved") { %>
   <p class="flash flash-ok">Settings saved. Click <strong>Publish</strong> in the header to apply.</p>
   <% } %>
+  <% if (it.error) { %>
+  <p class="flash flash-warn"><%= it.error %></p>
+  <% } %>
 
   <form method="post" action="<%= it.adminBase %>/settings/">
     <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
@@ -58,6 +61,15 @@
         <span>Calendar / booking URL</span>
         <input type="url" name="social.calendar" maxlength="250" value="<%= it.settings['social.calendar'] || '' %>" />
       </label>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Analytics</legend>
+      <label class="form-row">
+        <span>Google Analytics 4 measurement ID — leave empty to disable tracking and keep the strict Content-Security-Policy. Format: <code>G-</code> followed by 4–12 letters / digits.</span>
+        <input type="text" name="analytics.ga_id" maxlength="20" pattern="^$|^G-[A-Z0-9]{4,12}$" placeholder="G-XXXXXXXXXX" value="<%= it.settings['analytics.ga_id'] || '' %>" title="Leave empty to disable. Otherwise paste your GA4 measurement ID (e.g. G-ABC1234567) — found in Google Analytics → Admin → Data Streams → Web stream details." />
+      </label>
+      <p class="form-help">When set, the publish pipeline adds Google's <code>gtag.js</code> script to every public page's <code>&lt;head&gt;</code> and relaxes the CSP to allow connections to <code>googletagmanager.com</code> and <code>google-analytics.com</code>. When empty, no analytics scripts ship and the CSP stays strict (<code>'self'</code> only).</p>
     </fieldset>
 
     <div class="form-actions">

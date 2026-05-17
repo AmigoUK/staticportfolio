@@ -11,6 +11,21 @@ const currentPath = it_.currentPath || "";
 const menu = it_.menu || [];
 const menuStyle = it_.menuStyle || "underline-slide";
 const featuredStyle = it_.featuredStyle || "star-prefix";
+
+const gaId = String(it_.site["analytics.ga_id"] || "").trim();
+const gaEnabled = /^G-[A-Z0-9]{4,12}$/.test(gaId);
+const cspParts = [
+  "default-src 'self'",
+  "style-src 'self'",
+  "font-src 'self'",
+  "img-src 'self'" + (gaEnabled ? " https://www.google-analytics.com https://*.google-analytics.com" : ""),
+  "script-src 'self'" + (gaEnabled ? " https://www.googletagmanager.com" : ""),
+  "frame-src https://www.youtube-nocookie.com",
+  "base-uri 'self'",
+  "frame-ancestors 'none'",
+];
+if (gaEnabled) cspParts.push("connect-src 'self' https://www.google-analytics.com https://*.analytics.google.com");
+const csp = cspParts.join("; ") + ";";
 function renderMenuLink(m, extraClass = "") {
   const external = /^(https?:|mailto:)/i.test(m.href);
   const href = external ? m.href : (prefix + m.href);
@@ -35,7 +50,7 @@ function renderMenuItem(m) {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="light dark" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; script-src 'self'; frame-src https://www.youtube-nocookie.com; base-uri 'self'; frame-ancestors 'none';" />
+  <meta http-equiv="Content-Security-Policy" content="<%= csp %>" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title><%= title %></title>
   <meta name="description" content="<%= description %>" />
@@ -54,6 +69,10 @@ function renderMenuItem(m) {
   <script src="<%= prefix %>assets/js/theme.js"></script>
   <script src="<%= prefix %>assets/js/nav.js" defer></script>
   <script src="<%= prefix %>assets/js/code-copy.js" defer></script>
+  <% if (gaEnabled) { %>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=<%= gaId %>"></script>
+  <script src="<%= prefix %>assets/js/analytics.js"></script>
+  <% } %>
 </head>
 <body>
   <header class="site-header">

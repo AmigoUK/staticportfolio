@@ -90,6 +90,20 @@ async function runPublish(logger) {
   copyFileSync(join(SOURCE_ASSETS, "js", "nav.js"), join(STAGING_DIR, "assets", "js", "nav.js"));
   copyFileSync(join(SOURCE_ASSETS, "js", "code-copy.js"), join(STAGING_DIR, "assets", "js", "code-copy.js"));
 
+  // Google Analytics init — only when a measurement ID is configured.
+  // We write the gtag bootstrap to its own same-origin file so CSP can
+  // stay free of 'unsafe-inline'.
+  const gaId = String(site["analytics.ga_id"] || "").trim();
+  if (gaId && /^G-[A-Z0-9]{4,12}$/.test(gaId)) {
+    const safeId = gaId.replace(/[^A-Z0-9\-]/g, "");
+    const analyticsJs =
+      "window.dataLayer = window.dataLayer || [];\n" +
+      "function gtag(){dataLayer.push(arguments);}\n" +
+      "gtag('js', new Date());\n" +
+      "gtag('config', '" + safeId + "');\n";
+    writeFileSync(join(STAGING_DIR, "assets", "js", "analytics.js"), analyticsJs);
+  }
+
   let fontsCopied = 0;
   for (const face of fontFaces) {
     const src = fontFileSourcePath(face._font, face.file);
