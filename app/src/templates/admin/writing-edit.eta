@@ -1,15 +1,15 @@
 <% layout("/layouts/admin-base", { title: (it.mode === "new" ? "New post" : "Edit: " + it.post.title), user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
 <section class="page">
   <header class="page-head">
-    <p class="back-crumb"><a href="<%= it.adminBase %>/writing/">← Writing</a></p>
+    <p class="back-crumb"><a href="<%= it.adminBase %>/blog/">← Blog</a></p>
     <h1><%= it.mode === "new" ? "New post" : "Edit post" %></h1>
   </header>
 
-  <form method="post" action="<%= it.mode === "new" ? it.adminBase + "/writing/new" : it.adminBase + "/writing/" + it.post.id %>">
+  <form method="post" action="<%= it.mode === "new" ? it.adminBase + "/blog/new" : it.adminBase + "/blog/" + it.post.id %>">
     <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
 
     <label class="form-row">
-      <span>Slug (kebab-case; becomes /writing/{slug}.html)</span>
+      <span>Slug (kebab-case; becomes /blog/{slug}.html)</span>
       <input type="text" name="slug" required pattern="[a-z0-9](?:[a-z0-9-]{0,80}[a-z0-9])?" value="<%= it.post.slug %>" />
     </label>
 
@@ -41,13 +41,13 @@
       </label>
       <label class="form-row form-row-inline">
         <input type="checkbox" name="published" value="1" <%= it.post.published ? "checked" : "" %> />
-        <span>Published (uncheck to keep as a draft, hidden from /writing/)</span>
+        <span>Published (uncheck to keep as a draft, hidden from /blog/)</span>
       </label>
     </fieldset>
 
     <div class="form-actions">
       <button type="submit" class="btn btn-primary"><%= it.mode === "new" ? "Create" : "Save" %></button>
-      <a class="btn btn-ghost" href="<%= it.adminBase %>/writing/">Cancel</a>
+      <a class="btn btn-ghost" href="<%= it.adminBase %>/blog/">Cancel</a>
     </div>
   </form>
 </section>

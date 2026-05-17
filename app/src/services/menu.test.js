@@ -12,7 +12,7 @@ test("seedDefaultMenu inserts the 5 default items and is idempotent", () => {
   assert.equal(all.length, 5);
   assert.deepEqual(
     all.map((m) => m.label),
-    ["Work", "Writing", "About", "Now", "Contact"],
+    ["Work", "Blog", "About", "Now", "Contact"],
   );
   const reseed = menu.seedDefaultMenu();
   assert.equal(reseed, 0);
@@ -22,7 +22,7 @@ test("seedDefaultMenu inserts the 5 default items and is idempotent", () => {
 test("validateHref accepts safe relative + https + mailto", () => {
   assert.equal(menu.validateHref("work/"), "work/");
   assert.equal(menu.validateHref("about.html"), "about.html");
-  assert.equal(menu.validateHref("writing/feed.xml"), "writing/feed.xml");
+  assert.equal(menu.validateHref("blog/feed.xml"), "blog/feed.xml");
   assert.equal(menu.validateHref("https://example.com/cv.pdf"), "https://example.com/cv.pdf");
   assert.equal(menu.validateHref("mailto:hi@example.com"), "mailto:hi@example.com");
 });
@@ -48,7 +48,7 @@ test("createMenuItem auto-appends sort_order and trims label", () => {
 test("moveUp / moveDown swap neighbouring rows", () => {
   const all = menu.listAllForAdmin();
   const work = all.find((m) => m.label === "Work");
-  const writing = all.find((m) => m.label === "Writing");
+  const writing = all.find((m) => m.label === "Blog");
   const swapped = menu.moveUp(writing.id);
   assert.ok(swapped);
   const after = menu.listAllForAdmin();

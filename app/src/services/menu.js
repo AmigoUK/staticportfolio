@@ -19,7 +19,7 @@ export const FEATURED_STYLES = [
 
 export const DEFAULT_MENU = [
   { label: "Work", href: "work/" },
-  { label: "Writing", href: "writing/" },
+  { label: "Blog", href: "blog/" },
   { label: "About", href: "about.html" },
   { label: "Now", href: "now.html" },
   { label: "Contact", href: "contact.html" },

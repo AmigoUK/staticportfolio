@@ -82,7 +82,7 @@ async function runPublish(logger) {
   mkdirSync(join(STAGING_DIR, "assets", "img"), { recursive: true });
   mkdirSync(join(STAGING_DIR, "assets", "img", "work"), { recursive: true });
   mkdirSync(join(STAGING_DIR, "work"), { recursive: true });
-  mkdirSync(join(STAGING_DIR, "writing"), { recursive: true });
+  mkdirSync(join(STAGING_DIR, "blog"), { recursive: true });
 
   copyFileSync(join(SOURCE_ASSETS, "css", "reset.css"), join(STAGING_DIR, "assets", "css", "reset.css"));
   copyFileSync(join(SOURCE_ASSETS, "css", "site.css"), join(STAGING_DIR, "assets", "css", "site.css"));
@@ -203,20 +203,20 @@ async function runPublish(logger) {
 
   // Writing
   const writingIndexHtml = await eta.renderAsync("public/writing-index.eta", { ...baseCtx, posts });
-  writeHtmlFile(join(STAGING_DIR, "writing", "index.html"), writingIndexHtml);
+  writeHtmlFile(join(STAGING_DIR, "blog", "index.html"), writingIndexHtml);
   pagesWritten++;
 
   for (const post of posts) {
     const html = await eta.renderAsync("public/writing-post.eta", { ...baseCtx, post });
-    writeHtmlFile(join(STAGING_DIR, "writing", `${post.slug}.html`), html);
+    writeHtmlFile(join(STAGING_DIR, "blog", `${post.slug}.html`), html);
     pagesWritten++;
   }
 
-  // sitemap.xml + writing/feed.xml + robots.txt
+  // sitemap.xml + blog/feed.xml + robots.txt
   const sitemap = await eta.renderAsync("public/sitemap-xml.eta", { site, workEntries, posts, pages });
   writeFileSync(join(STAGING_DIR, "sitemap.xml"), sitemap);
   const rss = await eta.renderAsync("public/rss-xml.eta", { site, posts });
-  writeFileSync(join(STAGING_DIR, "writing", "feed.xml"), rss);
+  writeFileSync(join(STAGING_DIR, "blog", "feed.xml"), rss);
   writeFileSync(
     join(STAGING_DIR, "robots.txt"),
     `User-agent: *\nAllow: /\nSitemap: ${(site["site.base_url"] || "").replace(/\/+$/, "")}/sitemap.xml\n`,

@@ -1,4 +1,4 @@
-<% layout("/layouts/public-base", { title: it.post.title + " — " + it.site["site.brand"], description: it.post.meta_description || it.post.dek, ogType: "article", ogTitle: it.post.title, ogDescription: it.post.dek, prefix: "../", site: it.site, currentPath: "writing/" }) %>
+<% layout("/layouts/public-base", { title: it.post.title + " — " + it.site["site.brand"], description: it.post.meta_description || it.post.dek, ogType: "article", ogTitle: it.post.title, ogDescription: it.post.dek, prefix: "../", site: it.site, currentPath: "blog/" }) %>
     <article class="post">
       <header class="page-head">
         <div class="wrap">
@@ -10,7 +10,7 @@
       <div class="prose-body">
         <div class="wrap">
           <%~ it.post.body_html %>
-          <p class="back-link"><a class="btn btn-ghost" href="./">← All writing</a></p>
+          <p class="back-link"><a class="btn btn-ghost" href="./">← All posts</a></p>
         </div>
       </div>
     </article>

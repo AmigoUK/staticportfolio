@@ -1,11 +1,11 @@
-<% layout("/layouts/admin-base", { title: "Writing", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<% layout("/layouts/admin-base", { title: "Blog", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
 <section class="page">
   <header class="page-head">
     <div class="head-row">
-      <h1>Writing</h1>
-      <a class="btn btn-primary" href="<%= it.adminBase %>/writing/new">+ New post</a>
+      <h1>Blog</h1>
+      <a class="btn btn-primary" href="<%= it.adminBase %>/blog/new">+ New post</a>
     </div>
-    <p>Long-form posts. Drafts are kept out of /writing/ until published.</p>
+    <p>Long-form posts. Drafts are kept out of <code>/blog/</code> until published.</p>
   </header>
 
   <% if (it.flash === "saved") { %><p class="flash flash-ok">Saved.</p><% } %>
@@ -22,8 +22,8 @@
         <td><%= p.title %></td>
         <td><%= p.published ? "Published" : "Draft" %></td>
         <td class="actions">
-          <a class="btn btn-ghost" href="<%= it.adminBase %>/writing/<%= p.id %>/edit">Edit</a>
-          <form method="post" action="<%= it.adminBase %>/writing/<%= p.id %>/delete" class="inline" onsubmit="return confirm('Delete this post?')">
+          <a class="btn btn-ghost" href="<%= it.adminBase %>/blog/<%= p.id %>/edit">Edit</a>
+          <form method="post" action="<%= it.adminBase %>/blog/<%= p.id %>/delete" class="inline" onsubmit="return confirm('Delete this post?')">
             <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
             <button type="submit" class="btn btn-ghost btn-danger">Delete</button>
           </form>

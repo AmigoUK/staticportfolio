@@ -11,8 +11,8 @@
       <h2>Work</h2>
       <p>Selected projects with covers, tags, and structured bodies.</p>
     </a>
-    <a class="dash-tile" href="<%= it.adminBase %>/writing/">
-      <h2>Writing</h2>
+    <a class="dash-tile" href="<%= it.adminBase %>/blog/">
+      <h2>Blog</h2>
       <p>Long-form posts with publish state and date.</p>
     </a>
     <a class="dash-tile" href="<%= it.adminBase %>/media/">

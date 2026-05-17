@@ -33,7 +33,7 @@
     <li>Pick <strong>Fonts</strong> — one Sans, one Mono, one Header.</li>
     <li>Tweak the <strong>Menu</strong> — items, hover style, featured style.</li>
     <li>Edit the four system <strong>Pages</strong> (about, now, contact, 404). Add custom pages with <strong>+ New page</strong>.</li>
-    <li>Add a <strong>Work</strong> entry or a <strong>Writing</strong> post.</li>
+    <li>Add a <strong>Work</strong> entry or a <strong>Blog</strong> post.</li>
     <li>Click <strong>Publish</strong>. The public site regenerates from scratch in under 2 seconds.</li>
   </ol>
 
@@ -60,9 +60,9 @@
   <p><em>Path: <code>/admin/work/</code></em></p>
   <p>Structured project cards at <code>/work/{slug}.html</code>. Top 3 (by sort order, non-disabled) appear on the home page. Disabled cards render a non-clickable "coming soon" placeholder on <code>/work/</code> with no detail page.</p>
 
-  <h3 id="writing">Writing</h3>
-  <p><em>Path: <code>/admin/writing/</code></em></p>
-  <p>Long-form posts at <code>/writing/{slug}.html</code>. The two most recently published also appear on the home page. Toggle <em>Published</em> off to keep something out of the public site (drafts).</p>
+  <h3 id="writing">Blog</h3>
+  <p><em>Path: <code>/admin/blog/</code></em></p>
+  <p>Long-form posts at <code>/blog/{slug}.html</code>. The two most recently published also appear on the home page. Toggle <em>Published</em> off to keep something out of the public site (drafts).</p>
 
   <h3 id="media">Media</h3>
   <p><em>Path: <code>/admin/media/</code></em></p>
@@ -121,7 +121,7 @@
   </ul>
 
   <h2 id="editor">The rich-text editor</h2>
-  <p>Available wherever there's a body field (Pages, Work, Writing). Toolbar from left to right:</p>
+  <p>Available wherever there's a body field (Pages, Work, Blog). Toolbar from left to right:</p>
   <ul>
     <li><strong>B / I / U</strong> — bold, italic, underline.</li>
     <li><strong>H2 / H3 / P</strong> — headings and paragraphs.</li>

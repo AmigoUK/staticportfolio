@@ -11,7 +11,7 @@ const UNDELETABLE_SLUGS = new Set(["about", "now", "contact", "404"]);
 
 // Slugs that collide with existing site paths or generated files.
 const FORBIDDEN_SLUGS = new Set([
-  "index", "work", "writing", "admin", "assets", "sitemap", "robots",
+  "index", "work", "writing", "blog", "admin", "assets", "sitemap", "robots",
   "feed", "favicon", "uploads", "static",
 ]);
 

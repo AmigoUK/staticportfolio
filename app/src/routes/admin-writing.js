@@ -8,7 +8,7 @@ export default async function adminWritingRoutes(app) {
   const gate = requireAdmin(`${ADMIN_BASE}/login`);
   const csrfPre = { preHandler: [gate, app.csrfProtection] };
 
-  app.get(`${ADMIN_BASE}/writing/`, { preHandler: gate }, async (req, reply) => {
+  app.get(`${ADMIN_BASE}/blog/`, { preHandler: gate }, async (req, reply) => {
     const csrfToken = await reply.generateCsrf();
     return renderHtml(reply, "admin/writing-list.eta", {
       adminBase: ADMIN_BASE, user: req.currentUser, csrfToken,
@@ -16,7 +16,7 @@ export default async function adminWritingRoutes(app) {
     });
   });
 
-  app.get(`${ADMIN_BASE}/writing/new`, { preHandler: gate }, async (req, reply) => {
+  app.get(`${ADMIN_BASE}/blog/new`, { preHandler: gate }, async (req, reply) => {
     const csrfToken = await reply.generateCsrf();
     return renderHtml(reply, "admin/writing-edit.eta", {
       adminBase: ADMIN_BASE, user: req.currentUser, csrfToken,
@@ -25,7 +25,7 @@ export default async function adminWritingRoutes(app) {
     });
   });
 
-  app.get(`${ADMIN_BASE}/writing/:id/edit`, { preHandler: gate }, async (req, reply) => {
+  app.get(`${ADMIN_BASE}/blog/:id/edit`, { preHandler: gate }, async (req, reply) => {
     const post = getPostById(req.params.id);
     if (!post) { reply.code(404); return "Not found."; }
     const csrfToken = await reply.generateCsrf();
@@ -34,10 +34,10 @@ export default async function adminWritingRoutes(app) {
     });
   });
 
-  app.post(`${ADMIN_BASE}/writing/new`, csrfPre, async (req, reply) => {
+  app.post(`${ADMIN_BASE}/blog/new`, csrfPre, async (req, reply) => {
     try {
       const created = createPost(normalize(req.body));
-      reply.redirect(`${ADMIN_BASE}/writing/?msg=created&slug=${encodeURIComponent(created.slug)}`);
+      reply.redirect(`${ADMIN_BASE}/blog/?msg=created&slug=${encodeURIComponent(created.slug)}`);
     } catch (err) {
       reply.code(err.code === "DUP_SLUG" || err.code === "BAD_SLUG" ? 400 : 500);
       return err.message;
@@ -45,11 +45,11 @@ export default async function adminWritingRoutes(app) {
     return reply;
   });
 
-  app.post(`${ADMIN_BASE}/writing/:id`, csrfPre, async (req, reply) => {
+  app.post(`${ADMIN_BASE}/blog/:id`, csrfPre, async (req, reply) => {
     try {
       const updated = updatePost(req.params.id, normalize(req.body));
       if (!updated) { reply.code(404); return "Not found."; }
-      reply.redirect(`${ADMIN_BASE}/writing/?msg=saved&slug=${encodeURIComponent(updated.slug)}`);
+      reply.redirect(`${ADMIN_BASE}/blog/?msg=saved&slug=${encodeURIComponent(updated.slug)}`);
     } catch (err) {
       reply.code(err.code === "DUP_SLUG" || err.code === "BAD_SLUG" ? 400 : 500);
       return err.message;
@@ -57,9 +57,9 @@ export default async function adminWritingRoutes(app) {
     return reply;
   });
 
-  app.post(`${ADMIN_BASE}/writing/:id/delete`, csrfPre, async (req, reply) => {
+  app.post(`${ADMIN_BASE}/blog/:id/delete`, csrfPre, async (req, reply) => {
     deletePost(req.params.id);
-    reply.redirect(`${ADMIN_BASE}/writing/?msg=deleted`);
+    reply.redirect(`${ADMIN_BASE}/blog/?msg=deleted`);
     return reply;
   });
 }

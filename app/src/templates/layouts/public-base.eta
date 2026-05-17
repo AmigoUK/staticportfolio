@@ -62,7 +62,7 @@ function renderMenuItem(m) {
   <% } %>
   <meta property="og:type" content="<%= ogType %>" />
   <link rel="icon" href="<%= prefix %>assets/img/favicon.svg" type="image/svg+xml" />
-  <link rel="alternate" type="application/rss+xml" title="<%= it.site["site.brand"] %> — Writing" href="<%= prefix %>writing/feed.xml" />
+  <link rel="alternate" type="application/rss+xml" title="<%= it.site["site.brand"] %> — Blog" href="<%= prefix %>blog/feed.xml" />
   <link rel="stylesheet" href="<%= prefix %>assets/css/reset.css" />
   <link rel="stylesheet" href="<%= prefix %>assets/css/tokens.css" />
   <link rel="stylesheet" href="<%= prefix %>assets/css/site.css" />

@@ -41,6 +41,16 @@ function applyMigrations(db) {
   ensureColumn("media", "kind", "TEXT NOT NULL DEFAULT 'image'");
   widenFontsSourceCheck(db);
   widenFontsRoleCheck(db);
+  renameWritingMenuToBlog(db);
+}
+
+function renameWritingMenuToBlog(db) {
+  const tbl = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='menu_items'").get();
+  if (!tbl) return;
+  db.prepare(
+    "UPDATE menu_items SET label = 'Blog', href = 'blog/', updated_at = CURRENT_TIMESTAMP " +
+      "WHERE label = 'Writing' AND href = 'writing/'",
+  ).run();
 }
 
 // SQLite has no DROP CONSTRAINT; widening a CHECK means recreating the

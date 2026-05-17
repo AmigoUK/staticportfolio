@@ -12,8 +12,8 @@ const simplePages = (it.pages || []).filter((p) => p.slug !== "404" && p.publish
   <% it.workEntries.forEach(function(w){ if (!w.is_disabled) { %>
   <url><loc><%= base %>/work/<%= w.slug %>.html</loc><lastmod><%= w.updated_at.slice(0,10) %></lastmod></url>
   <% } }); %>
-  <url><loc><%= base %>/writing/</loc><lastmod><%= today %></lastmod></url>
+  <url><loc><%= base %>/blog/</loc><lastmod><%= today %></lastmod></url>
   <% it.posts.forEach(function(p){ %>
-  <url><loc><%= base %>/writing/<%= p.slug %>.html</loc><lastmod><%= (p.published_at || p.updated_at).slice(0,10) %></lastmod></url>
+  <url><loc><%= base %>/blog/<%= p.slug %>.html</loc><lastmod><%= (p.published_at || p.updated_at).slice(0,10) %></lastmod></url>
   <% }); %>
 </urlset>

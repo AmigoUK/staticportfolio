@@ -1,7 +1,7 @@
-<% layout("/layouts/public-base", { title: "Writing — " + it.site["site.brand"], description: "Essays and notes on LLM evaluation and applied ML.", ogType: "website", prefix: "../", site: it.site, currentPath: "writing/" }) %>
+<% layout("/layouts/public-base", { title: "Blog — " + it.site["site.brand"], description: "Essays and notes on LLM evaluation and applied ML.", ogType: "website", prefix: "../", site: it.site, currentPath: "blog/" }) %>
     <section class="page-head">
       <div class="wrap">
-        <h1>Writing</h1>
+        <h1>Blog</h1>
         <p class="lede">Notes, longer essays, and rough drafts on language-model evaluation, retrieval, and the operational side of applied ML.</p>
       </div>
     </section>

@@ -89,7 +89,7 @@ html, body { margin: 0; padding: 14px 16px; font-family: -apple-system, BlinkMac
 function previewSrcdoc(style) {
   return "<!doctype html><html><head><style>" + PREVIEW_CSS + "</style></head><body>" +
     "<nav class='nav' data-menu-style='" + style + "'>" +
-    "<a href='#'>Work</a><a href='#' aria-current='page'>Writing</a><a href='#'>About</a>" +
+    "<a href='#'>Work</a><a href='#' aria-current='page'>Blog</a><a href='#'>About</a>" +
     "</nav></body></html>";
 }
 function featuredPreviewSrcdoc(featuredStyle) {

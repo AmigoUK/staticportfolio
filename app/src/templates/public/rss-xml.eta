@@ -7,17 +7,17 @@ function pubDate(d) {
 %><?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title><%= it.site["site.brand"] %> — Writing</title>
-    <link><%= base %>/writing/</link>
-    <atom:link href="<%= base %>/writing/feed.xml" rel="self" type="application/rss+xml" />
+    <title><%= it.site["site.brand"] %> — Blog</title>
+    <link><%= base %>/blog/</link>
+    <atom:link href="<%= base %>/blog/feed.xml" rel="self" type="application/rss+xml" />
     <description><%= it.site["site.tagline"] || "" %></description>
     <language>en</language>
     <lastBuildDate><%= pubDate() %></lastBuildDate>
     <% it.posts.forEach(function(p){ %>
     <item>
       <title><%= p.title %></title>
-      <link><%= base %>/writing/<%= p.slug %>.html</link>
-      <guid isPermaLink="true"><%= base %>/writing/<%= p.slug %>.html</guid>
+      <link><%= base %>/blog/<%= p.slug %>.html</link>
+      <guid isPermaLink="true"><%= base %>/blog/<%= p.slug %>.html</guid>
       <pubDate><%= pubDate(p.published_at) %></pubDate>
       <description><%= p.dek || "" %></description>
     </item>
