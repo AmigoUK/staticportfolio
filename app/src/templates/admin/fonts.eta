@@ -18,101 +18,127 @@
   <p class="flash flash-warn"><%= it.error %></p>
   <% } %>
 
-  <fieldset class="form-section">
-    <legend>Upload a custom WOFF2 font</legend>
-    <p class="form-help">Drop in your own typography. WOFF2 only (≤ 2&nbsp;MB). Upload one file per weight — re-uploading the same family / weight replaces it. The font shows up in the picker below once added.</p>
-    <form method="post" action="<%= it.adminBase %>/fonts/upload" enctype="multipart/form-data" class="font-upload-form">
-      <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-      <label class="form-row">
-        <span>Family name (what to call it; letters, digits, spaces, dashes)</span>
-        <input type="text" name="family" required maxlength="60" placeholder="e.g. Söhne, Tiempos, JetBrains Mono Custom" />
-      </label>
-      <label class="form-row">
-        <span>Role</span>
-        <select name="role" required>
-          <option value="sans">Sans (for body text)</option>
-          <option value="mono">Mono (for code blocks)</option>
-        </select>
-      </label>
-      <label class="form-row">
-        <span>Weight (standard CSS values)</span>
-        <select name="weight" required>
-          <option value="100">100 — Thin</option>
-          <option value="200">200 — Extra Light</option>
-          <option value="300">300 — Light</option>
-          <option value="400" selected>400 — Regular</option>
-          <option value="500">500 — Medium</option>
-          <option value="600">600 — Semi Bold</option>
-          <option value="700">700 — Bold</option>
-          <option value="800">800 — Extra Bold</option>
-          <option value="900">900 — Black</option>
-        </select>
-      </label>
-      <label class="form-row">
-        <span>WOFF2 file</span>
-        <input type="file" name="file" accept=".woff2,font/woff2,application/font-woff2" required />
-      </label>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Upload font</button>
-      </div>
-    </form>
-  </fieldset>
+  <div class="tabs">
+    <input type="radio" name="fonts-tab" id="fonts-tab-picker" class="tabs-input" <%= it.activeTab === "picker" ? "checked" : "" %> />
+    <input type="radio" name="fonts-tab" id="fonts-tab-upload" class="tabs-input" <%= it.activeTab === "upload" ? "checked" : "" %> />
 
-  <form method="post" action="<%= it.adminBase %>/fonts/">
-    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+    <nav class="tabs-strip" aria-label="Fonts sections">
+      <label for="fonts-tab-picker" class="tabs-tab">Picker <span class="tabs-count"><%= it.sansFonts.length + it.monoFonts.length %></span></label>
+      <label for="fonts-tab-upload" class="tabs-tab">Upload custom<% if (it.customCount) { %> <span class="tabs-count"><%= it.customCount %></span><% } %></label>
+    </nav>
 
-    <fieldset class="form-section">
-      <legend>Sans family</legend>
-      <% it.sansFonts.forEach(function(f){ %>
-      <label class="font-option">
-        <input type="radio" name="sans_id" value="<%= f.id %>" <%= f.is_active ? "checked" : "" %> />
-        <span class="font-meta">
-          <span class="font-family"><%= f.family %></span>
-          <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : f.source === "custom" ? "Custom · " + f.files.length + " weights" : "System stack" %></span>
-        </span>
-        <span class="font-preview font-preview-<%= f.source %>" data-family-css='<%= f.source === "system" ? f.fallback_stack : "\"" + f.family + "\", " + f.fallback_stack %>'>
-          The quick brown fox jumps over the lazy dog 0123456789
-        </span>
-        <% if (f.source === "custom") { %>
-        <span class="font-actions">
-          <form method="post" action="<%= it.adminBase %>/fonts/<%= f.id %>/delete" onsubmit="return confirm('Delete this custom font? Cannot be undone.')">
-            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-            <button type="submit" class="btn btn-ghost btn-danger btn-sm" <%= f.is_active ? "disabled title='Deactivate first'" : "" %>>Delete</button>
-          </form>
-        </span>
-        <% } %>
-      </label>
-      <% }); %>
-    </fieldset>
+    <section class="tabs-panel" data-tab="picker">
+      <form method="post" action="<%= it.adminBase %>/fonts/">
+        <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
 
-    <fieldset class="form-section">
-      <legend>Mono family</legend>
-      <% it.monoFonts.forEach(function(f){ %>
-      <label class="font-option">
-        <input type="radio" name="mono_id" value="<%= f.id %>" <%= f.is_active ? "checked" : "" %> />
-        <span class="font-meta">
-          <span class="font-family"><%= f.family %></span>
-          <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : f.source === "custom" ? "Custom · " + f.files.length + " weights" : "System stack" %></span>
-        </span>
-        <span class="font-preview font-preview-<%= f.source %> font-preview-mono" data-family-css='<%= f.source === "system" ? f.fallback_stack : "\"" + f.family + "\", " + f.fallback_stack %>'>
-          const tokens_per_second = 42; // for the publish loop
-        </span>
-        <% if (f.source === "custom") { %>
-        <span class="font-actions">
-          <form method="post" action="<%= it.adminBase %>/fonts/<%= f.id %>/delete" onsubmit="return confirm('Delete this custom font? Cannot be undone.')">
-            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-            <button type="submit" class="btn btn-ghost btn-danger btn-sm" <%= f.is_active ? "disabled title='Deactivate first'" : "" %>>Delete</button>
-          </form>
-        </span>
-        <% } %>
-      </label>
-      <% }); %>
-    </fieldset>
+        <fieldset class="form-section">
+          <legend>Sans family</legend>
+          <% it.sansFonts.forEach(function(f){ %>
+          <label class="font-option">
+            <input type="radio" name="sans_id" value="<%= f.id %>" <%= f.is_active ? "checked" : "" %> />
+            <span class="font-meta">
+              <span class="font-family"><%= f.family %></span>
+              <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : f.source === "custom" ? "Custom · " + f.files.length + " weights" : "System stack" %></span>
+            </span>
+            <span class="font-preview font-preview-<%= f.source %>" data-family-css='<%= f.source === "system" ? f.fallback_stack : "\"" + f.family + "\", " + f.fallback_stack %>'>
+              The quick brown fox jumps over the lazy dog 0123456789
+            </span>
+          </label>
+          <% }); %>
+        </fieldset>
 
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">Save font choices</button>
-    </div>
-  </form>
+        <fieldset class="form-section">
+          <legend>Mono family</legend>
+          <% it.monoFonts.forEach(function(f){ %>
+          <label class="font-option">
+            <input type="radio" name="mono_id" value="<%= f.id %>" <%= f.is_active ? "checked" : "" %> />
+            <span class="font-meta">
+              <span class="font-family"><%= f.family %></span>
+              <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : f.source === "custom" ? "Custom · " + f.files.length + " weights" : "System stack" %></span>
+            </span>
+            <span class="font-preview font-preview-<%= f.source %> font-preview-mono" data-family-css='<%= f.source === "system" ? f.fallback_stack : "\"" + f.family + "\", " + f.fallback_stack %>'>
+              const tokens_per_second = 42; // for the publish loop
+            </span>
+          </label>
+          <% }); %>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save font choices</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="tabs-panel" data-tab="upload">
+      <fieldset class="form-section">
+        <legend>Upload a custom WOFF2 font</legend>
+        <p class="form-help">Drop in your own typography. WOFF2 only (≤ 2&nbsp;MB). Upload one file per weight — re-uploading the same family / weight replaces it. The font shows up in the Picker tab once added.</p>
+        <form method="post" action="<%= it.adminBase %>/fonts/upload" enctype="multipart/form-data" class="font-upload-form">
+          <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+          <label class="form-row">
+            <span>Family name (what to call it; letters, digits, spaces, dashes)</span>
+            <input type="text" name="family" required maxlength="60" placeholder="e.g. Söhne, Tiempos, JetBrains Mono Custom" />
+          </label>
+          <label class="form-row">
+            <span>Role</span>
+            <select name="role" required>
+              <option value="sans">Sans (for body text)</option>
+              <option value="mono">Mono (for code blocks)</option>
+            </select>
+          </label>
+          <label class="form-row">
+            <span>Weight (standard CSS values)</span>
+            <select name="weight" required>
+              <option value="100">100 — Thin</option>
+              <option value="200">200 — Extra Light</option>
+              <option value="300">300 — Light</option>
+              <option value="400" selected>400 — Regular</option>
+              <option value="500">500 — Medium</option>
+              <option value="600">600 — Semi Bold</option>
+              <option value="700">700 — Bold</option>
+              <option value="800">800 — Extra Bold</option>
+              <option value="900">900 — Black</option>
+            </select>
+          </label>
+          <label class="form-row">
+            <span>WOFF2 file</span>
+            <input type="file" name="file" accept=".woff2,font/woff2,application/font-woff2" required />
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Upload font</button>
+          </div>
+        </form>
+      </fieldset>
+
+      <%
+        var customs = it.sansFonts.concat(it.monoFonts).filter(function(f){ return f.source === "custom"; });
+      %>
+      <% if (customs.length) { %>
+      <fieldset class="form-section">
+        <legend>Your custom fonts (<%= customs.length %>)</legend>
+        <div class="custom-fonts-list">
+          <% customs.forEach(function(f){ %>
+          <div class="custom-font-row">
+            <span class="custom-font-meta">
+              <strong><%= f.family %></strong>
+              <span class="font-tag"><%= f.role %> · <%= f.files.length %> weight<%= f.files.length === 1 ? "" : "s" %> (<%= f.files.map(function(x){ return x.weight; }).join(", ") %>)</span>
+            </span>
+            <span class="custom-font-preview" data-family-css='"<%= f.family %>", <%= f.fallback_stack %>'>
+              Aa Bb Cc 123 — The quick brown fox
+            </span>
+            <form method="post" action="<%= it.adminBase %>/fonts/<%= f.id %>/delete" onsubmit="return confirm('Delete this custom font? Cannot be undone.')" class="inline">
+              <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+              <button type="submit" class="btn btn-ghost btn-danger btn-sm" <%= f.is_active ? "disabled title='This font is active — pick another in the Picker tab first.'" : "" %>>Delete</button>
+            </form>
+          </div>
+          <% }); %>
+        </div>
+      </fieldset>
+      <% } else { %>
+      <p class="empty-hint">No custom fonts uploaded yet. Use the form above to add one.</p>
+      <% } %>
+    </section>
+  </div>
 </section>
 
 <style>
@@ -131,8 +157,24 @@
 <%  });
   }
 }); %>
-.font-option { display: grid; grid-template-columns: 24px 200px 1fr auto; gap: 14px; align-items: center; padding: 10px 12px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); margin-bottom: 8px; background: var(--admin-bg-elevated); }
-.font-actions { display: inline-block; }
+/* Tabs */
+.tabs > .tabs-input { position: absolute; opacity: 0; pointer-events: none; }
+.tabs-strip { display: flex; gap: 4px; border-bottom: 1px solid var(--admin-border); margin: 8px 0 20px; }
+.tabs-tab { padding: 10px 18px; font-size: 14px; font-weight: 500; color: var(--admin-fg-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 160ms ease, border-color 160ms ease; }
+.tabs-tab:hover { color: var(--admin-fg); }
+.tabs-count { font-size: 11px; color: var(--admin-fg-muted); background: var(--admin-bg-elevated); border: 1px solid var(--admin-border); padding: 0 6px; border-radius: 10px; margin-left: 4px; vertical-align: middle; }
+#fonts-tab-picker:checked ~ .tabs-strip [for="fonts-tab-picker"],
+#fonts-tab-upload:checked ~ .tabs-strip [for="fonts-tab-upload"] {
+  color: var(--admin-accent);
+  border-bottom-color: var(--admin-accent);
+}
+.tabs-panel { display: none; }
+#fonts-tab-picker:checked ~ .tabs-panel[data-tab="picker"],
+#fonts-tab-upload:checked ~ .tabs-panel[data-tab="upload"] {
+  display: block;
+}
+
+.font-option { display: grid; grid-template-columns: 24px 200px 1fr; gap: 14px; align-items: center; padding: 10px 12px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); margin-bottom: 8px; background: var(--admin-bg-elevated); }
 .form-help { font-size: 13px; color: var(--admin-fg-muted); margin: 0 0 14px; line-height: 1.5; }
 .font-upload-form { display: grid; gap: 12px; max-width: 580px; }
 .font-option:has(input:checked) { border-color: var(--admin-accent); }
@@ -141,11 +183,19 @@
 .font-tag { font-size: 11px; color: var(--admin-fg-muted); text-transform: uppercase; letter-spacing: .04em; }
 .font-preview { font-size: 16px; line-height: 1.4; padding: 6px 0; color: var(--admin-fg); }
 .font-preview-mono { font-size: 14px; }
+
+/* Upload tab — custom font management list */
+.custom-fonts-list { display: flex; flex-direction: column; gap: 8px; }
+.custom-font-row { display: grid; grid-template-columns: 200px 1fr auto; gap: 16px; align-items: center; padding: 12px 14px; background: var(--admin-bg-elevated); border: 1px solid var(--admin-border); border-radius: var(--admin-radius); }
+.custom-font-meta { display: flex; flex-direction: column; gap: 2px; }
+.custom-font-meta strong { color: var(--admin-fg); }
+.custom-font-preview { font-size: 16px; color: var(--admin-fg); }
+.empty-hint { padding: 28px; text-align: center; background: var(--admin-bg-elevated); border: 1px dashed var(--admin-border); border-radius: var(--admin-radius); color: var(--admin-fg-muted); }
 </style>
 
 <script>
 (function(){
-  document.querySelectorAll(".font-preview").forEach(function(el){
+  document.querySelectorAll(".font-preview, .custom-font-preview").forEach(function(el){
     var css = el.getAttribute("data-family-css");
     if (css) el.style.fontFamily = css;
   });

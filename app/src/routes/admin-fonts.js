@@ -28,14 +28,21 @@ export default async function adminFontsRoutes(app) {
 
   app.get(`${ADMIN_BASE}/fonts/`, { preHandler: gate }, async (req, reply) => {
     const csrfToken = await reply.generateCsrf();
+    const sansFonts = listFonts("sans");
+    const monoFonts = listFonts("mono");
+    const customCount = sansFonts.concat(monoFonts).filter((f) => f.source === "custom").length;
+    const requestedTab = String(req.query.tab || "picker");
+    const activeTab = ["picker", "upload"].includes(requestedTab) ? requestedTab : "picker";
     return renderHtml(reply, "admin/fonts.eta", {
       adminBase: ADMIN_BASE,
       user: req.currentUser,
       csrfToken,
-      sansFonts: listFonts("sans"),
-      monoFonts: listFonts("mono"),
+      sansFonts,
+      monoFonts,
       activeSans: getActiveFont("sans"),
       activeMono: getActiveFont("mono"),
+      customCount,
+      activeTab,
       flash: req.query.msg || null,
       error: req.query.err || null,
     });
@@ -45,7 +52,7 @@ export default async function adminFontsRoutes(app) {
     const body = req.body || {};
     if (body.sans_id) setActiveFont("sans", body.sans_id);
     if (body.mono_id) setActiveFont("mono", body.mono_id);
-    reply.redirect(`${ADMIN_BASE}/fonts/?msg=saved`);
+    reply.redirect(`${ADMIN_BASE}/fonts/?tab=picker&msg=saved`);
     return reply;
   });
 
@@ -69,10 +76,10 @@ export default async function adminFontsRoutes(app) {
       const weight = part.fields?.weight?.value;
       const role = part.fields?.role?.value;
       await ingestFontUpload({ buffer, family, weight, role, originalFilename: part.filename });
-      reply.redirect(`${ADMIN_BASE}/fonts/?msg=uploaded`);
+      reply.redirect(`${ADMIN_BASE}/fonts/?tab=upload&msg=uploaded`);
     } catch (err) {
       req.log.warn({ err }, "font upload failed");
-      reply.redirect(`${ADMIN_BASE}/fonts/?err=${encodeURIComponent(err.message)}`);
+      reply.redirect(`${ADMIN_BASE}/fonts/?tab=upload&err=${encodeURIComponent(err.message)}`);
     }
     return reply;
   });
@@ -81,9 +88,9 @@ export default async function adminFontsRoutes(app) {
     try {
       const ok = deleteCustomFont(req.params.id);
       if (!ok) { reply.code(404); return "Not found."; }
-      reply.redirect(`${ADMIN_BASE}/fonts/?msg=deleted`);
+      reply.redirect(`${ADMIN_BASE}/fonts/?tab=upload&msg=deleted`);
     } catch (err) {
-      reply.redirect(`${ADMIN_BASE}/fonts/?err=${encodeURIComponent(err.message)}`);
+      reply.redirect(`${ADMIN_BASE}/fonts/?tab=upload&err=${encodeURIComponent(err.message)}`);
     }
     return reply;
   });
