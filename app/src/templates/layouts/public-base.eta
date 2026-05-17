@@ -52,11 +52,17 @@ function renderMenuItem(m) {
   <link rel="stylesheet" href="<%= prefix %>assets/css/tokens.css" />
   <link rel="stylesheet" href="<%= prefix %>assets/css/site.css" />
   <script src="<%= prefix %>assets/js/theme.js"></script>
+  <script src="<%= prefix %>assets/js/nav.js" defer></script>
 </head>
 <body>
   <header class="site-header">
     <div class="wrap">
       <a href="<%= prefix || './' %>" class="brand"><%= it.site["site.brand"] %><span>.</span></a>
+      <input type="checkbox" id="nav-toggle" class="nav-toggle-input" aria-hidden="true" />
+      <label for="nav-toggle" class="nav-toggle" aria-label="Toggle menu" role="button" tabindex="0">
+        <svg class="icon-hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
       <nav class="nav" aria-label="Primary" data-menu-style="<%= menuStyle %>" data-featured-style="<%= featuredStyle %>">
         <% menu.forEach(function(m){ %><%~ renderMenuItem(m) %><% }); %>
         <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">

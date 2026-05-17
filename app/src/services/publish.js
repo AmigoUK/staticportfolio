@@ -77,6 +77,7 @@ async function runPublish(logger) {
   copyFileSync(join(SOURCE_ASSETS, "css", "reset.css"), join(STAGING_DIR, "assets", "css", "reset.css"));
   copyFileSync(join(SOURCE_ASSETS, "css", "site.css"), join(STAGING_DIR, "assets", "css", "site.css"));
   copyFileSync(join(SOURCE_ASSETS, "js", "theme.js"), join(STAGING_DIR, "assets", "js", "theme.js"));
+  copyFileSync(join(SOURCE_ASSETS, "js", "nav.js"), join(STAGING_DIR, "assets", "js", "nav.js"));
 
   let fontsCopied = 0;
   for (const face of fontFaces) {
