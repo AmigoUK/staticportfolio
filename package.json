@@ -1,0 +1,35 @@
+{
+  "name": "staticportfolio-cms",
+  "version": "0.1.0",
+  "description": "SQLite-backed CMS that publishes a static portfolio site",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "dev": "node --watch app/src/server.js",
+    "start": "node app/src/server.js",
+    "test": "node --test app/src/**/*.test.js",
+    "create-admin": "node scripts/create-admin.js",
+    "reset-password": "node scripts/reset-password.js",
+    "seed": "node seed/seed-from-static.js",
+    "publish": "node scripts/publish.js"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^9.3.1",
+    "@fastify/csrf-protection": "^6.4.1",
+    "@fastify/multipart": "^8.3.0",
+    "@fastify/rate-limit": "^9.1.0",
+    "@fastify/session": "^10.7.0",
+    "@fastify/static": "^7.0.4",
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^11.5.0",
+    "eta": "^3.5.0",
+    "fastify": "^4.28.1",
+    "node-html-parser": "^6.1.13",
+    "sanitize-html": "^2.13.1",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {}
+}
