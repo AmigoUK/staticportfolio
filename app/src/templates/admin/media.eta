@@ -1,0 +1,73 @@
+<% layout("/layouts/admin-base", { title: "Media library", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<section class="page">
+  <header class="page-head">
+    <h1>Media library</h1>
+    <p>Upload images for hero / covers / inline use. Re-encoded through sharp (EXIF stripped); SVG and other formats rejected.</p>
+  </header>
+
+  <% if (it.flash === "uploaded") { %><p class="flash flash-ok">File uploaded.</p><% } %>
+  <% if (it.flash === "alt-saved") { %><p class="flash flash-ok">Alt text updated.</p><% } %>
+  <% if (it.flash === "deleted") { %><p class="flash flash-ok">Media deleted.</p><% } %>
+  <% if (it.error) { %><p class="flash flash-warn"><%= it.error %></p><% } %>
+
+  <form class="media-upload" method="post" action="<%= it.adminBase %>/media/upload" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+    <label class="form-row">
+      <span>Choose an image (JPEG / PNG / WebP, ≤ 8 MB)</span>
+      <input type="file" name="file" accept="image/jpeg,image/png,image/webp" required />
+    </label>
+    <label class="form-row">
+      <span>Alt text (describes the image for screen readers; required for accessibility)</span>
+      <input type="text" name="alt" maxlength="500" placeholder="e.g. Library shelves — RAG Eval Harness cover" />
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Upload</button>
+    </div>
+  </form>
+
+  <% if (it.media.length === 0) { %>
+  <p class="empty-hint">No media yet. Upload your first image above.</p>
+  <% } else { %>
+  <div class="media-grid">
+    <% it.media.forEach(function(m){ %>
+    <div class="media-card">
+      <a class="media-thumb" href="<%= it.adminBase %>/uploads/<%= m.filename %>" target="_blank" rel="noopener">
+        <img src="<%= it.adminBase %>/uploads/<%= m.filename %>" alt="<%= m.alt || m.original_filename || m.filename %>" loading="lazy" />
+      </a>
+      <div class="media-meta">
+        <p class="media-name"><%= m.original_filename || m.filename %></p>
+        <p class="media-info"><%= m.width %>×<%= m.height %> · <%= m.mime_type %> · <%= (m.bytes / 1024).toFixed(1) %> KB</p>
+      </div>
+      <form method="post" action="<%= it.adminBase %>/media/<%= m.id %>/alt" class="media-alt-form">
+        <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+        <label>
+          <span>Alt text</span>
+          <input type="text" name="alt" value="<%= m.alt || '' %>" maxlength="500" />
+        </label>
+        <button type="submit" class="btn btn-ghost btn-sm">Save alt</button>
+      </form>
+      <form method="post" action="<%= it.adminBase %>/media/<%= m.id %>/delete" class="media-delete-form" onsubmit="return confirm('Delete this media file? Cannot be undone.')">
+        <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+        <button type="submit" class="btn btn-ghost btn-danger btn-sm">Delete</button>
+      </form>
+    </div>
+    <% }); %>
+  </div>
+  <% } %>
+</section>
+
+<style>
+.media-upload { background: var(--admin-bg-elevated); padding: 18px 20px; border-radius: var(--admin-radius); border: 1px solid var(--admin-border); margin-bottom: 24px; }
+.empty-hint { padding: 28px; text-align: center; background: var(--admin-bg-elevated); border: 1px dashed var(--admin-border); border-radius: var(--admin-radius); color: var(--admin-fg-muted); }
+.media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.media-card { background: var(--admin-bg-elevated); border: 1px solid var(--admin-border); border-radius: var(--admin-radius); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.media-thumb { display: block; height: 140px; overflow: hidden; border-radius: var(--admin-radius-sm); background: var(--admin-bg); }
+.media-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.media-name { font-size: 13px; font-weight: 500; margin: 0; word-break: break-all; color: var(--admin-fg); }
+.media-info { font-size: 12px; color: var(--admin-fg-muted); margin: 0; }
+.media-alt-form, .media-delete-form { margin: 0; }
+.media-alt-form label { display: block; font-size: 12px; }
+.media-alt-form label span { display: block; color: var(--admin-fg-muted); margin-bottom: 2px; }
+.media-alt-form input { width: 100%; padding: 4px 6px; font-size: 12px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+</style>
