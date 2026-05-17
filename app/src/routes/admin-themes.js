@@ -7,14 +7,23 @@ import {
   updateTheme,
   activateTheme,
   deleteTheme,
+  createBlankTheme,
+  exportThemeAsJson,
+  importThemeFromJson,
   TOKEN_KEYS,
 } from "../services/themes.js";
+import multipart from "@fastify/multipart";
+import CSRF from "@fastify/csrf";
 
 const ADMIN_BASE = process.env.ADMIN_BASE_PATH || "/admin";
+const csrfTokens = new CSRF();
 
 export default async function adminThemesRoutes(app) {
   const gate = requireAdmin(`${ADMIN_BASE}/login`);
   const csrfPre = { preHandler: [gate, app.csrfProtection] };
+
+  // Multipart for the import-JSON route. 1 MB cap — themes are tiny.
+  await app.register(multipart, { limits: { fileSize: 1024 * 1024, files: 1 } });
 
   app.get(`${ADMIN_BASE}/themes/`, { preHandler: gate }, async (req, reply) => {
     const csrfToken = await reply.generateCsrf();
@@ -24,7 +33,48 @@ export default async function adminThemesRoutes(app) {
       csrfToken,
       themes: listThemes(),
       flash: req.query.msg || null,
+      error: req.query.err || null,
     });
+  });
+
+  app.post(`${ADMIN_BASE}/themes/new`, csrfPre, async (_req, reply) => {
+    const created = createBlankTheme();
+    reply.redirect(`${ADMIN_BASE}/themes/${created.id}/edit`);
+    return reply;
+  });
+
+  app.get(`${ADMIN_BASE}/themes/:id/export`, { preHandler: gate }, async (req, reply) => {
+    const data = exportThemeAsJson(req.params.id);
+    if (!data) { reply.code(404); return "Theme not found."; }
+    const safeName = String(data.name).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "theme";
+    reply.type("application/json; charset=utf-8");
+    reply.header("content-disposition", `attachment; filename="theme-${safeName}.json"`);
+    return JSON.stringify(data, null, 2);
+  });
+
+  app.post(`${ADMIN_BASE}/themes/import`, { preHandler: gate }, async (req, reply) => {
+    const part = await req.file();
+    if (!part) {
+      reply.redirect(`${ADMIN_BASE}/themes/?err=${encodeURIComponent("No file in request.")}`);
+      return reply;
+    }
+    const secret = req.session?._csrf;
+    const submittedToken = part.fields?._csrf?.value;
+    if (!secret || !submittedToken || !csrfTokens.verify(secret, submittedToken)) {
+      reply.code(403);
+      reply.redirect(`${ADMIN_BASE}/themes/?err=${encodeURIComponent("Invalid CSRF token.")}`);
+      return reply;
+    }
+    try {
+      const buffer = await part.toBuffer();
+      const text = buffer.toString("utf8");
+      const created = importThemeFromJson(text);
+      reply.redirect(`${ADMIN_BASE}/themes/?msg=imported&slug=${encodeURIComponent(created.name)}`);
+    } catch (err) {
+      req.log.warn({ err }, "theme import failed");
+      reply.redirect(`${ADMIN_BASE}/themes/?err=${encodeURIComponent(err.message)}`);
+    }
+    return reply;
   });
 
   app.get(`${ADMIN_BASE}/themes/:id/edit`, { preHandler: gate }, async (req, reply) => {

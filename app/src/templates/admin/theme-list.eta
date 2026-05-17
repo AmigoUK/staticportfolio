@@ -1,17 +1,43 @@
 <% layout("/layouts/admin-base", { title: "Themes", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
 <section class="page">
   <header class="page-head">
-    <h1>Themes</h1>
-    <p>Pick the active theme, or clone a preset to make your own. Presets are read-only.</p>
+    <div class="head-row">
+      <h1>Themes</h1>
+      <div class="head-actions">
+        <form method="post" action="<%= it.adminBase %>/themes/new" class="inline">
+          <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+          <button type="submit" class="btn btn-primary">+ New theme</button>
+        </form>
+        <button type="button" class="btn btn-ghost" onclick="document.getElementById('theme-import-form').classList.toggle('is-open')">Import JSON…</button>
+      </div>
+    </div>
+    <p>Pick the active theme, clone a preset to customize, or build your own from scratch. Presets are read-only. Custom themes can be exported / imported as JSON.</p>
   </header>
+
+  <form id="theme-import-form" method="post" action="<%= it.adminBase %>/themes/import" enctype="multipart/form-data" class="theme-import-form">
+    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+    <p class="form-help">Upload a theme JSON file. The shape is <code>{ "name": "…", "tokens": { "light": { … }, "dark": { … } } }</code> — the same format the <strong>Export</strong> button produces. Hex colors only.</p>
+    <label class="form-row">
+      <span>Theme JSON file</span>
+      <input type="file" name="file" accept="application/json,.json" required />
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Import theme</button>
+      <button type="button" class="btn btn-ghost" onclick="document.getElementById('theme-import-form').classList.remove('is-open')">Cancel</button>
+    </div>
+  </form>
 
   <% if (it.flash) { %>
   <p class="flash flash-ok">
     <% if (it.flash === "saved") { %>Theme saved.<% } %>
     <% if (it.flash === "activated") { %>Theme activated.<% } %>
     <% if (it.flash === "deleted") { %>Theme deleted.<% } %>
+    <% if (it.flash === "imported") { %>Theme imported.<% } %>
     Click <strong>Publish</strong> in the header to apply the change to the public site.
   </p>
+  <% } %>
+  <% if (it.error) { %>
+  <p class="flash flash-warn"><%= it.error %></p>
   <% } %>
 
   <table class="data-table">
@@ -35,6 +61,7 @@
             <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
             <button type="submit" class="btn btn-ghost">Clone</button>
           </form>
+          <a class="btn btn-ghost" href="<%= it.adminBase %>/themes/<%= t.id %>/export" title="Download as JSON">Export</a>
           <% if (!t.is_preset) { %>
           <a class="btn btn-ghost" href="<%= it.adminBase %>/themes/<%= t.id %>/edit">Edit</a>
           <% if (!t.is_active) { %>
@@ -50,3 +77,14 @@
     </tbody>
   </table>
 </section>
+
+<style>
+.head-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.head-actions { display: flex; gap: 8px; align-items: center; }
+.head-actions .inline { display: inline; margin: 0; }
+
+.theme-import-form { display: none; background: var(--admin-bg-elevated); border: 1px dashed var(--admin-border); border-radius: var(--admin-radius); padding: 18px 22px; margin: 0 0 20px; }
+.theme-import-form.is-open { display: block; }
+.theme-import-form .form-help { margin: 0 0 14px; font-size: 13px; color: var(--admin-fg-muted); }
+.theme-import-form .form-help code { background: var(--admin-bg); padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+</style>

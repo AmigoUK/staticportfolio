@@ -225,6 +225,60 @@ function nextCloneName(base) {
   return candidate;
 }
 
+function nextNameWithStem(stem) {
+  const db = getDb();
+  let candidate = stem;
+  let n = 2;
+  while (db.prepare("SELECT 1 FROM themes WHERE name = ?").get(candidate)) {
+    candidate = `${stem} (${n++})`;
+  }
+  return candidate;
+}
+
+export function createBlankTheme() {
+  // Starting point: a copy of the first preset's tokens (Cream + Indigo).
+  // Users tweak from here rather than starting from black & white.
+  const tokens = JSON.parse(JSON.stringify(PRESET_THEMES[0].tokens));
+  const db = getDb();
+  const name = nextNameWithStem("New theme");
+  const info = db
+    .prepare("INSERT INTO themes (name, is_preset, tokens_json) VALUES (?, 0, ?)")
+    .run(name, JSON.stringify(tokens));
+  return getThemeById(info.lastInsertRowid);
+}
+
+export function exportThemeAsJson(id) {
+  const theme = getThemeById(id);
+  if (!theme) return null;
+  return {
+    name: theme.name,
+    tokens: theme.tokens,
+  };
+}
+
+export function importThemeFromJson(raw) {
+  let parsed;
+  try {
+    parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+  } catch (e) {
+    const err = new Error("Not valid JSON."); err.code = "BAD_JSON"; throw err;
+  }
+  if (!parsed || typeof parsed !== "object") {
+    const e = new Error("JSON must be an object."); e.code = "BAD_JSON"; throw e;
+  }
+  if (!parsed.tokens || typeof parsed.tokens !== "object") {
+    const e = new Error("JSON must have a 'tokens' object."); e.code = "BAD_JSON"; throw e;
+  }
+  validateTokens(parsed.tokens);
+  const requestedName = String(parsed.name || "Imported theme").trim().slice(0, 100);
+  const name = nextNameWithStem(requestedName);
+  const db = getDb();
+  const info = db
+    .prepare("INSERT INTO themes (name, is_preset, tokens_json) VALUES (?, 0, ?)")
+    .run(name, JSON.stringify(parsed.tokens));
+  return getThemeById(info.lastInsertRowid);
+}
+
 export function updateTheme(id, { name, tokens }) {
   const db = getDb();
   const theme = getThemeById(id);
