@@ -1,0 +1,43 @@
+# Systemd unit for the Portfolio CMS admin app.
+#
+# Install:
+#   sudo cp deploy/portfolio-cms.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now portfolio-cms
+#   sudo systemctl status portfolio-cms
+#
+# Logs:
+#   journalctl -u portfolio-cms -f
+#
+# Restart after deploys:
+#   sudo systemctl restart portfolio-cms
+#
+# Adjust User/Group/WorkingDirectory for your install.
+
+[Unit]
+Description=Portfolio CMS (Fastify admin behind Apache reverse proxy)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/html/staticportfolio
+ExecStart=/usr/bin/node --env-file=.env app/src/server.js
+Restart=on-failure
+RestartSec=3
+User=www-data
+Group=www-data
+Environment=NODE_ENV=production
+# Limit how loud the process can be in journalctl.
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=portfolio-cms
+
+# Filesystem hardening (loosen if your data/uploads dir is elsewhere).
+ProtectSystem=full
+ProtectHome=read-only
+PrivateTmp=yes
+NoNewPrivileges=yes
+ReadWritePaths=/var/www/html/staticportfolio/data /var/www/html/staticportfolio/uploads /var/www/html/staticportfolio/public /var/www/html/staticportfolio/public.next /var/www/html/staticportfolio/public.prev
+
+[Install]
+WantedBy=multi-user.target
