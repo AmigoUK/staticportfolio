@@ -27,6 +27,10 @@ const adminBase = it.adminBase || "/admin";
       <a href="<%= adminBase %>/fonts/">Fonts</a>
       <a href="<%= adminBase %>/settings/">Settings</a>
     </nav>
+    <form class="admin-publish-inline" method="post" action="<%= adminBase %>/publish">
+      <input type="hidden" name="_csrf" value="<%= it.csrfToken || '' %>" />
+      <button type="submit" class="btn btn-primary btn-publish" title="Regenerate the public site with current DB state">Publish</button>
+    </form>
     <form class="admin-logout" method="post" action="<%= adminBase %>/logout">
       <input type="hidden" name="_csrf" value="<%= it.csrfToken || '' %>" />
       <button type="submit" class="btn btn-ghost">Log out (<%= user.username %>)</button>
@@ -34,7 +38,27 @@ const adminBase = it.adminBase || "/admin";
   </header>
   <% } %>
   <main class="admin-main">
+    <div id="global-flash" hidden></div>
     <%~ it.body %>
   </main>
+  <% if (user) { %>
+  <script>
+  (function(){
+    var params = new URLSearchParams(location.search);
+    var box = document.getElementById("global-flash");
+    if (!box) return;
+    if (params.get("msg") === "published") {
+      var pages = params.get("pages") || "?";
+      box.className = "flash flash-ok";
+      box.textContent = "Published — " + pages + " pages regenerated. The public site is live.";
+      box.hidden = false;
+    } else if (params.get("err")) {
+      box.className = "flash flash-warn";
+      box.textContent = params.get("err");
+      box.hidden = false;
+    }
+  })();
+  </script>
+  <% } %>
 </body>
 </html>

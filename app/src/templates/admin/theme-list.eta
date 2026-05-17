@@ -10,6 +10,7 @@
     <% if (it.flash === "saved") { %>Theme saved.<% } %>
     <% if (it.flash === "activated") { %>Theme activated.<% } %>
     <% if (it.flash === "deleted") { %>Theme deleted.<% } %>
+    Click <strong>Publish</strong> in the header to apply the change to the public site.
   </p>
   <% } %>
 

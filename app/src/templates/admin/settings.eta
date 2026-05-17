@@ -6,7 +6,7 @@
   </header>
 
   <% if (it.flash === "saved") { %>
-  <p class="flash flash-ok">Settings saved.</p>
+  <p class="flash flash-ok">Settings saved. Click <strong>Publish</strong> in the header to apply.</p>
   <% } %>
 
   <form method="post" action="<%= it.adminBase %>/settings/">
