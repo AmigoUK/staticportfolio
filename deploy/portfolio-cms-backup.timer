@@ -1,0 +1,16 @@
+# Systemd timer: daily backup at 03:30, with a randomized 10-minute jitter
+# so co-tenants on the box don't all sync at exactly the same moment.
+# Persistent=true catches up if the box was off when the slot passed.
+
+[Unit]
+Description=Portfolio CMS daily backup
+Requires=portfolio-cms-backup.service
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+RandomizedDelaySec=600
+Persistent=true
+Unit=portfolio-cms-backup.service
+
+[Install]
+WantedBy=timers.target

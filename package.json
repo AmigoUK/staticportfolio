@@ -14,7 +14,8 @@
     "create-admin": "node --env-file=.env scripts/create-admin.js",
     "reset-password": "node --env-file=.env scripts/reset-password.js",
     "seed": "node --env-file=.env seed/seed-from-static.js",
-    "publish": "node --env-file=.env scripts/publish.js"
+    "publish": "node --env-file=.env scripts/publish.js",
+    "backup": "node --env-file=.env scripts/backup.js"
   },
   "dependencies": {
     "@fastify/cookie": "^9.3.1",

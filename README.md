@@ -84,19 +84,32 @@ Two long-running pieces: Apache 2.4 (or any static webserver) serving
 ### Backup
 
 Two paths are precious: `data/portfolio.db` and `uploads/`. Everything
-else regenerates from them.
+else regenerates from them. `scripts/backup.js` takes a hot snapshot
+of the DB via SQLite's online-backup API (no app downtime) and rsyncs
+the uploads dir to `/var/backups/portfolio-cms/`. Retention defaults
+to 14 days, pruned on each run.
 
 ```sh
-# Backup (run from cron nightly)
-sqlite3 data/portfolio.db ".backup /backups/portfolio-$(date +%Y%m%d).db"
-rsync -a uploads/ /backups/uploads/
+# One-off manual backup
+npm run backup
+ls /var/backups/portfolio-cms/
+
+# Scheduled daily via systemd timer (already installed in production):
+sudo cp deploy/portfolio-cms-backup.{service,timer} /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now portfolio-cms-backup.timer
+systemctl list-timers portfolio-cms-backup --no-pager
+journalctl -u portfolio-cms-backup -n 30 --no-pager
 
 # Restore
-cp /backups/portfolio-YYYYMMDD.db data/portfolio.db
-rsync -a /backups/uploads/ uploads/
-sudo systemctl restart portfolio-cms
+sudo systemctl stop portfolio-cms
+cp /var/backups/portfolio-cms/portfolio-YYYY-MM-DD.db data/portfolio.db
+rsync -a --delete /var/backups/portfolio-cms/uploads/ uploads/
+sudo systemctl start portfolio-cms
 npm run publish
 ```
+
+Override via env: `BACKUP_DIR`, `RETAIN_DAYS`.
 
 ### Health check
 
