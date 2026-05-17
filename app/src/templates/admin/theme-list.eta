@@ -1,0 +1,51 @@
+<% layout("/layouts/admin-base", { title: "Themes", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<section class="page">
+  <header class="page-head">
+    <h1>Themes</h1>
+    <p>Pick the active theme, or clone a preset to make your own. Presets are read-only.</p>
+  </header>
+
+  <% if (it.flash) { %>
+  <p class="flash flash-ok">
+    <% if (it.flash === "saved") { %>Theme saved.<% } %>
+    <% if (it.flash === "activated") { %>Theme activated.<% } %>
+    <% if (it.flash === "deleted") { %>Theme deleted.<% } %>
+  </p>
+  <% } %>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Name</th><th>Kind</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      <% it.themes.forEach(function(t){ %>
+      <tr>
+        <td><%= t.name %></td>
+        <td><%= t.is_preset ? "Preset" : "Custom" %></td>
+        <td><%= t.is_active ? "✓ Active" : "" %></td>
+        <td class="actions">
+          <% if (!t.is_active) { %>
+          <form method="post" action="<%= it.adminBase %>/themes/<%= t.id %>/activate" class="inline">
+            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+            <button type="submit" class="btn btn-ghost">Activate</button>
+          </form>
+          <% } %>
+          <form method="post" action="<%= it.adminBase %>/themes/<%= t.id %>/clone" class="inline">
+            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+            <button type="submit" class="btn btn-ghost">Clone</button>
+          </form>
+          <% if (!t.is_preset) { %>
+          <a class="btn btn-ghost" href="<%= it.adminBase %>/themes/<%= t.id %>/edit">Edit</a>
+          <% if (!t.is_active) { %>
+          <form method="post" action="<%= it.adminBase %>/themes/<%= t.id %>/delete" class="inline" onsubmit="return confirm('Delete this theme?')">
+            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+            <button type="submit" class="btn btn-ghost btn-danger">Delete</button>
+          </form>
+          <% } %>
+          <% } %>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</section>

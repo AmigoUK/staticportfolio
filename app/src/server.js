@@ -9,6 +9,10 @@ import { fileURLToPath } from "node:url";
 import { getDb } from "./db/connect.js";
 import authRoutes from "./routes/auth.js";
 import adminPagesRoutes from "./routes/admin-pages.js";
+import adminThemesRoutes from "./routes/admin-themes.js";
+import adminSettingsRoutes from "./routes/admin-settings.js";
+import { seedPresets } from "./services/themes.js";
+import { seedDefaults } from "./services/settings.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -41,6 +45,8 @@ export async function buildServer() {
   });
 
   getDb();
+  seedPresets();
+  seedDefaults();
 
   app.addContentTypeParser(
     "application/x-www-form-urlencoded",
@@ -80,6 +86,8 @@ export async function buildServer() {
   });
 
   await app.register(authRoutes);
+  await app.register(adminThemesRoutes);
+  await app.register(adminSettingsRoutes);
   await app.register(adminPagesRoutes);
 
   app.get("/healthz", async () => ({ ok: true }));

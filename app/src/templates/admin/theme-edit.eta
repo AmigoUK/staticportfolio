@@ -1,0 +1,139 @@
+<% layout("/layouts/admin-base", { title: "Edit theme — " + it.theme.name, user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<section class="page page-theme-edit">
+  <header class="page-head">
+    <p class="back-crumb"><a href="<%= it.adminBase %>/themes/">← Themes</a></p>
+    <h1>Edit theme</h1>
+    <% if (it.theme.is_preset) { %>
+    <p class="flash flash-warn">This is a preset theme and cannot be edited. Clone it from the list page first.</p>
+    <% } %>
+  </header>
+
+  <form id="theme-form" method="post" action="<%= it.adminBase %>/themes/<%= it.theme.id %>" <%= it.theme.is_preset ? "data-locked='1'" : "" %>>
+    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+    <input type="hidden" name="tokens_json" id="tokens-json" value="<%= JSON.stringify(it.theme.tokens) %>" />
+
+    <label class="form-row">
+      <span>Name</span>
+      <input type="text" name="name" required maxlength="100" value="<%= it.theme.name %>" <%= it.theme.is_preset ? "readonly" : "" %> />
+    </label>
+
+    <div class="theme-grid">
+      <div class="theme-col">
+        <h2>Light mode</h2>
+        <% it.tokenKeys.forEach(function(key){ %>
+        <label class="theme-token">
+          <span class="token-name"><%= key %></span>
+          <span class="token-input-wrap">
+            <input type="color" data-mode="light" data-key="<%= key %>" value="<%= it.theme.tokens.light[key] %>" <%= it.theme.is_preset ? "disabled" : "" %> />
+            <input type="text" class="token-hex" data-mode="light" data-key="<%= key %>" value="<%= it.theme.tokens.light[key] %>" pattern="#[0-9a-fA-F]{6}" maxlength="7" <%= it.theme.is_preset ? "readonly" : "" %> />
+          </span>
+        </label>
+        <% }); %>
+      </div>
+
+      <div class="theme-col">
+        <h2>Dark mode</h2>
+        <% it.tokenKeys.forEach(function(key){ %>
+        <label class="theme-token">
+          <span class="token-name"><%= key %></span>
+          <span class="token-input-wrap">
+            <input type="color" data-mode="dark" data-key="<%= key %>" value="<%= it.theme.tokens.dark[key] %>" <%= it.theme.is_preset ? "disabled" : "" %> />
+            <input type="text" class="token-hex" data-mode="dark" data-key="<%= key %>" value="<%= it.theme.tokens.dark[key] %>" pattern="#[0-9a-fA-F]{6}" maxlength="7" <%= it.theme.is_preset ? "readonly" : "" %> />
+          </span>
+        </label>
+        <% }); %>
+      </div>
+
+      <div class="theme-col theme-preview-col">
+        <h2>Preview</h2>
+        <div class="theme-preview-tabs">
+          <button type="button" data-mode="light" class="active">Light</button>
+          <button type="button" data-mode="dark">Dark</button>
+        </div>
+        <iframe id="theme-preview" title="Theme preview" loading="eager"></iframe>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" <%= it.theme.is_preset ? "disabled" : "" %>>Save</button>
+      <a href="<%= it.adminBase %>/themes/" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<script>
+(function(){
+  var form = document.getElementById("theme-form");
+  if (!form) return;
+  var locked = form.dataset.locked === "1";
+  var json = document.getElementById("tokens-json");
+  var preview = document.getElementById("theme-preview");
+  var tabs = document.querySelectorAll(".theme-preview-tabs button");
+  var tokens = JSON.parse(json.value);
+  var mode = "light";
+
+  function render() {
+    var t = tokens[mode];
+    var rootRules = Object.keys(t).map(function(k){ return "--" + k + ":" + t[k]; }).join(";");
+    var bg = t.bg, fg = t.fg, fgMuted = t["fg-muted"], border = t.border;
+    var bgElev = t["bg-elevated"], accent = t.accent, accentSubtle = t["accent-subtle"];
+    var html = "<!doctype html><html><head><meta charset='utf-8'><style>" +
+      "html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.45;background:" + bg + ";color:" + fg + ";}" +
+      ".wrap{padding:24px;}" +
+      ".card{background:" + bgElev + ";border:1px solid " + border + ";border-radius:10px;padding:18px;}" +
+      ".kicker{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:" + fgMuted + ";}" +
+      "h2{font-size:22px;margin:8px 0;}" +
+      "p{margin:0 0 12px;color:" + fgMuted + ";font-size:14px;}" +
+      ".tag{display:inline-block;padding:2px 8px;background:" + accentSubtle + ";color:" + accent + ";border-radius:4px;font-size:12px;margin-right:6px;}" +
+      "a.btn{display:inline-block;padding:8px 14px;background:" + accent + ";color:#fff;border-radius:6px;text-decoration:none;font-weight:500;font-size:14px;}" +
+      "</style></head><body><div class='wrap'>" +
+      "<div class='card'>" +
+      "<p class='kicker'>Sample card</p>" +
+      "<h2>Sample headline</h2>" +
+      "<p>A short paragraph that uses the muted foreground color to demonstrate readability.</p>" +
+      "<div><span class='tag'>Tag</span><span class='tag'>Another</span></div>" +
+      "<p style='margin-top:14px;'><a href='#' class='btn'>Primary action</a></p>" +
+      "</div></div></body></html>";
+    preview.srcdoc = html;
+  }
+
+  function syncJson() {
+    json.value = JSON.stringify(tokens);
+  }
+
+  if (!locked) {
+    document.querySelectorAll("input[type='color']").forEach(function(input){
+      input.addEventListener("input", function(){
+        var m = input.dataset.mode, k = input.dataset.key;
+        tokens[m][k] = input.value.toUpperCase();
+        var hex = document.querySelector(".token-hex[data-mode='" + m + "'][data-key='" + k + "']");
+        if (hex) hex.value = tokens[m][k];
+        syncJson();
+        if (m === mode) render();
+      });
+    });
+    document.querySelectorAll("input.token-hex").forEach(function(input){
+      input.addEventListener("change", function(){
+        if (!/^#[0-9a-fA-F]{6}$/.test(input.value)) return;
+        var m = input.dataset.mode, k = input.dataset.key;
+        tokens[m][k] = input.value.toUpperCase();
+        var color = document.querySelector("input[type='color'][data-mode='" + m + "'][data-key='" + k + "']");
+        if (color) color.value = tokens[m][k];
+        syncJson();
+        if (m === mode) render();
+      });
+    });
+  }
+
+  tabs.forEach(function(b){
+    b.addEventListener("click", function(){
+      tabs.forEach(function(x){ x.classList.remove("active"); });
+      b.classList.add("active");
+      mode = b.dataset.mode;
+      render();
+    });
+  });
+
+  render();
+})();
+</script>

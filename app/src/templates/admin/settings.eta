@@ -1,0 +1,67 @@
+<% layout("/layouts/admin-base", { title: "Site settings", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<section class="page">
+  <header class="page-head">
+    <h1>Site settings</h1>
+    <p>Title, brand, social links, and contact email. Changes apply on the next publish.</p>
+  </header>
+
+  <% if (it.flash === "saved") { %>
+  <p class="flash flash-ok">Settings saved.</p>
+  <% } %>
+
+  <form method="post" action="<%= it.adminBase %>/settings/">
+    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+
+    <fieldset class="form-section">
+      <legend>Site identity</legend>
+      <label class="form-row">
+        <span>Site title (used in &lt;title&gt;)</span>
+        <input type="text" name="site.title" maxlength="200" value="<%= it.settings['site.title'] || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>Brand name (shown in header)</span>
+        <input type="text" name="site.brand" maxlength="60" value="<%= it.settings['site.brand'] || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>Tagline</span>
+        <input type="text" name="site.tagline" maxlength="160" value="<%= it.settings['site.tagline'] || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>Home page lede</span>
+        <textarea name="site.lede" rows="3" maxlength="500"><%= it.settings['site.lede'] || '' %></textarea>
+      </label>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Contact + social</legend>
+      <label class="form-row">
+        <span>Contact email</span>
+        <input type="email" name="site.contact_email" maxlength="120" value="<%= it.settings['site.contact_email'] || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>Public base URL (e.g. https://example.com or with /staticportfolio path)</span>
+        <input type="url" name="site.base_url" maxlength="250" value="<%= it.settings['site.base_url'] || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>GitHub URL</span>
+        <input type="url" name="social.github" maxlength="250" value="<%= it.settings['social.github'] || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>Hugging Face URL</span>
+        <input type="url" name="social.huggingface" maxlength="250" value="<%= it.settings['social.huggingface'] || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>LinkedIn URL</span>
+        <input type="url" name="social.linkedin" maxlength="250" value="<%= it.settings['social.linkedin'] || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>Calendar / booking URL</span>
+        <input type="url" name="social.calendar" maxlength="250" value="<%= it.settings['social.calendar'] || '' %>" />
+      </label>
+    </fieldset>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save settings</button>
+    </div>
+  </form>
+</section>

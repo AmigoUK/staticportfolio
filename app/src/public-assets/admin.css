@@ -136,3 +136,133 @@ p { margin: 0 0 12px; color: var(--admin-fg-muted); }
 .dash-publish-hint { font-size: 13px; margin-top: 8px; }
 
 .dash-lede { font-size: 14px; }
+
+/* Page heads / flashes */
+.page-head { margin-bottom: 24px; }
+.page-head h1 { font-size: 26px; }
+.back-crumb { margin: 0 0 6px; font-size: 13px; }
+.back-crumb a { color: var(--admin-fg-muted); }
+.back-crumb a:hover { color: var(--admin-fg); }
+
+.flash {
+  padding: 10px 14px;
+  margin: 0 0 18px;
+  border-radius: var(--admin-radius-sm);
+  font-size: 14px;
+}
+.flash-ok { background: #e6f4e6; color: #14532d; }
+.flash-warn { background: #fef3c7; color: #78350f; }
+@media (prefers-color-scheme: dark) {
+  .flash-ok { background: #14321e; color: #c1f5d4; }
+  .flash-warn { background: #3b2c0e; color: #fde68a; }
+}
+
+/* Tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--admin-bg-elevated);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  overflow: hidden;
+}
+.data-table th, .data-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--admin-border);
+  font-size: 14px;
+  vertical-align: middle;
+}
+.data-table th {
+  background: var(--admin-bg);
+  font-weight: 500;
+  color: var(--admin-fg-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.actions { white-space: nowrap; }
+.actions .btn { padding: 4px 10px; font-size: 13px; }
+.inline { display: inline; }
+.btn-danger { color: #b91c1c; border-color: #fecaca; }
+@media (prefers-color-scheme: dark) {
+  .btn-danger { color: #fca5a5; border-color: #7f1d1d; }
+}
+
+/* Forms */
+.form-row {
+  display: block;
+  margin-bottom: 16px;
+}
+.form-row > span {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: var(--admin-fg-muted);
+}
+.form-row input[type="text"],
+.form-row input[type="email"],
+.form-row input[type="url"],
+.form-row input[type="password"],
+.form-row textarea {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-bg);
+  color: var(--admin-fg);
+}
+.form-row textarea { resize: vertical; min-height: 80px; }
+
+.form-section {
+  margin: 0 0 24px;
+  padding: 18px 20px;
+  background: var(--admin-bg-elevated);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+.form-section legend {
+  padding: 0 8px;
+  font-size: 13px;
+  color: var(--admin-fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.form-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Theme editor */
+.theme-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.6fr;
+  gap: 22px;
+  margin: 16px 0;
+}
+@media (max-width: 900px) {
+  .theme-grid { grid-template-columns: 1fr; }
+}
+.theme-col {
+  padding: 16px;
+  background: var(--admin-bg-elevated);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+}
+.theme-col h2 { font-size: 14px; margin: 0 0 12px; color: var(--admin-fg-muted); text-transform: uppercase; letter-spacing: .05em; }
+.theme-token { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+.token-name { flex: 1; color: var(--admin-fg-muted); font-family: ui-monospace, monospace; }
+.token-input-wrap { display: flex; align-items: center; gap: 6px; }
+input[type="color"] { width: 32px; height: 32px; border: 1px solid var(--admin-border); padding: 0; cursor: pointer; border-radius: 4px; background: transparent; }
+input.token-hex { width: 84px; padding: 4px 6px; font-family: ui-monospace, monospace; font-size: 12px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); }
+.theme-preview-tabs { display: flex; gap: 4px; margin-bottom: 8px; }
+.theme-preview-tabs button { padding: 4px 12px; font-size: 13px; border: 1px solid var(--admin-border); background: transparent; color: var(--admin-fg-muted); cursor: pointer; border-radius: 4px; }
+.theme-preview-tabs button.active { background: var(--admin-accent); color: #fff; border-color: var(--admin-accent); }
+#theme-preview { width: 100%; height: 340px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius); background: #fff; }
+
