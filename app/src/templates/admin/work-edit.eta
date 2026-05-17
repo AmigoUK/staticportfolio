@@ -1,0 +1,115 @@
+<% layout("/layouts/admin-base", { title: (it.mode === "new" ? "New work entry" : "Edit: " + it.entry.title), user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<section class="page">
+  <header class="page-head">
+    <p class="back-crumb"><a href="<%= it.adminBase %>/work/">← Work</a></p>
+    <h1><%= it.mode === "new" ? "New work entry" : "Edit work entry" %></h1>
+  </header>
+
+  <form method="post" action="<%= it.mode === "new" ? it.adminBase + "/work/new" : it.adminBase + "/work/" + it.entry.id %>">
+    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+
+    <fieldset class="form-section">
+      <legend>Identification</legend>
+      <label class="form-row">
+        <span>Slug (kebab-case; becomes /work/{slug}.html)</span>
+        <input type="text" name="slug" required pattern="[a-z0-9](?:[a-z0-9-]{0,80}[a-z0-9])?" value="<%= it.entry.slug %>" />
+      </label>
+      <label class="form-row">
+        <span>Title</span>
+        <input type="text" name="title" required maxlength="200" value="<%= it.entry.title %>" />
+      </label>
+      <label class="form-row">
+        <span>Kicker (shown above the title on cards; e.g. "Open source · Eval")</span>
+        <input type="text" name="kicker" maxlength="100" value="<%= it.entry.kicker || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>Eyebrow (shown above the H1 on the detail page; usually same as kicker)</span>
+        <input type="text" name="eyebrow" maxlength="100" value="<%= it.entry.eyebrow || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>Lede (one-sentence summary; shown on cards and as the detail-page lede)</span>
+        <textarea name="lede" rows="2" maxlength="500"><%= it.entry.lede || '' %></textarea>
+      </label>
+      <label class="form-row">
+        <span>Article meta (small line under the detail-page lede; HTML allowed for inline links)</span>
+        <input type="text" name="article_meta" maxlength="500" value="<%= it.entry.article_meta || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>Tags (comma-separated; e.g. "Python,Ragas,MLflow")</span>
+        <input type="text" name="tags_csv" maxlength="200" value="<%= it.entry.tags_csv || '' %>" />
+      </label>
+      <label class="form-row">
+        <span>Meta description (HTML &lt;meta name="description"&gt;)</span>
+        <input type="text" name="meta_description" maxlength="500" value="<%= it.entry.meta_description || '' %>" />
+      </label>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Cover image</legend>
+      <% if (it.media.length > 0) { %>
+      <label class="form-row">
+        <span>Pick from media library</span>
+        <select name="cover_media_id">
+          <option value="">— none —</option>
+          <% it.media.forEach(function(m){ %>
+          <option value="<%= m.id %>" <%= it.entry.cover_media_id === m.id ? "selected" : "" %>><%= m.alt || m.original_filename || m.filename %> (<%= m.width %>×<%= m.height %>)</option>
+          <% }); %>
+        </select>
+      </label>
+      <% } else { %>
+      <p class="form-help">No media uploaded yet. <a href="<%= it.adminBase %>/media/">Upload an image</a> first.</p>
+      <% } %>
+      <% if (it.entry.cover_filename) { %>
+      <label class="form-row">
+        <span>Or legacy cover filename (relative to assets/img/, e.g. "work/rag-eval-harness.jpg" — used when no media library selection)</span>
+        <input type="text" name="cover_filename" maxlength="200" value="<%= it.entry.cover_filename %>" />
+      </label>
+      <label class="form-row">
+        <span>Cover alt text</span>
+        <input type="text" name="cover_alt" maxlength="500" value="<%= it.entry.cover_alt || '' %>" />
+      </label>
+      <% } %>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Body</legend>
+      <label class="form-row">
+        <span>Body — rich text. Output is sanitized server-side.</span>
+        <textarea name="body_html" data-rte rows="22"><%= it.entry.body_html || '' %></textarea>
+      </label>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Publication</legend>
+      <label class="form-row">
+        <span>Sort order (lower = first; appears on home page if in the top 3 non-disabled by sort)</span>
+        <input type="number" name="sort_order" min="0" max="1000" value="<%= it.entry.sort_order %>" />
+      </label>
+      <label class="form-row">
+        <span>Published date (YYYY-MM-DD)</span>
+        <input type="date" name="published_at" value="<%= (it.entry.published_at || '').slice(0,10) %>" />
+      </label>
+      <label class="form-row form-row-inline">
+        <input type="checkbox" name="published" value="1" <%= it.entry.published ? "checked" : "" %> />
+        <span>Published</span>
+      </label>
+      <label class="form-row form-row-inline">
+        <input type="checkbox" name="is_disabled" value="1" <%= it.entry.is_disabled ? "checked" : "" %> />
+        <span>Disabled (shown on /work/ as a non-clickable "coming soon" card; no detail page generated)</span>
+      </label>
+    </fieldset>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"><%= it.mode === "new" ? "Create" : "Save" %></button>
+      <a class="btn btn-ghost" href="<%= it.adminBase %>/work/">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<script src="<%= it.adminBase %>/static/mini-rte.js"></script>
+
+<style>
+.form-help { padding: 10px 12px; background: var(--admin-bg); border-radius: var(--admin-radius-sm); color: var(--admin-fg-muted); font-size: 13px; }
+select { width: 100%; padding: 8px 10px; font-size: 14px; font-family: inherit; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); }
+input[type="number"], input[type="date"] { width: 220px; padding: 8px 10px; font-size: 14px; font-family: inherit; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); }
+</style>

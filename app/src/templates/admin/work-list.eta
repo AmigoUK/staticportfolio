@@ -1,0 +1,45 @@
+<% layout("/layouts/admin-base", { title: "Work", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<section class="page">
+  <header class="page-head">
+    <div class="head-row">
+      <h1>Work</h1>
+      <a class="btn btn-primary" href="<%= it.adminBase %>/work/new">+ New work entry</a>
+    </div>
+    <p>Selected projects shown on the home page (first 3) and the /work/ index (all entries, including disabled ones).</p>
+  </header>
+
+  <% if (it.flash === "saved") { %><p class="flash flash-ok">Saved.</p><% } %>
+  <% if (it.flash === "created") { %><p class="flash flash-ok">Created.</p><% } %>
+  <% if (it.flash === "deleted") { %><p class="flash flash-ok">Deleted.</p><% } %>
+
+  <table class="data-table">
+    <thead><tr><th>Sort</th><th>Slug</th><th>Title</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
+    <tbody>
+      <% it.work.forEach(function(w){ %>
+      <tr>
+        <td><%= w.sort_order %></td>
+        <td><code><%= w.slug %></code></td>
+        <td><%= w.title %><% if (w.is_disabled) { %> <span class="tag-mini">disabled</span><% } %></td>
+        <td><%= w.published ? "Published" : "Draft" %></td>
+        <td><%= w.updated_at %></td>
+        <td class="actions">
+          <a class="btn btn-ghost" href="<%= it.adminBase %>/work/<%= w.id %>/edit">Edit</a>
+          <form method="post" action="<%= it.adminBase %>/work/<%= w.id %>/delete" class="inline" onsubmit="return confirm('Delete this work entry?')">
+            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+            <button type="submit" class="btn btn-ghost btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }); %>
+      <% if (it.work.length === 0) { %>
+      <tr><td colspan="6" class="empty-cell">No work entries yet. Click <em>+ New work entry</em> to add one.</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+</section>
+
+<style>
+.head-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.tag-mini { font-size: 11px; background: var(--admin-bg); padding: 2px 6px; border-radius: 3px; color: var(--admin-fg-muted); margin-left: 4px; }
+.empty-cell { padding: 24px; text-align: center; color: var(--admin-fg-muted); }
+</style>

@@ -15,7 +15,7 @@ export default async function adminPagesRoutes(app) {
     });
   });
 
-  for (const slug of ["work", "writing"]) {
+  for (const slug of ["writing"]) {
     app.get(`${ADMIN_BASE}/${slug}/`, { preHandler: gate }, async (_req, reply) => {
       const csrfToken = await reply.generateCsrf();
       reply.type("text/html; charset=utf-8");
