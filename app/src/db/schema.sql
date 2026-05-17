@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS fonts (
   family TEXT NOT NULL,
   role TEXT NOT NULL CHECK(role IN ('sans','mono')),
   weights_csv TEXT NOT NULL,
-  source TEXT NOT NULL CHECK(source IN ('bundled','system')),
+  source TEXT NOT NULL CHECK(source IN ('bundled','system','custom')),
   files_json TEXT,
   fallback_stack TEXT,
   is_active INTEGER NOT NULL DEFAULT 0,

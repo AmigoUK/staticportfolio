@@ -8,6 +8,55 @@
   <% if (it.flash === "saved") { %>
   <p class="flash flash-ok">Fonts saved. Click <strong>Publish</strong> in the header to apply.</p>
   <% } %>
+  <% if (it.flash === "uploaded") { %>
+  <p class="flash flash-ok">Custom font uploaded.</p>
+  <% } %>
+  <% if (it.flash === "deleted") { %>
+  <p class="flash flash-ok">Custom font deleted.</p>
+  <% } %>
+  <% if (it.error) { %>
+  <p class="flash flash-warn"><%= it.error %></p>
+  <% } %>
+
+  <fieldset class="form-section">
+    <legend>Upload a custom WOFF2 font</legend>
+    <p class="form-help">Drop in your own typography. WOFF2 only (≤ 2&nbsp;MB). Upload one file per weight — re-uploading the same family / weight replaces it. The font shows up in the picker below once added.</p>
+    <form method="post" action="<%= it.adminBase %>/fonts/upload" enctype="multipart/form-data" class="font-upload-form">
+      <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+      <label class="form-row">
+        <span>Family name (what to call it; letters, digits, spaces, dashes)</span>
+        <input type="text" name="family" required maxlength="60" placeholder="e.g. Söhne, Tiempos, JetBrains Mono Custom" />
+      </label>
+      <label class="form-row">
+        <span>Role</span>
+        <select name="role" required>
+          <option value="sans">Sans (for body text)</option>
+          <option value="mono">Mono (for code blocks)</option>
+        </select>
+      </label>
+      <label class="form-row">
+        <span>Weight (standard CSS values)</span>
+        <select name="weight" required>
+          <option value="100">100 — Thin</option>
+          <option value="200">200 — Extra Light</option>
+          <option value="300">300 — Light</option>
+          <option value="400" selected>400 — Regular</option>
+          <option value="500">500 — Medium</option>
+          <option value="600">600 — Semi Bold</option>
+          <option value="700">700 — Bold</option>
+          <option value="800">800 — Extra Bold</option>
+          <option value="900">900 — Black</option>
+        </select>
+      </label>
+      <label class="form-row">
+        <span>WOFF2 file</span>
+        <input type="file" name="file" accept=".woff2,font/woff2,application/font-woff2" required />
+      </label>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Upload font</button>
+      </div>
+    </form>
+  </fieldset>
 
   <form method="post" action="<%= it.adminBase %>/fonts/">
     <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
@@ -19,11 +68,19 @@
         <input type="radio" name="sans_id" value="<%= f.id %>" <%= f.is_active ? "checked" : "" %> />
         <span class="font-meta">
           <span class="font-family"><%= f.family %></span>
-          <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : "System stack" %></span>
+          <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : f.source === "custom" ? "Custom · " + f.files.length + " weights" : "System stack" %></span>
         </span>
         <span class="font-preview font-preview-<%= f.source %>" data-family-css='<%= f.source === "system" ? f.fallback_stack : "\"" + f.family + "\", " + f.fallback_stack %>'>
           The quick brown fox jumps over the lazy dog 0123456789
         </span>
+        <% if (f.source === "custom") { %>
+        <span class="font-actions">
+          <form method="post" action="<%= it.adminBase %>/fonts/<%= f.id %>/delete" onsubmit="return confirm('Delete this custom font? Cannot be undone.')">
+            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+            <button type="submit" class="btn btn-ghost btn-danger btn-sm" <%= f.is_active ? "disabled title='Deactivate first'" : "" %>>Delete</button>
+          </form>
+        </span>
+        <% } %>
       </label>
       <% }); %>
     </fieldset>
@@ -35,11 +92,19 @@
         <input type="radio" name="mono_id" value="<%= f.id %>" <%= f.is_active ? "checked" : "" %> />
         <span class="font-meta">
           <span class="font-family"><%= f.family %></span>
-          <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : "System stack" %></span>
+          <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : f.source === "custom" ? "Custom · " + f.files.length + " weights" : "System stack" %></span>
         </span>
         <span class="font-preview font-preview-<%= f.source %> font-preview-mono" data-family-css='<%= f.source === "system" ? f.fallback_stack : "\"" + f.family + "\", " + f.fallback_stack %>'>
           const tokens_per_second = 42; // for the publish loop
         </span>
+        <% if (f.source === "custom") { %>
+        <span class="font-actions">
+          <form method="post" action="<%= it.adminBase %>/fonts/<%= f.id %>/delete" onsubmit="return confirm('Delete this custom font? Cannot be undone.')">
+            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+            <button type="submit" class="btn btn-ghost btn-danger btn-sm" <%= f.is_active ? "disabled title='Deactivate first'" : "" %>>Delete</button>
+          </form>
+        </span>
+        <% } %>
       </label>
       <% }); %>
     </fieldset>
@@ -53,11 +118,12 @@
 <style>
 /* Locally @font-face the bundled fonts so the preview renders in the actual face. */
 <% it.sansFonts.concat(it.monoFonts).forEach(function(f){
-  if (f.source === "bundled") {
+  if (f.source === "bundled" || f.source === "custom") {
+    var basePath = f.source === "custom" ? it.adminBase + "/static/custom-fonts/" : it.adminBase + "/static/fonts/";
     f.files.forEach(function(file){ %>
 @font-face {
   font-family: "<%= f.family %>";
-  src: url("<%= it.adminBase %>/static/fonts/<%= file.file %>") format("woff2");
+  src: url("<%= basePath %><%= file.file %>") format("woff2");
   font-weight: <%= file.weight %>;
   font-style: normal;
   font-display: swap;
@@ -65,7 +131,10 @@
 <%  });
   }
 }); %>
-.font-option { display: grid; grid-template-columns: 24px 200px 1fr; gap: 14px; align-items: center; padding: 10px 12px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); margin-bottom: 8px; background: var(--admin-bg-elevated); }
+.font-option { display: grid; grid-template-columns: 24px 200px 1fr auto; gap: 14px; align-items: center; padding: 10px 12px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); margin-bottom: 8px; background: var(--admin-bg-elevated); }
+.font-actions { display: inline-block; }
+.form-help { font-size: 13px; color: var(--admin-fg-muted); margin: 0 0 14px; line-height: 1.5; }
+.font-upload-form { display: grid; gap: 12px; max-width: 580px; }
 .font-option:has(input:checked) { border-color: var(--admin-accent); }
 .font-meta { display: flex; flex-direction: column; gap: 2px; }
 .font-family { font-weight: 500; }

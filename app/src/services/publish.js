@@ -1,6 +1,6 @@
 import { getDb } from "../db/connect.js";
 import { getActiveTheme } from "./themes.js";
-import { getActiveFont, familyCssValue } from "./fonts.js";
+import { getActiveFont, familyCssValue, fontFileSourcePath } from "./fonts.js";
 import { getAllSettings, DEFAULT_SETTINGS } from "./settings.js";
 import { listMenu } from "./menu.js";
 import { eta } from "../lib/render.js";
@@ -62,8 +62,10 @@ async function runPublish(logger) {
 
   const fontFaces = [];
   for (const font of [activeSans, activeMono].filter(Boolean)) {
-    if (font.source === "bundled" && font.files) {
-      for (const f of font.files) fontFaces.push({ family: font.family, weight: f.weight, file: f.file });
+    if ((font.source === "bundled" || font.source === "custom") && font.files) {
+      for (const f of font.files) {
+        fontFaces.push({ family: font.family, weight: f.weight, file: f.file, source: font.source, _font: font });
+      }
     }
   }
 
@@ -83,7 +85,7 @@ async function runPublish(logger) {
 
   let fontsCopied = 0;
   for (const face of fontFaces) {
-    const src = join(SOURCE_ASSETS, "fonts", face.file);
+    const src = fontFileSourcePath(face._font, face.file);
     const dst = join(STAGING_DIR, "assets", "fonts", face.file);
     if (existsSync(src)) {
       copyFileSync(src, dst);
