@@ -39,7 +39,7 @@ function nav(path, label) {
 <body>
   <header class="site-header">
     <div class="wrap">
-      <a href="<%= prefix %>" class="brand"><%= it.site["site.brand"] %><span>.</span></a>
+      <a href="<%= prefix || './' %>" class="brand"><%= it.site["site.brand"] %><span>.</span></a>
       <nav class="nav" aria-label="Primary">
         <%~ nav("work/", "Work") %>
         <%~ nav("writing/", "Writing") %>

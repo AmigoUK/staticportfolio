@@ -74,6 +74,8 @@ CREATE TABLE IF NOT EXISTS work_entries (
   body_json TEXT NOT NULL,
   body_html TEXT NOT NULL,
   cover_media_id INTEGER REFERENCES media(id) ON DELETE SET NULL,
+  cover_filename TEXT,
+  cover_alt TEXT,
   tags_csv TEXT,
   sort_order INTEGER NOT NULL DEFAULT 0,
   is_disabled INTEGER NOT NULL DEFAULT 0,
