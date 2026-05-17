@@ -102,10 +102,12 @@ async function runPublish(logger) {
 
   const mediaIndex = readMediaIndex();
   let mediaCopied = 0;
-  for (const filename of mediaIndex.allFiles) {
-    const src = join(UPLOADS, filename);
+  mkdirSync(join(STAGING_DIR, "assets", "files"), { recursive: true });
+  for (const row of mediaIndex.rows) {
+    const src = join(UPLOADS, row.filename);
     if (!existsSync(src)) continue;
-    const dst = join(STAGING_DIR, "assets", "img", filename);
+    const subdir = row.kind === "file" ? "files" : "img";
+    const dst = join(STAGING_DIR, "assets", subdir, row.filename);
     mkdirSync(dirname(dst), { recursive: true });
     copyFileSync(src, dst);
     mediaCopied++;
@@ -225,7 +227,7 @@ function decorateWork(row) {
 
 function readMediaIndex() {
   const db_ = getDb();
-  const rows = db_.prepare("SELECT id, filename FROM media").all();
+  const rows = db_.prepare("SELECT id, filename, kind FROM media").all();
   return {
     rows,
     allFiles: rows.map((r) => r.filename),

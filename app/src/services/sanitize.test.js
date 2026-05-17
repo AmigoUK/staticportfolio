@@ -46,9 +46,27 @@ test("strips style attributes from any tag", () => {
   assert.equal(out, "<p>hi</p>");
 });
 
-test("strips iframe, object, embed, form", () => {
-  const out = sanitize('<iframe src="x"></iframe><form action="x"><input /></form>');
+test("strips object, embed, form entirely", () => {
+  const out = sanitize('<object data="x"></object><embed src="x" /><form action="x"><input /></form>');
   assert.equal(out, "");
+});
+
+test("blanks iframe src when host is not on the whitelist", () => {
+  const out = sanitize('<iframe src="https://evil.example/x" width="560" height="315"></iframe>');
+  assert.ok(!out.includes("evil.example"), "evil host must be stripped");
+});
+
+test("preserves youtube-nocookie iframe with normalised attributes", () => {
+  const out = sanitize('<iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"></iframe>');
+  assert.match(out, /src="https:\/\/www\.youtube-nocookie\.com\/embed\/dQw4w9WgXcQ"/);
+  assert.match(out, /allowfullscreen/);
+  assert.match(out, /loading="lazy"/);
+});
+
+test("preserves download attribute on links to assets/files/", () => {
+  const out = sanitize('<a href="assets/files/cv.pdf" download="cv.pdf">Download CV</a>');
+  assert.match(out, /download="cv\.pdf"/);
+  assert.match(out, /href="assets\/files\/cv\.pdf"/);
 });
 
 test("empty input returns empty string", () => {

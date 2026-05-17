@@ -11,14 +11,18 @@ export const SANITIZE_OPTIONS = {
     "code", "pre",
     "img",
     "figure", "figcaption",
+    "iframe",
   ],
   allowedAttributes: {
-    a: ["href", "rel", "target", "title"],
+    a: ["href", "rel", "target", "title", "download"],
     img: ["src", "alt", "width", "height", "loading"],
+    iframe: ["src", "width", "height", "title", "frameborder", "allow", "allowfullscreen", "loading"],
     "*": ["class"],
   },
   allowedSchemes: ["http", "https", "mailto"],
   allowProtocolRelative: false,
+  allowedIframeHostnames: ["www.youtube-nocookie.com"],
+  allowIframeRelativeUrls: false,
   transformTags: {
     a: (tagName, attribs) => {
       // Force rel="noopener" + target="_blank" on external links
@@ -30,6 +34,28 @@ export const SANITIZE_OPTIONS = {
         out.target = "_blank";
       }
       return { tagName, attribs: out };
+    },
+    iframe: (tagName, attribs) => {
+      // Only allow the privacy-friendly YouTube embed host.
+      const src = attribs.src || "";
+      if (!/^https:\/\/www\.youtube-nocookie\.com\/embed\//.test(src)) {
+        // sanitize-html drops disallowed iframes via allowedIframeHostnames
+        // already, but be explicit: blank out src so it can't load anything.
+        return { tagName, attribs: { src: "" } };
+      }
+      return {
+        tagName,
+        attribs: {
+          src,
+          width: attribs.width || "560",
+          height: attribs.height || "315",
+          title: attribs.title || "YouTube video",
+          frameborder: "0",
+          loading: "lazy",
+          allow: "accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+          allowfullscreen: "",
+        },
+      };
     },
   },
   exclusiveFilter: (frame) =>

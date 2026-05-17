@@ -2,34 +2,54 @@
 <section class="page">
   <header class="page-head">
     <h1>Media library</h1>
-    <p>Upload images for hero / covers / inline use. Re-encoded through sharp (EXIF stripped); SVG and other formats rejected.</p>
+    <p>Images get re-encoded through sharp (EXIF stripped, WebP variant generated on publish). Files (PDF / ZIP / MP3 / MP4, ≤ 32&nbsp;MB) are stored as-is and copied to <code>/assets/files/</code> on publish.</p>
   </header>
 
-  <% if (it.flash === "uploaded") { %><p class="flash flash-ok">File uploaded.</p><% } %>
+  <% if (it.flash === "uploaded") { %><p class="flash flash-ok">Upload saved.</p><% } %>
   <% if (it.flash === "alt-saved") { %><p class="flash flash-ok">Alt text updated.</p><% } %>
   <% if (it.flash === "deleted") { %><p class="flash flash-ok">Media deleted.</p><% } %>
   <% if (it.error) { %><p class="flash flash-warn"><%= it.error %></p><% } %>
 
-  <form class="media-upload" method="post" action="<%= it.adminBase %>/media/upload" enctype="multipart/form-data">
-    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-    <label class="form-row">
-      <span>Choose an image (JPEG / PNG / WebP, ≤ 8 MB)</span>
-      <input type="file" name="file" accept="image/jpeg,image/png,image/webp" required />
-    </label>
-    <label class="form-row">
-      <span>Alt text (describes the image for screen readers; required for accessibility)</span>
-      <input type="text" name="alt" maxlength="500" placeholder="e.g. Library shelves — RAG Eval Harness cover" />
-    </label>
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">Upload</button>
-    </div>
-  </form>
+  <div class="media-uploads">
+    <form class="media-upload" method="post" action="<%= it.adminBase %>/media/upload" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+      <h2>Upload image</h2>
+      <label class="form-row">
+        <span>Image (JPEG / PNG / WebP, ≤ 8&nbsp;MB)</span>
+        <input type="file" name="file" accept="image/jpeg,image/png,image/webp" required />
+      </label>
+      <label class="form-row">
+        <span>Alt text (for screen readers)</span>
+        <input type="text" name="alt" maxlength="500" placeholder="e.g. Library shelves — RAG Eval Harness cover" />
+      </label>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Upload image</button>
+      </div>
+    </form>
 
-  <% if (it.media.length === 0) { %>
-  <p class="empty-hint">No media yet. Upload your first image above.</p>
+    <form class="media-upload" method="post" action="<%= it.adminBase %>/media/upload-file" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+      <h2>Upload file</h2>
+      <label class="form-row">
+        <span>File (PDF / ZIP / MP3 / MP4, ≤ 32&nbsp;MB)</span>
+        <input type="file" name="file" accept="application/pdf,application/zip,audio/mpeg,video/mp4" required />
+      </label>
+      <label class="form-row">
+        <span>Label (shown as the link text in inserts)</span>
+        <input type="text" name="alt" maxlength="500" placeholder="e.g. Résumé (PDF)" />
+      </label>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Upload file</button>
+      </div>
+    </form>
+  </div>
+
+  <h2 class="section-title">Images (<%= it.images.length %>)</h2>
+  <% if (it.images.length === 0) { %>
+  <p class="empty-hint">No images yet. Upload your first one above.</p>
   <% } else { %>
   <div class="media-grid">
-    <% it.media.forEach(function(m){ %>
+    <% it.images.forEach(function(m){ %>
     <div class="media-card">
       <a class="media-thumb" href="<%= it.adminBase %>/uploads/<%= m.filename %>" target="_blank" rel="noopener">
         <img src="<%= it.adminBase %>/uploads/<%= m.filename %>" alt="<%= m.alt || m.original_filename || m.filename %>" loading="lazy" />
@@ -46,7 +66,33 @@
         </label>
         <button type="submit" class="btn btn-ghost btn-sm">Save alt</button>
       </form>
-      <form method="post" action="<%= it.adminBase %>/media/<%= m.id %>/delete" class="media-delete-form" onsubmit="return confirm('Delete this media file? Cannot be undone.')">
+      <form method="post" action="<%= it.adminBase %>/media/<%= m.id %>/delete" class="media-delete-form" onsubmit="return confirm('Delete this image? Cannot be undone.')">
+        <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+        <button type="submit" class="btn btn-ghost btn-danger btn-sm">Delete</button>
+      </form>
+    </div>
+    <% }); %>
+  </div>
+  <% } %>
+
+  <h2 class="section-title">Files (<%= it.files.length %>)</h2>
+  <% if (it.files.length === 0) { %>
+  <p class="empty-hint">No files yet.</p>
+  <% } else { %>
+  <div class="file-list">
+    <% it.files.forEach(function(m){ %>
+    <div class="file-row">
+      <span class="file-icon"><%= m.mime_type.startsWith("audio") ? "♪" : m.mime_type.startsWith("video") ? "▶" : "📄" %></span>
+      <div class="file-meta">
+        <p class="file-name"><%= m.alt || m.original_filename || m.filename %></p>
+        <p class="file-info"><%= m.mime_type %> · <%= (m.bytes / 1024).toFixed(1) %> KB · <code><%= m.filename %></code></p>
+      </div>
+      <form method="post" action="<%= it.adminBase %>/media/<%= m.id %>/alt" class="file-alt-form">
+        <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+        <input type="text" name="alt" value="<%= m.alt || '' %>" maxlength="500" placeholder="Label" />
+        <button type="submit" class="btn btn-ghost btn-sm">Save</button>
+      </form>
+      <form method="post" action="<%= it.adminBase %>/media/<%= m.id %>/delete" class="file-delete-form inline" onsubmit="return confirm('Delete this file? Cannot be undone.')">
         <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
         <button type="submit" class="btn btn-ghost btn-danger btn-sm">Delete</button>
       </form>
@@ -57,8 +103,12 @@
 </section>
 
 <style>
-.media-upload { background: var(--admin-bg-elevated); padding: 18px 20px; border-radius: var(--admin-radius); border: 1px solid var(--admin-border); margin-bottom: 24px; }
-.empty-hint { padding: 28px; text-align: center; background: var(--admin-bg-elevated); border: 1px dashed var(--admin-border); border-radius: var(--admin-radius); color: var(--admin-fg-muted); }
+.media-uploads { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+@media (max-width: 800px) { .media-uploads { grid-template-columns: 1fr; } }
+.media-upload { background: var(--admin-bg-elevated); padding: 18px 20px; border-radius: var(--admin-radius); border: 1px solid var(--admin-border); }
+.media-upload h2 { margin: 0 0 12px; font-size: 14px; color: var(--admin-fg-muted); text-transform: uppercase; letter-spacing: .05em; }
+.section-title { font-size: 14px; color: var(--admin-fg-muted); text-transform: uppercase; letter-spacing: .05em; margin: 24px 0 12px; }
+.empty-hint { padding: 24px; text-align: center; background: var(--admin-bg-elevated); border: 1px dashed var(--admin-border); border-radius: var(--admin-radius); color: var(--admin-fg-muted); }
 .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
 .media-card { background: var(--admin-bg-elevated); border: 1px solid var(--admin-border); border-radius: var(--admin-radius); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
 .media-thumb { display: block; height: 140px; overflow: hidden; border-radius: var(--admin-radius-sm); background: var(--admin-bg); }
@@ -70,4 +120,13 @@
 .media-alt-form label span { display: block; color: var(--admin-fg-muted); margin-bottom: 2px; }
 .media-alt-form input { width: 100%; padding: 4px 6px; font-size: 12px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); }
 .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+.file-list { display: flex; flex-direction: column; gap: 6px; }
+.file-row { display: grid; grid-template-columns: 32px 1fr auto auto; align-items: center; gap: 12px; padding: 10px 12px; background: var(--admin-bg-elevated); border: 1px solid var(--admin-border); border-radius: var(--admin-radius); }
+.file-icon { font-size: 20px; color: var(--admin-fg-muted); text-align: center; }
+.file-meta { min-width: 0; }
+.file-name { font-size: 14px; font-weight: 500; margin: 0; color: var(--admin-fg); word-break: break-word; }
+.file-info { font-size: 12px; color: var(--admin-fg-muted); margin: 0; }
+.file-alt-form { display: flex; gap: 6px; }
+.file-alt-form input { padding: 4px 8px; font-size: 12px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); width: 180px; }
 </style>

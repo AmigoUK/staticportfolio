@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS media (
   bytes INTEGER NOT NULL,
   alt TEXT,
   attribution_json TEXT,
+  kind TEXT NOT NULL DEFAULT 'image',
   uploaded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

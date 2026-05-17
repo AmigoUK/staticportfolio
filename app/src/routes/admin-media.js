@@ -1,6 +1,6 @@
 import { requireAdmin } from "../lib/auth.js";
 import { renderHtml } from "../lib/render.js";
-import { ingestUpload, listMedia, getMediaById, updateAlt, deleteMedia, uploadsDir } from "../services/media.js";
+import { ingestUpload, ingestFile, listMedia, getMediaById, updateAlt, deleteMedia, uploadsDir } from "../services/media.js";
 import multipart from "@fastify/multipart";
 import fastifyStatic from "@fastify/static";
 import CSRF from "@fastify/csrf";
@@ -28,14 +28,19 @@ export default async function adminMediaRoutes(app) {
       adminBase: ADMIN_BASE,
       user: req.currentUser,
       csrfToken,
-      media: listMedia(),
+      images: listMedia("image"),
+      files: listMedia("file"),
       flash: req.query.msg || null,
       error: req.query.err || null,
     });
   });
 
   app.get(`${ADMIN_BASE}/api/media.json`, { preHandler: gate }, async () => {
-    return { media: listMedia() };
+    return { media: listMedia("image") };
+  });
+
+  app.get(`${ADMIN_BASE}/api/files.json`, { preHandler: gate }, async () => {
+    return { media: listMedia("file") };
   });
 
   // Upload uses multipart, so CSRF can't live in the standard preHandler
@@ -64,6 +69,34 @@ export default async function adminMediaRoutes(app) {
       reply.redirect(`${ADMIN_BASE}/media/?msg=uploaded&id=${media.id}`);
     } catch (err) {
       req.log.warn({ err }, "media upload failed");
+      reply.redirect(`${ADMIN_BASE}/media/?err=${encodeURIComponent(err.message)}`);
+    }
+    return reply;
+  });
+
+  app.post(`${ADMIN_BASE}/media/upload-file`, { preHandler: gate }, async (req, reply) => {
+    const part = await req.file();
+    if (!part) {
+      reply.redirect(`${ADMIN_BASE}/media/?err=${encodeURIComponent("No file in request.")}`);
+      return reply;
+    }
+    const secret = req.session?._csrf;
+    const submittedToken = part.fields?._csrf?.value;
+    if (!secret || !submittedToken || !csrfTokens.verify(secret, submittedToken)) {
+      reply.code(403);
+      reply.redirect(`${ADMIN_BASE}/media/?err=${encodeURIComponent("Invalid CSRF token.")}`);
+      return reply;
+    }
+    try {
+      const buffer = await part.toBuffer();
+      const media = await ingestFile({
+        buffer,
+        originalFilename: part.filename,
+        alt: typeof part.fields?.alt?.value === "string" ? part.fields.alt.value : null,
+      });
+      reply.redirect(`${ADMIN_BASE}/media/?msg=uploaded&id=${media.id}`);
+    } catch (err) {
+      req.log.warn({ err }, "file upload failed");
       reply.redirect(`${ADMIN_BASE}/media/?err=${encodeURIComponent(err.message)}`);
     }
     return reply;

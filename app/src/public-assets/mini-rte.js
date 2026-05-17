@@ -1,8 +1,9 @@
 // Mini rich-text editor.
-// - Wraps a hidden textarea with a contenteditable shell + a toolbar.
-// - Syncs the contenteditable back to the textarea on every input.
+// - Wraps a hidden textarea with a contenteditable shell + toolbar.
+// - Syncs editor.innerHTML back to the textarea on every input.
 // - Server-side sanitize-html is the source of truth for what survives a save.
-// - Image insertion opens a picker that fetches /admin/api/media.json.
+// - Insert menu: YouTube embed, code block, image, file download.
+// - Source/HTML view toggle: swap contenteditable for the raw textarea.
 
 (function () {
   "use strict";
@@ -33,7 +34,11 @@
   function readHtml(node) { return node[HTML_KEY]; }
   function writeHtml(node, html) { node[HTML_KEY] = html; }
 
-  function makeToolbar(editor, area) {
+  function escapeAttr(s) {
+    return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function makeToolbar(editor, area, controls) {
     const bar = elt("div", { class: "rte-toolbar", role: "toolbar" });
     const buttons = [
       ["B", "Bold (Ctrl+B)", "rte-bold", () => runCmd("bold")],
@@ -50,7 +55,6 @@
       ["</>", "Inline code", "rte-code", () => wrapSelectionWith("code")],
       ["sep"],
       ["Link", "Insert / edit link", "rte-link", () => insertLink()],
-      ["Image", "Insert image from media library", "rte-image", () => openImagePicker(editor, area)],
       ["sep"],
       ["Clear", "Strip formatting from selection", "rte-clear", () => runCmd("removeFormat")],
     ];
@@ -67,7 +71,57 @@
       });
       bar.appendChild(b);
     }
+
+    // Insert dropdown — YouTube, image, code block, file download.
+    bar.appendChild(elt("span", { class: "rte-divider" }));
+    bar.appendChild(makeInsertMenu(editor, area));
+
+    // Push HTML-view toggle to the right.
+    bar.appendChild(elt("span", { class: "rte-spacer" }));
+    const htmlBtn = elt("button", {
+      type: "button",
+      class: "rte-btn rte-source",
+      title: "Toggle source / HTML view",
+      text: "Source",
+    });
+    htmlBtn.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      controls.toggleSource(htmlBtn);
+    });
+    bar.appendChild(htmlBtn);
     return bar;
+  }
+
+  function makeInsertMenu(editor, area) {
+    const wrap = elt("span", { class: "rte-insert-wrap" });
+    const btn = elt("button", { type: "button", class: "rte-btn rte-insert-btn", title: "Insert…", text: "Insert ▾" });
+    const menu = elt("div", { class: "rte-insert-menu", role: "menu" });
+    const items = [
+      ["Image", () => openImagePicker(editor, area)],
+      ["YouTube embed", () => insertYouTube(editor, area)],
+      ["Code block", () => insertCodeBlock(editor, area)],
+      ["File download", () => openFilePicker(editor, area)],
+    ];
+    for (const [label, action] of items) {
+      const it = elt("button", { type: "button", class: "rte-insert-item", role: "menuitem", text: label });
+      it.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        wrap.classList.remove("is-open");
+        editor.focus();
+        action();
+      });
+      menu.appendChild(it);
+    }
+    btn.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      wrap.classList.toggle("is-open");
+    });
+    document.addEventListener("click", (ev) => {
+      if (!wrap.contains(ev.target)) wrap.classList.remove("is-open");
+    });
+    wrap.appendChild(btn);
+    wrap.appendChild(menu);
+    return wrap;
   }
 
   function wrapSelectionWith(tagName) {
@@ -75,9 +129,8 @@
     if (!sel.rangeCount) return;
     const range = sel.getRangeAt(0);
     const wrapper = document.createElement(tagName);
-    try {
-      range.surroundContents(wrapper);
-    } catch (_) {
+    try { range.surroundContents(wrapper); }
+    catch (_) {
       wrapper.textContent = sel.toString();
       range.deleteContents();
       range.insertNode(wrapper);
@@ -94,41 +147,119 @@
     runCmd("createLink", url);
   }
 
+  function extractYouTubeId(input) {
+    const s = String(input || "").trim();
+    if (!s) return null;
+    // Bare ID
+    if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+    try {
+      const u = new URL(s);
+      if (u.hostname === "youtu.be") return u.pathname.slice(1).split("/")[0] || null;
+      if (/youtube(-nocookie)?\.com$/.test(u.hostname)) {
+        const v = u.searchParams.get("v");
+        if (v) return v;
+        const m = u.pathname.match(/\/(embed|shorts|v)\/([a-zA-Z0-9_-]{11})/);
+        if (m) return m[2];
+      }
+    } catch (_) { /* not a URL */ }
+    return null;
+  }
+
+  function insertYouTube(editor, area) {
+    const input = prompt("YouTube URL or video ID:", "https://www.youtube.com/watch?v=");
+    if (!input) return;
+    const id = extractYouTubeId(input);
+    if (!id) {
+      alert("Couldn't recognise that as a YouTube URL or video ID.");
+      return;
+    }
+    const iframe =
+      '<iframe src="https://www.youtube-nocookie.com/embed/' + escapeAttr(id) + '" ' +
+      'width="560" height="315" title="YouTube video" frameborder="0" ' +
+      'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ' +
+      'allowfullscreen></iframe>';
+    runCmd("insertHTML", '<p>' + iframe + '</p><p><br></p>');
+    syncToTextarea(editor, area);
+  }
+
+  function insertCodeBlock(editor, area) {
+    runCmd("insertHTML", '<pre><code>// code here</code></pre><p><br></p>');
+    syncToTextarea(editor, area);
+  }
+
   function openImagePicker(editor, area) {
-    fetch(`${ADMIN_BASE}/api/media.json`, { credentials: "same-origin" })
+    openPicker({
+      endpoint: ADMIN_BASE + "/api/media.json",
+      title: "Insert image",
+      emptyMsg: "No images uploaded yet. Visit Media to upload first.",
+      renderCard: (m) => {
+        const card = elt("button", { type: "button", class: "rte-modal-card" });
+        const img = elt("img", { src: ADMIN_BASE + "/uploads/" + m.filename, alt: m.alt || "" });
+        card.appendChild(img);
+        card.appendChild(elt("span", { class: "rte-modal-name", text: m.alt || m.original_filename || m.filename }));
+        card.addEventListener("click", () => {
+          const publicHref = "assets/img/" + m.filename;
+          runCmd("insertHTML", '<img src="' + escapeAttr(publicHref) + '" alt="' + escapeAttr(m.alt || "") + '" />');
+          syncToTextarea(editor, area);
+          closeOverlay();
+        });
+        return card;
+      },
+    });
+  }
+
+  function openFilePicker(editor, area) {
+    openPicker({
+      endpoint: ADMIN_BASE + "/api/files.json",
+      title: "Insert file download",
+      emptyMsg: "No files uploaded yet. Visit Media → Upload file first.",
+      renderCard: (m) => {
+        const card = elt("button", { type: "button", class: "rte-modal-card rte-modal-card-file" });
+        const icon = m.mime_type && m.mime_type.indexOf("audio/") === 0 ? "♪"
+                   : m.mime_type && m.mime_type.indexOf("video/") === 0 ? "▶" : "📄";
+        card.appendChild(elt("span", { class: "rte-file-icon", text: icon }));
+        const label = m.alt || m.original_filename || m.filename;
+        card.appendChild(elt("span", { class: "rte-modal-name", text: label }));
+        card.appendChild(elt("span", { class: "rte-modal-info", text: m.mime_type + " · " + (m.bytes / 1024).toFixed(1) + " KB" }));
+        card.addEventListener("click", () => {
+          const publicHref = "assets/files/" + m.filename;
+          const downloadName = m.original_filename || m.filename;
+          const html = '<a href="' + escapeAttr(publicHref) + '" download="' + escapeAttr(downloadName) + '">' + escapeAttr(label) + '</a>';
+          runCmd("insertHTML", html);
+          syncToTextarea(editor, area);
+          closeOverlay();
+        });
+        return card;
+      },
+    });
+  }
+
+  let currentOverlay = null;
+  function closeOverlay() {
+    if (currentOverlay && currentOverlay.parentNode) currentOverlay.parentNode.removeChild(currentOverlay);
+    currentOverlay = null;
+  }
+
+  function openPicker({ endpoint, title, emptyMsg, renderCard }) {
+    fetch(endpoint, { credentials: "same-origin" })
       .then((r) => r.json())
       .then(({ media }) => {
-        if (!media || media.length === 0) {
-          alert("No media uploaded yet. Visit Media to upload first.");
-          return;
-        }
-        const overlay = elt("div", { class: "rte-modal-overlay", onclick: (e) => { if (e.target === overlay) document.body.removeChild(overlay); } });
-        const modal = elt("div", { class: "rte-modal" });
-        modal.appendChild(elt("h3", { text: "Insert image" }));
-        const grid = elt("div", { class: "rte-modal-grid" });
-        media.forEach((m) => {
-          const card = elt("button", { type: "button", class: "rte-modal-card" });
-          const img = elt("img", { src: `${ADMIN_BASE}/uploads/${m.filename}`, alt: m.alt || "" });
-          card.appendChild(img);
-          const label = elt("span", { class: "rte-modal-name", text: m.alt || m.original_filename || m.filename });
-          card.appendChild(label);
-          card.addEventListener("click", () => {
-            editor.focus();
-            const altSafe = (m.alt || "").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const publicHref = `assets/img/${m.filename}`;
-            runCmd("insertHTML", `<img src="${publicHref}" alt="${altSafe}" />`);
-            syncToTextarea(editor, area);
-            document.body.removeChild(overlay);
-          });
-          grid.appendChild(card);
+        if (!media || media.length === 0) { alert(emptyMsg); return; }
+        const overlay = elt("div", {
+          class: "rte-modal-overlay",
+          onclick: (e) => { if (e.target === overlay) closeOverlay(); },
         });
+        const modal = elt("div", { class: "rte-modal" });
+        modal.appendChild(elt("h3", { text: title }));
+        const grid = elt("div", { class: "rte-modal-grid" });
+        media.forEach((m) => grid.appendChild(renderCard(m)));
         modal.appendChild(grid);
-        const close = elt("button", { type: "button", class: "btn btn-ghost", text: "Cancel", onclick: () => document.body.removeChild(overlay) });
-        modal.appendChild(close);
+        modal.appendChild(elt("button", { type: "button", class: "btn btn-ghost", text: "Cancel", onclick: closeOverlay }));
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
+        currentOverlay = overlay;
       })
-      .catch(() => alert("Failed to load media list."));
+      .catch(() => alert("Failed to load list."));
   }
 
   function syncToTextarea(editor, area) {
@@ -142,14 +273,38 @@
       writeHtml(editor, area.value || "");
       area.style.display = "none";
       area.insertAdjacentElement("beforebegin", wrap);
-      wrap.appendChild(makeToolbar(editor, area));
+
+      let sourceMode = false;
+      function toggleSource(btn) {
+        if (sourceMode) {
+          // Going back to WYSIWYG: pull the (possibly hand-edited) HTML into the editor.
+          writeHtml(editor, area.value || "");
+          editor.style.display = "";
+          area.classList.remove("rte-html-mode");
+          area.style.display = "none";
+          btn.textContent = "Source";
+          sourceMode = false;
+          editor.focus();
+        } else {
+          // Going to source: write the latest editor HTML into the textarea, then show it.
+          syncToTextarea(editor, area);
+          editor.style.display = "none";
+          area.classList.add("rte-html-mode");
+          area.style.display = "";
+          btn.textContent = "Visual";
+          sourceMode = true;
+          area.focus();
+        }
+      }
+
+      wrap.appendChild(makeToolbar(editor, area, { toggleSource }));
       wrap.appendChild(editor);
       wrap.appendChild(area);
 
       editor.addEventListener("input", () => syncToTextarea(editor, area));
       editor.addEventListener("blur", () => syncToTextarea(editor, area));
       editor.addEventListener("paste", (e) => {
-        const text = e.clipboardData?.getData("text/plain");
+        const text = e.clipboardData && e.clipboardData.getData("text/plain");
         if (text) {
           e.preventDefault();
           runCmd("insertText", text);
