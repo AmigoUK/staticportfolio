@@ -16,10 +16,12 @@ import adminMediaRoutes from "./routes/admin-media.js";
 import adminPagesEditRoutes from "./routes/admin-pages-edit.js";
 import adminWorkRoutes from "./routes/admin-work.js";
 import adminWritingRoutes from "./routes/admin-writing.js";
+import adminMenuRoutes from "./routes/admin-menu.js";
 import adminPublishRoutes from "./routes/admin-publish.js";
 import { seedPresets } from "./services/themes.js";
 import { seedDefaults } from "./services/settings.js";
 import { seedFonts } from "./services/fonts.js";
+import { seedDefaultMenu } from "./services/menu.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -65,6 +67,7 @@ export async function buildServer() {
   seedPresets();
   seedDefaults();
   seedFonts();
+  seedDefaultMenu();
 
   app.addContentTypeParser(
     "application/x-www-form-urlencoded",
@@ -116,6 +119,7 @@ export async function buildServer() {
   await app.register(adminPagesEditRoutes);
   await app.register(adminWorkRoutes);
   await app.register(adminWritingRoutes);
+  await app.register(adminMenuRoutes);
   await app.register(adminPublishRoutes);
   await app.register(adminPagesRoutes);
 

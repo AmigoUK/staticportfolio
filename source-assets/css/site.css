@@ -71,12 +71,72 @@ code {
   color: var(--fg-muted);
   font-size: var(--fs-xs);
   font-weight: 500;
+  text-decoration: none;
 }
-.nav a:hover, .nav a[aria-current="page"] {
+
+/* ---- Style: underline-slide ---- */
+.nav[data-menu-style="underline-slide"] a {
+  position: relative;
+  padding: 4px 0;
+}
+.nav[data-menu-style="underline-slide"] a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 200ms ease;
+}
+.nav[data-menu-style="underline-slide"] a:hover,
+.nav[data-menu-style="underline-slide"] a:focus-visible {
   color: var(--fg);
   text-decoration: none;
 }
-.nav a[aria-current="page"] {
+.nav[data-menu-style="underline-slide"] a:hover::after,
+.nav[data-menu-style="underline-slide"] a:focus-visible::after,
+.nav[data-menu-style="underline-slide"] a[aria-current="page"]::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.nav[data-menu-style="underline-slide"] a[aria-current="page"] {
+  color: var(--accent);
+}
+
+/* ---- Style: pill-fill ---- */
+.nav[data-menu-style="pill-fill"] a {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  transition: background var(--transition), color var(--transition);
+}
+.nav[data-menu-style="pill-fill"] a:hover,
+.nav[data-menu-style="pill-fill"] a:focus-visible {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  text-decoration: none;
+}
+.nav[data-menu-style="pill-fill"] a[aria-current="page"] {
+  background: var(--accent);
+  color: var(--fg-on-accent);
+}
+
+/* ---- Style: spotlight-glow ---- */
+.nav[data-menu-style="spotlight-glow"] a {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: color 220ms ease, box-shadow 220ms ease, text-shadow 220ms ease;
+}
+.nav[data-menu-style="spotlight-glow"] a:hover,
+.nav[data-menu-style="spotlight-glow"] a:focus-visible {
+  color: var(--fg);
+  box-shadow: 0 0 0 6px var(--accent-subtle);
+  text-shadow: 0 0 8px var(--accent-subtle);
+  text-decoration: none;
+}
+.nav[data-menu-style="spotlight-glow"] a[aria-current="page"] {
   color: var(--accent);
 }
 

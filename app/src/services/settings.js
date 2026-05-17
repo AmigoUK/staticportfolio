@@ -11,6 +11,7 @@ export const DEFAULT_SETTINGS = {
   "social.huggingface": "https://huggingface.co/",
   "social.linkedin": "https://linkedin.com/",
   "social.calendar": "https://cal.com/",
+  "menu.style": "underline-slide",
 };
 
 export function seedDefaults() {

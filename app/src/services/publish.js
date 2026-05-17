@@ -2,6 +2,7 @@ import { getDb } from "../db/connect.js";
 import { getActiveTheme } from "./themes.js";
 import { getActiveFont, familyCssValue } from "./fonts.js";
 import { getAllSettings, DEFAULT_SETTINGS } from "./settings.js";
+import { listMenu } from "./menu.js";
 import { eta } from "../lib/render.js";
 import { mkdirSync, rmSync, renameSync, copyFileSync, existsSync, readdirSync, writeFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -53,6 +54,8 @@ async function runPublish(logger) {
   const theme = getActiveTheme();
   const activeSans = getActiveFont("sans");
   const activeMono = getActiveFont("mono");
+  const menu = listMenu();
+  const menuStyle = site["menu.style"] || "underline-slide";
   if (!theme) throw new Error("No active theme — seed presets first.");
 
   const fontFaces = [];
@@ -120,11 +123,12 @@ async function runPublish(logger) {
     .all();
 
   let pagesWritten = 0;
+  const baseCtx = { site, menu, menuStyle };
 
   // Home
   const featuredWork = workEntries.filter((w) => !w.is_disabled).slice(0, 3);
   const home = await eta.renderAsync("public/home.eta", {
-    site,
+    ...baseCtx,
     featuredWork,
     recentPosts: posts.slice(0, 2),
     workYearRange: workYearRange(workEntries),
@@ -137,7 +141,7 @@ async function runPublish(logger) {
   for (const page of pages) {
     const html = await eta.renderAsync(
       page.slug === "404" ? "public/error-404.eta" : "public/simple-page.eta",
-      { site, page },
+      { ...baseCtx, page },
     );
     writeFileSync(join(STAGING_DIR, `${page.slug}.html`), html);
     pagesWritten++;
@@ -145,30 +149,30 @@ async function runPublish(logger) {
 
   // Ensure 404 is always generated even if no row exists
   if (!pages.find((p) => p.slug === "404")) {
-    const html = await eta.renderAsync("public/error-404.eta", { site, page: { slug: "404", title: "Not found" } });
+    const html = await eta.renderAsync("public/error-404.eta", { ...baseCtx, page: { slug: "404", title: "Not found" } });
     writeFileSync(join(STAGING_DIR, "404.html"), html);
     pagesWritten++;
   }
 
   // Work
-  const workIndexHtml = await eta.renderAsync("public/work-index.eta", { site, workEntries });
+  const workIndexHtml = await eta.renderAsync("public/work-index.eta", { ...baseCtx, workEntries });
   writeFileSync(join(STAGING_DIR, "work", "index.html"), workIndexHtml);
   pagesWritten++;
 
   for (const entry of workEntries) {
     if (entry.is_disabled) continue;
-    const html = await eta.renderAsync("public/work-detail.eta", { site, entry });
+    const html = await eta.renderAsync("public/work-detail.eta", { ...baseCtx, entry });
     writeFileSync(join(STAGING_DIR, "work", `${entry.slug}.html`), html);
     pagesWritten++;
   }
 
   // Writing
-  const writingIndexHtml = await eta.renderAsync("public/writing-index.eta", { site, posts });
+  const writingIndexHtml = await eta.renderAsync("public/writing-index.eta", { ...baseCtx, posts });
   writeFileSync(join(STAGING_DIR, "writing", "index.html"), writingIndexHtml);
   pagesWritten++;
 
   for (const post of posts) {
-    const html = await eta.renderAsync("public/writing-post.eta", { site, post });
+    const html = await eta.renderAsync("public/writing-post.eta", { ...baseCtx, post });
     writeFileSync(join(STAGING_DIR, "writing", `${post.slug}.html`), html);
     pagesWritten++;
   }

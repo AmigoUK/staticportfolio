@@ -108,3 +108,15 @@ CREATE TABLE IF NOT EXISTS publish_log (
 
 CREATE INDEX IF NOT EXISTS idx_work_published_sort ON work_entries(published, sort_order);
 CREATE INDEX IF NOT EXISTS idx_posts_published_date ON posts(published, published_at DESC);
+
+CREATE TABLE IF NOT EXISTS menu_items (
+  id INTEGER PRIMARY KEY,
+  label TEXT NOT NULL,
+  href TEXT NOT NULL,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  open_new_tab INTEGER NOT NULL DEFAULT 0,
+  is_visible INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_menu_visible_order ON menu_items(is_visible, sort_order);

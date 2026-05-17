@@ -24,6 +24,7 @@ const adminBase = it.adminBase || "/admin";
       <a href="<%= adminBase %>/writing/">Writing</a>
       <a href="<%= adminBase %>/media/">Media</a>
       <a href="<%= adminBase %>/themes/">Themes</a>
+      <a href="<%= adminBase %>/menu/">Menu</a>
       <a href="<%= adminBase %>/fonts/">Fonts</a>
       <a href="<%= adminBase %>/settings/">Settings</a>
     </nav>

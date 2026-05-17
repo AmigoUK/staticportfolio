@@ -8,9 +8,15 @@ const ogTitle = it_.ogTitle || title;
 const ogDescription = it_.ogDescription || description;
 const ogImage = it_.ogImage || ((it_.site["site.base_url"] || "") + "/" + prefix + "assets/img/og-default.jpg").replace(/\/\/+/g, "/").replace(":/", "://");
 const currentPath = it_.currentPath || "";
-function nav(path, label) {
-  const aria = path === currentPath ? ' aria-current="page"' : "";
-  return `<a href="${prefix}${path}"${aria}>${label}</a>`;
+const menu = it_.menu || [];
+const menuStyle = it_.menuStyle || "underline-slide";
+function renderMenuItem(m) {
+  const external = /^(https?:|mailto:)/i.test(m.href);
+  const href = external ? m.href : (prefix + m.href);
+  const isActive = !external && m.href === currentPath;
+  const target = m.open_new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
+  const aria = isActive ? ' aria-current="page"' : '';
+  return `<a href="${href}"${target}${aria}>${m.label}</a>`;
 }
 %><!doctype html>
 <html lang="en">
@@ -40,12 +46,8 @@ function nav(path, label) {
   <header class="site-header">
     <div class="wrap">
       <a href="<%= prefix || './' %>" class="brand"><%= it.site["site.brand"] %><span>.</span></a>
-      <nav class="nav" aria-label="Primary">
-        <%~ nav("work/", "Work") %>
-        <%~ nav("writing/", "Writing") %>
-        <%~ nav("about.html", "About") %>
-        <%~ nav("now.html", "Now") %>
-        <%~ nav("contact.html", "Contact") %>
+      <nav class="nav" aria-label="Primary" data-menu-style="<%= menuStyle %>">
+        <% menu.forEach(function(m){ %><%~ renderMenuItem(m) %><% }); %>
         <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
           <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>

@@ -11,6 +11,7 @@ import { getDb } from "../app/src/db/connect.js";
 import { seedPresets } from "../app/src/services/themes.js";
 import { seedDefaults, setSetting } from "../app/src/services/settings.js";
 import { seedFonts } from "../app/src/services/fonts.js";
+import { seedDefaultMenu } from "../app/src/services/menu.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..");
@@ -187,10 +188,11 @@ function walk(dir, fn, base = dir) {
 
 function main() {
   const db = getDb();
-  console.log("Seeding presets / defaults / fonts…");
+  console.log("Seeding presets / defaults / fonts / menu…");
   seedPresets();
   seedDefaults();
   seedFonts();
+  seedDefaultMenu();
 
   // Override the site brand to "John Doe" (default already), tagline, etc. from legacy home.
   const home = readHtml("index.html");
