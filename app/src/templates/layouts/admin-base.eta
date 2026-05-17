@@ -13,38 +13,69 @@ const adminBase = it.adminBase || "/admin";
   <title><%= title %> — Portfolio CMS</title>
   <link rel="stylesheet" href="<%= adminBase %>/static/admin.css" />
 </head>
-<body class="admin">
+<body class="admin <%= user ? 'admin-shell' : 'admin-unauthed' %>">
   <% if (user) { %>
-  <header class="admin-header">
+  <input type="checkbox" id="admin-sidebar-toggle" class="admin-sidebar-toggle-input" aria-hidden="true" />
+  <label for="admin-sidebar-toggle" class="admin-sidebar-toggle" aria-label="Toggle navigation" role="button" tabindex="0">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </label>
+
+  <aside class="admin-sidebar" aria-label="Primary">
     <a href="<%= adminBase %>/" class="admin-brand">Portfolio CMS</a>
-    <nav class="admin-nav" aria-label="Primary">
-      <a href="<%= adminBase %>/">Dashboard</a>
-      <a href="<%= adminBase %>/pages/">Pages</a>
-      <a href="<%= adminBase %>/work/">Work</a>
-      <a href="<%= adminBase %>/writing/">Writing</a>
-      <a href="<%= adminBase %>/media/">Media</a>
-      <a href="<%= adminBase %>/themes/">Themes</a>
-      <a href="<%= adminBase %>/menu/">Menu</a>
-      <a href="<%= adminBase %>/fonts/">Fonts</a>
-      <a href="<%= adminBase %>/settings/">Settings</a>
+    <nav class="admin-nav">
+      <a href="<%= adminBase %>/" data-section="dashboard">Dashboard</a>
+      <a href="<%= adminBase %>/pages/" data-section="pages">Pages</a>
+      <a href="<%= adminBase %>/work/" data-section="work">Work</a>
+      <a href="<%= adminBase %>/writing/" data-section="writing">Writing</a>
+      <a href="<%= adminBase %>/media/" data-section="media">Media</a>
+      <a href="<%= adminBase %>/themes/" data-section="themes">Themes</a>
+      <a href="<%= adminBase %>/menu/" data-section="menu">Menu</a>
+      <a href="<%= adminBase %>/fonts/" data-section="fonts">Fonts</a>
+      <a href="<%= adminBase %>/settings/" data-section="settings">Settings</a>
     </nav>
-    <form class="admin-publish-inline" method="post" action="<%= adminBase %>/publish">
-      <input type="hidden" name="_csrf" value="<%= it.csrfToken || '' %>" />
-      <button type="submit" class="btn btn-primary btn-publish" title="Regenerate the public site with current DB state">Publish</button>
-    </form>
-    <form class="admin-logout" method="post" action="<%= adminBase %>/logout">
-      <input type="hidden" name="_csrf" value="<%= it.csrfToken || '' %>" />
-      <button type="submit" class="btn btn-ghost">Log out (<%= user.username %>)</button>
-    </form>
-  </header>
+    <div class="admin-sidebar-footer">
+      <form class="admin-publish-inline" method="post" action="<%= adminBase %>/publish">
+        <input type="hidden" name="_csrf" value="<%= it.csrfToken || '' %>" />
+        <button type="submit" class="btn btn-primary btn-publish" title="Regenerate the public site with current DB state">Publish</button>
+      </form>
+      <form class="admin-logout" method="post" action="<%= adminBase %>/logout">
+        <input type="hidden" name="_csrf" value="<%= it.csrfToken || '' %>" />
+        <button type="submit" class="btn btn-ghost btn-block">Log out (<%= user.username %>)</button>
+      </form>
+    </div>
+  </aside>
   <% } %>
+
   <main class="admin-main">
     <div id="global-flash" hidden></div>
     <%~ it.body %>
   </main>
+
   <% if (user) { %>
   <script>
   (function(){
+    // Highlight the currently-active sidebar link.
+    var path = location.pathname.replace(/\/+$/, "/") || "/";
+    var links = document.querySelectorAll(".admin-nav a");
+    var best = null;
+    var bestLen = -1;
+    links.forEach(function(a){
+      var href = a.getAttribute("href");
+      var norm = href.replace(/\/+$/, "/");
+      var matches = false;
+      if (norm === "<%= adminBase %>/") {
+        matches = (path === norm);
+      } else {
+        matches = (path === norm) || path.indexOf(norm) === 0;
+      }
+      if (matches && norm.length > bestLen) {
+        best = a;
+        bestLen = norm.length;
+      }
+    });
+    if (best) best.classList.add("is-active");
+
+    // Render the publish-result banner from query params.
     var params = new URLSearchParams(location.search);
     var box = document.getElementById("global-flash");
     if (!box) return;
