@@ -17,6 +17,21 @@ const STYLE_DESCRIPTIONS = {
   "bg-slide": "A solid accent block slides up from below to fill the item. Bold.",
 };
 
+const FEATURED_LABELS = {
+  "star-prefix": "Star prefix",
+  "pill-solid": "Solid pill",
+  "pill-outline": "Outline pill",
+  "underline-thick": "Thick underline",
+  "badge-corner": "Corner badge",
+};
+const FEATURED_DESCRIPTIONS = {
+  "star-prefix": "Bold accent label with a ★ prefix. Subtle.",
+  "pill-solid": "Solid accent-filled rounded chip with inverted text. Loudest.",
+  "pill-outline": "Accent ring around the label, fills on hover.",
+  "underline-thick": "Always-visible 3px accent underline. Classic.",
+  "badge-corner": "Small ★ corner badge, top-right of the label.",
+};
+
 const PREVIEW_CSS = `
 :root { color-scheme: light dark;
   --fg: #18181b; --fg-muted: #5a5a5a; --accent: #7c3aed; --accent-hover: #6d28d9;
@@ -61,11 +76,26 @@ html, body { margin: 0; padding: 14px 16px; font-family: -apple-system, BlinkMac
 .nav[data-menu-style="bg-slide"] a:hover::before { transform: translateY(0); }
 .nav[data-menu-style="bg-slide"] a[aria-current="page"] { color: var(--fg-on-accent); }
 .nav[data-menu-style="bg-slide"] a[aria-current="page"]::before { transform: translateY(0); }
+
+/* Featured presets */
+.nav[data-featured-style="star-prefix"] .is-featured { font-weight: 700; color: var(--accent); }
+.nav[data-featured-style="star-prefix"] .is-featured::before { content: "★ "; font-size: 0.85em; color: var(--accent); }
+.nav[data-featured-style="pill-solid"] .is-featured { padding: 4px 14px; border-radius: 9999px; background: var(--accent); color: var(--fg-on-accent); font-weight: 600; }
+.nav[data-featured-style="pill-outline"] .is-featured { padding: 3px 13px; border-radius: 9999px; border: 1.5px solid var(--accent); color: var(--accent); font-weight: 600; }
+.nav[data-featured-style="underline-thick"] .is-featured { color: var(--accent); font-weight: 700; padding-bottom: 2px; border-bottom: 3px solid var(--accent); }
+.nav[data-featured-style="badge-corner"] .is-featured { position: relative; color: var(--accent); font-weight: 700; padding-right: 14px; }
+.nav[data-featured-style="badge-corner"] .is-featured::after { content: "★"; position: absolute; top: -6px; right: 0; font-size: 0.7em; color: var(--accent); line-height: 1; }
 `;
 function previewSrcdoc(style) {
   return "<!doctype html><html><head><style>" + PREVIEW_CSS + "</style></head><body>" +
     "<nav class='nav' data-menu-style='" + style + "'>" +
     "<a href='#'>Work</a><a href='#' aria-current='page'>Writing</a><a href='#'>About</a>" +
+    "</nav></body></html>";
+}
+function featuredPreviewSrcdoc(featuredStyle) {
+  return "<!doctype html><html><head><style>" + PREVIEW_CSS + "</style></head><body>" +
+    "<nav class='nav' data-featured-style='" + featuredStyle + "'>" +
+    "<a href='#'>Work</a><a href='#' class='is-featured'>Hire me</a><a href='#'>About</a>" +
     "</nav></body></html>";
 }
 %>
@@ -76,7 +106,8 @@ function previewSrcdoc(style) {
     <p>Manage navigation items, parents, the featured highlight, and the hover style. Click <strong>Publish</strong> in the header to apply.</p>
   </header>
 
-  <% if (it.flash === "style-saved") { %><p class="flash flash-ok">Style saved. Click Publish in the header to apply.</p><% } %>
+  <% if (it.flash === "style-saved") { %><p class="flash flash-ok">Hover style saved. Click Publish in the header to apply.</p><% } %>
+  <% if (it.flash === "featured-style-saved") { %><p class="flash flash-ok">Featured style saved. Click Publish in the header to apply.</p><% } %>
   <% if (it.flash === "created") { %><p class="flash flash-ok">Item added.</p><% } %>
   <% if (it.flash === "saved") { %><p class="flash flash-ok">Item updated.</p><% } %>
   <% if (it.flash === "deleted") { %><p class="flash flash-ok">Item deleted.</p><% } %>
@@ -100,7 +131,29 @@ function previewSrcdoc(style) {
         <% }); %>
       </div>
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save style</button>
+        <button type="submit" class="btn btn-primary">Save hover style</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <form method="post" action="<%= it.adminBase %>/menu/featured-style" class="menu-style-form">
+    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+    <fieldset class="form-section">
+      <legend>Featured item style (5 options) — applies to every item with the ★ flag</legend>
+      <div class="menu-style-grid">
+        <% it.featuredStyles.forEach(function(s){ %>
+        <label class="menu-style-card">
+          <input type="radio" name="style" value="<%= s %>" <%= s === it.activeFeaturedStyle ? "checked" : "" %> />
+          <div class="menu-style-meta">
+            <strong><%= FEATURED_LABELS[s] %></strong>
+            <span><%= FEATURED_DESCRIPTIONS[s] %></span>
+          </div>
+          <iframe class="menu-style-preview" loading="lazy" srcdoc="<%= featuredPreviewSrcdoc(s) %>" title="<%= FEATURED_LABELS[s] %> preview"></iframe>
+        </label>
+        <% }); %>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save featured style</button>
       </div>
     </fieldset>
   </form>

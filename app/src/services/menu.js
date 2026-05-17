@@ -9,6 +9,14 @@ export const MENU_STYLES = [
   "bg-slide",
 ];
 
+export const FEATURED_STYLES = [
+  "star-prefix",
+  "pill-solid",
+  "pill-outline",
+  "underline-thick",
+  "badge-corner",
+];
+
 export const DEFAULT_MENU = [
   { label: "Work", href: "work/" },
   { label: "Writing", href: "writing/" },

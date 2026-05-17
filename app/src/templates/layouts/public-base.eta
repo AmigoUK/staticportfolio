@@ -10,6 +10,7 @@ const ogImage = it_.ogImage || ((it_.site["site.base_url"] || "") + "/" + prefix
 const currentPath = it_.currentPath || "";
 const menu = it_.menu || [];
 const menuStyle = it_.menuStyle || "underline-slide";
+const featuredStyle = it_.featuredStyle || "star-prefix";
 function renderMenuLink(m, extraClass = "") {
   const external = /^(https?:|mailto:)/i.test(m.href);
   const href = external ? m.href : (prefix + m.href);
@@ -56,7 +57,7 @@ function renderMenuItem(m) {
   <header class="site-header">
     <div class="wrap">
       <a href="<%= prefix || './' %>" class="brand"><%= it.site["site.brand"] %><span>.</span></a>
-      <nav class="nav" aria-label="Primary" data-menu-style="<%= menuStyle %>">
+      <nav class="nav" aria-label="Primary" data-menu-style="<%= menuStyle %>" data-featured-style="<%= featuredStyle %>">
         <% menu.forEach(function(m){ %><%~ renderMenuItem(m) %><% }); %>
         <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>

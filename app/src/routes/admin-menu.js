@@ -10,6 +10,7 @@ import {
   moveUp,
   moveDown,
   MENU_STYLES,
+  FEATURED_STYLES,
 } from "../services/menu.js";
 import { getSetting, setSetting } from "../services/settings.js";
 
@@ -28,7 +29,9 @@ export default async function adminMenuRoutes(app) {
       items: listAllForAdmin(),
       parents: listPotentialParents(),
       activeStyle: getSetting("menu.style") || "underline-slide",
+      activeFeaturedStyle: getSetting("featured.style") || "star-prefix",
       styles: MENU_STYLES,
+      featuredStyles: FEATURED_STYLES,
       flash: req.query.msg || null,
       error: req.query.err || null,
     });
@@ -42,6 +45,17 @@ export default async function adminMenuRoutes(app) {
     }
     setSetting("menu.style", style);
     reply.redirect(`${ADMIN_BASE}/menu/?msg=style-saved`);
+    return reply;
+  });
+
+  app.post(`${ADMIN_BASE}/menu/featured-style`, csrfPre, async (req, reply) => {
+    const { style } = req.body || {};
+    if (!FEATURED_STYLES.includes(style)) {
+      reply.redirect(`${ADMIN_BASE}/menu/?err=${encodeURIComponent("Unknown featured style.")}`);
+      return reply;
+    }
+    setSetting("featured.style", style);
+    reply.redirect(`${ADMIN_BASE}/menu/?msg=featured-style-saved`);
     return reply;
   });
 

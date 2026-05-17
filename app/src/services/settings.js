@@ -12,6 +12,7 @@ export const DEFAULT_SETTINGS = {
   "social.linkedin": "https://linkedin.com/",
   "social.calendar": "https://cal.com/",
   "menu.style": "underline-slide",
+  "featured.style": "star-prefix",
 };
 
 export function seedDefaults() {

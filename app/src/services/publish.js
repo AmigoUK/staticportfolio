@@ -56,6 +56,7 @@ async function runPublish(logger) {
   const activeMono = getActiveFont("mono");
   const menu = listMenu();
   const menuStyle = site["menu.style"] || "underline-slide";
+  const featuredStyle = site["featured.style"] || "star-prefix";
   if (!theme) throw new Error("No active theme — seed presets first.");
 
   const fontFaces = [];
@@ -123,7 +124,7 @@ async function runPublish(logger) {
     .all();
 
   let pagesWritten = 0;
-  const baseCtx = { site, menu, menuStyle };
+  const baseCtx = { site, menu, menuStyle, featuredStyle };
 
   // Home
   const featuredWork = workEntries.filter((w) => !w.is_disabled).slice(0, 3);

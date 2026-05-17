@@ -117,16 +117,73 @@ code {
   display: block;
 }
 
-/* Featured marker — universal regardless of style. Each style variant can
-   tweak below if it wants to layer something special. */
-.nav .is-featured {
+/* Featured item — variant set by data-featured-style on the parent nav.
+   Each style is layered on top of whatever hover style is active. */
+
+/* star-prefix — bold + accent + '★ ' before label */
+.nav[data-featured-style="star-prefix"] .is-featured {
   font-weight: 700;
   color: var(--accent);
 }
-.nav .is-featured::before {
+.nav[data-featured-style="star-prefix"] .is-featured::before {
   content: "★ ";
   font-size: 0.85em;
   color: var(--accent);
+}
+
+/* pill-solid — accent-filled rounded pill, inverted text */
+.nav[data-featured-style="pill-solid"] .is-featured {
+  padding: 4px 14px;
+  border-radius: 9999px;
+  background: var(--accent);
+  color: var(--fg-on-accent);
+  font-weight: 600;
+  transition: background var(--transition);
+}
+.nav[data-featured-style="pill-solid"] .is-featured:hover,
+.nav[data-featured-style="pill-solid"] .is-featured:focus-visible {
+  background: var(--accent-hover);
+  color: var(--fg-on-accent);
+}
+
+/* pill-outline — 1.5px accent ring, accent text, fills on hover */
+.nav[data-featured-style="pill-outline"] .is-featured {
+  padding: 3px 13px;
+  border-radius: 9999px;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+  transition: background var(--transition), color var(--transition);
+}
+.nav[data-featured-style="pill-outline"] .is-featured:hover,
+.nav[data-featured-style="pill-outline"] .is-featured:focus-visible {
+  background: var(--accent);
+  color: var(--fg-on-accent);
+}
+
+/* underline-thick — always-visible 3px accent underline */
+.nav[data-featured-style="underline-thick"] .is-featured {
+  color: var(--accent);
+  font-weight: 700;
+  padding-bottom: 2px;
+  border-bottom: 3px solid var(--accent);
+}
+
+/* badge-corner — small ★ badge in the top-right corner of the label */
+.nav[data-featured-style="badge-corner"] .is-featured {
+  position: relative;
+  color: var(--accent);
+  font-weight: 700;
+  padding-right: 14px;
+}
+.nav[data-featured-style="badge-corner"] .is-featured::after {
+  content: "★";
+  position: absolute;
+  top: -6px;
+  right: 0;
+  font-size: 0.7em;
+  color: var(--accent);
+  line-height: 1;
 }
 
 /* ---- Style: underline-slide ---- */

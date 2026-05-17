@@ -91,6 +91,16 @@ test("deleteMenuItem removes the row", () => {
   assert.equal(menu.getMenuItem(created.id), null);
 });
 
+test("FEATURED_STYLES exposes all 5 variants", () => {
+  assert.deepEqual(menu.FEATURED_STYLES.sort(), [
+    "badge-corner",
+    "pill-outline",
+    "pill-solid",
+    "star-prefix",
+    "underline-thick",
+  ]);
+});
+
 test("MENU_STYLES exposes all 6 variants", () => {
   assert.deepEqual(menu.MENU_STYLES.sort(), [
     "bg-slide",
