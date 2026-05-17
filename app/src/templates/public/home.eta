@@ -1,0 +1,74 @@
+<% layout("/layouts/public-base", { title: it.site["site.title"], description: it.site["site.tagline"], ogTitle: it.site["site.brand"] + " — " + it.site["site.tagline"], ogDescription: "Retrieval and evaluation systems for LLMs.", ogType: "website", prefix: "", site: it.site, currentPath: "" }) %>
+    <section class="hero">
+      <div class="wrap">
+        <img class="hero-avatar" src="assets/img/avatar.jpg" alt="<%= it.heroAvatarAlt || 'Avatar' %>" width="88" height="88" />
+        <p class="eyebrow"><%= it.site["site.tagline"] %></p>
+        <h1><%= it.site["site.brand"] %></h1>
+        <p class="lede"><%= it.site["site.lede"] %></p>
+        <div class="cta-row">
+          <a href="work/" class="btn btn-primary">See selected work →</a>
+          <a href="writing/" class="btn btn-ghost">Read writing</a>
+        </div>
+      </div>
+    </section>
+
+    <% if (it.featuredWork && it.featuredWork.length) { %>
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Selected work</h2>
+          <span class="meta"><%= it.workYearRange %></span>
+        </div>
+        <div class="card-grid">
+          <% it.featuredWork.forEach(function(w){ %>
+          <a class="card" href="work/<%= w.slug %>.html">
+            <% if (w.cover_filename) { %>
+            <img class="card-cover" src="assets/img/<%= w.cover_filename %>" alt="<%= w.cover_alt || (w.title + ' cover') %>" width="640" height="360" />
+            <% } %>
+            <p class="kicker"><%= w.kicker %></p>
+            <h3><%= w.title %></h3>
+            <p><%= w.lede %></p>
+            <% if (w.tags_csv) { %>
+            <div class="tags"><% w.tags_csv.split(",").forEach(function(t){ %><span class="tag"><%= t.trim() %></span><% }); %></div>
+            <% } %>
+          </a>
+          <% }); %>
+        </div>
+      </div>
+    </section>
+    <% } %>
+
+    <% if (it.recentPosts && it.recentPosts.length) { %>
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Recent writing</h2>
+          <a href="writing/" class="meta">All posts →</a>
+        </div>
+        <ul class="post-list">
+          <% it.recentPosts.forEach(function(p){ %>
+          <li>
+            <a href="writing/<%= p.slug %>.html">
+              <time datetime="<%= p.published_at %>"><%= p.published_at %></time>
+              <h3><%= p.title %></h3>
+              <p class="dek"><%= p.dek %></p>
+            </a>
+          </li>
+          <% }); %>
+        </ul>
+      </div>
+    </section>
+    <% } %>
+
+    <div class="wrap">
+      <div class="contact-strip">
+        <span>Get in touch —</span>
+        <a href="mailto:<%= it.site["site.contact_email"] %>"><%= it.site["site.contact_email"] %></a>
+        <span class="dot">·</span>
+        <a href="<%= it.site["social.github"] %>" rel="noopener">GitHub</a>
+        <span class="dot">·</span>
+        <a href="<%= it.site["social.huggingface"] %>" rel="noopener">Hugging Face</a>
+        <span class="dot">·</span>
+        <a href="<%= it.site["social.linkedin"] %>" rel="noopener">LinkedIn</a>
+      </div>
+    </div>

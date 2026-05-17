@@ -1,0 +1,23 @@
+<% layout("/layouts/public-base", { title: it.entry.title + " — " + it.site["site.brand"], description: it.entry.meta_description || it.entry.lede, ogType: "article", prefix: "../", site: it.site, currentPath: "work/" }) %>
+    <section class="page-head">
+      <div class="wrap">
+        <% if (it.entry.eyebrow) { %>
+        <p class="eyebrow"><%= it.entry.eyebrow %></p>
+        <% } %>
+        <h1><%= it.entry.title %></h1>
+        <p class="lede"><%= it.entry.lede %></p>
+        <% if (it.entry.article_meta) { %>
+        <p class="article-meta"><%~ it.entry.article_meta %></p>
+        <% } %>
+      </div>
+    </section>
+
+    <section class="prose-body">
+      <div class="wrap">
+        <% if (it.entry.cover_filename) { %>
+        <img class="work-banner" src="../assets/img/<%= it.entry.cover_filename %>" alt="<%= it.entry.cover_alt || (it.entry.title + ' banner') %>" width="640" height="360" />
+        <% } %>
+        <%~ it.entry.body_html %>
+        <p class="back-link"><a class="btn btn-ghost" href="./">← All work</a></p>
+      </div>
+    </section>

@@ -12,15 +12,9 @@ RAPORT_AUDYTU.md
 # CMS branch — runtime + generated state
 node_modules/
 .env
-data/*.db
-data/*.db-journal
-data/*.db-wal
-data/*.db-shm
-uploads/*
-!uploads/.gitkeep
-public/*
-!public/.gitkeep
-public.next/
-public.prev/
-data/*.cache.json
+/data/
+/uploads/
+/public/
+/public.next/
+/public.prev/
 

@@ -1,0 +1,12 @@
+<% layout("/layouts/public-base", { title: it.page.title + " — " + it.site["site.brand"], description: it.page.meta_description || (it.page.title + " — " + it.site["site.brand"]), ogType: "website", ogTitle: it.page.title, prefix: "", site: it.site, currentPath: it.page.slug + ".html" }) %>
+    <section class="page-head">
+      <div class="wrap">
+        <h1><%= it.page.title %></h1>
+      </div>
+    </section>
+
+    <section class="prose-body">
+      <div class="wrap">
+        <%~ it.page.body_html %>
+      </div>
+    </section>

@@ -1,0 +1,71 @@
+<%
+const it_ = it;
+const prefix = it_.prefix || "";
+const title = it_.title || it_.site["site.title"];
+const description = it_.description || it_.site["site.tagline"] || "";
+const ogType = it_.ogType || "website";
+const ogTitle = it_.ogTitle || title;
+const ogDescription = it_.ogDescription || description;
+const ogImage = it_.ogImage || ((it_.site["site.base_url"] || "") + "/" + prefix + "assets/img/og-default.jpg").replace(/\/\/+/g, "/").replace(":/", "://");
+const currentPath = it_.currentPath || "";
+function nav(path, label) {
+  const aria = path === currentPath ? ' aria-current="page"' : "";
+  return `<a href="${prefix}${path}"${aria}>${label}</a>`;
+}
+%><!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; script-src 'self'; base-uri 'self'; frame-ancestors 'none';" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title><%= title %></title>
+  <meta name="description" content="<%= description %>" />
+  <meta property="og:title" content="<%= ogTitle %>" />
+  <meta property="og:description" content="<%= ogDescription %>" />
+  <% if (it.site["site.base_url"]) { %>
+  <meta property="og:image" content="<%= it.site["site.base_url"] %>/assets/img/og-default.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <% } %>
+  <meta property="og:type" content="<%= ogType %>" />
+  <link rel="icon" href="<%= prefix %>assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="alternate" type="application/rss+xml" title="<%= it.site["site.brand"] %> — Writing" href="<%= prefix %>writing/feed.xml" />
+  <link rel="stylesheet" href="<%= prefix %>assets/css/reset.css" />
+  <link rel="stylesheet" href="<%= prefix %>assets/css/tokens.css" />
+  <link rel="stylesheet" href="<%= prefix %>assets/css/site.css" />
+  <script src="<%= prefix %>assets/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a href="<%= prefix %>" class="brand"><%= it.site["site.brand"] %><span>.</span></a>
+      <nav class="nav" aria-label="Primary">
+        <%~ nav("work/", "Work") %>
+        <%~ nav("writing/", "Writing") %>
+        <%~ nav("about.html", "About") %>
+        <%~ nav("now.html", "Now") %>
+        <%~ nav("contact.html", "Contact") %>
+        <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <%~ it.body %>
+  </main>
+
+  <footer class="site-credit">
+    <a href="mailto:dev@attv.uk">dev@attv.uk</a>
+    <span class="sep">·</span>
+    <span>Project &amp; Development: Tomasz &lsquo;Amigo&rsquo; Lewandowski</span>
+    <span class="sep">·</span>
+    <a href="https://www.attv.uk" target="_blank" rel="noreferrer noopener">www.attv.uk</a>
+    <span class="sep">·</span>
+    <a href="https://github.com/AmigoUK/staticportfolio" target="_blank" rel="noreferrer noopener">GitHub</a>
+  </footer>
+</body>
+</html>

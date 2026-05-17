@@ -1,0 +1,31 @@
+<% layout("/layouts/public-base", { title: "Work — " + it.site["site.brand"], description: "Selected projects by " + it.site["site.brand"] + " — LLM evaluation, fine-tuning, retrieval, and agents.", ogType: "website", prefix: "../", site: it.site, currentPath: "work/" }) %>
+    <section class="page-head">
+      <div class="wrap">
+        <h1>Work</h1>
+        <p class="lede">Selected projects from the last two years — most LLM-adjacent, a few from before the wave that I still maintain.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="card-grid card-grid--two">
+          <% it.workEntries.forEach(function(w){ %>
+          <% if (w.is_disabled) { %>
+          <a class="card" href="#" aria-disabled="true">
+          <% } else { %>
+          <a class="card" href="<%= w.slug %>.html">
+          <% } %>
+            <% if (w.cover_filename) { %>
+            <img class="card-cover" src="../assets/img/<%= w.cover_filename %>" alt="<%= w.cover_alt || (w.title + ' cover') %>" width="640" height="360" />
+            <% } %>
+            <p class="kicker"><%= w.kicker %></p>
+            <h3><%= w.title %></h3>
+            <p><%= w.lede %></p>
+            <% if (w.tags_csv) { %>
+            <div class="tags"><% w.tags_csv.split(",").forEach(function(t){ %><span class="tag"><%= t.trim() %></span><% }); %></div>
+            <% } %>
+          </a>
+          <% }); %>
+        </div>
+      </div>
+    </section>

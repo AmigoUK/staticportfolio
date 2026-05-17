@@ -1,0 +1,23 @@
+<% layout("/layouts/public-base", { title: "Writing — " + it.site["site.brand"], description: "Essays and notes on LLM evaluation and applied ML.", ogType: "website", prefix: "../", site: it.site, currentPath: "writing/" }) %>
+    <section class="page-head">
+      <div class="wrap">
+        <h1>Writing</h1>
+        <p class="lede">Notes, longer essays, and rough drafts on language-model evaluation, retrieval, and the operational side of applied ML.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <ul class="post-list">
+          <% it.posts.forEach(function(p){ %>
+          <li>
+            <a href="<%= p.slug %>.html">
+              <time datetime="<%= p.published_at %>"><%= p.published_at %></time>
+              <h3><%= p.title %></h3>
+              <p class="dek"><%= p.dek %></p>
+            </a>
+          </li>
+          <% }); %>
+        </ul>
+      </div>
+    </section>

@@ -1,0 +1,57 @@
+<%
+const t = it.theme.tokens;
+function decl(map) {
+  return Object.entries(map).map(([k, v]) => `  --${k}: ${v};`).join("\n");
+}
+%>:root {
+  --font-sans: <%~ it.sansFamilyCss %>;
+  --font-mono: <%~ it.monoFamilyCss %>;
+
+  --fs-xs: 0.875rem;
+  --fs-sm: 1rem;
+  --fs-md: 1.25rem;
+  --fs-lg: 1.563rem;
+  --fs-xl: 1.953rem;
+  --fs-2xl: 2.441rem;
+  --fs-3xl: 3.052rem;
+
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+  --space-7: 4rem;
+  --space-8: 6rem;
+
+  --content-max: 64rem;
+  --prose-max: 42rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  --transition: 160ms ease;
+
+  --fg-on-accent: #ffffff;
+}
+
+:root[data-theme="light"] {
+<%~ decl(t.light) %>
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+<%~ decl(t.dark) %>
+  color-scheme: dark;
+}
+
+<% it.fontFaces.forEach(function(f){ %>
+@font-face {
+  font-family: "<%= f.family %>";
+  src: url("../fonts/<%= f.file %>") format("woff2");
+  font-weight: <%= f.weight %>;
+  font-style: normal;
+  font-display: swap;
+}
+<% }); %>
