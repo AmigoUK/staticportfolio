@@ -1,16 +1,18 @@
-import { requireAdmin } from "../lib/auth.js";
 import { getActiveTheme } from "../services/themes.js";
 
 const ADMIN_BASE = process.env.ADMIN_BASE_PATH || "/admin";
 
 export default async function adminTokensRoutes(app) {
-  const gate = requireAdmin(`${ADMIN_BASE}/login`);
-
   // Live theme tokens for the admin. Mirrors the same shape as
   // public/assets/css/tokens.css so the admin can inherit colors
   // without needing a publish. Cache for 5 seconds — short enough that
   // saving a theme reflects immediately on the next page load.
-  app.get(`${ADMIN_BASE}/tokens.css`, { preHandler: gate }, async (_req, reply) => {
+  //
+  // Not auth-gated: color values aren't secret (the public site
+  // already exposes the same palette via /assets/css/tokens.css after
+  // publish), and the login page needs to read this to match the
+  // active theme.
+  app.get(`${ADMIN_BASE}/tokens.css`, async (_req, reply) => {
     const theme = getActiveTheme();
     reply.type("text/css; charset=utf-8");
     reply.header("cache-control", "private, max-age=5");

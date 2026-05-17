@@ -11,9 +11,9 @@ const adminBase = it.adminBase || "/admin";
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; frame-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';" />
   <title><%= title %> — Portfolio CMS</title>
-  <% if (user) { %>
   <script>
-  /* Theme bootstrap — runs sync before paint so admin doesn't flash. */
+  /* Theme bootstrap — runs sync before paint so admin (and the login
+     page) don't flash. Applies to both authenticated and login views. */
   (function(){
     try {
       var s = localStorage.getItem("jd.theme");
@@ -25,7 +25,6 @@ const adminBase = it.adminBase || "/admin";
   })();
   </script>
   <link rel="stylesheet" href="<%= adminBase %>/tokens.css" />
-  <% } %>
   <link rel="stylesheet" href="<%= adminBase %>/static/admin.css" />
 </head>
 <body class="admin <%= user ? 'admin-shell' : 'admin-unauthed' %>">
