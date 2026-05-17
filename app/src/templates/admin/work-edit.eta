@@ -11,20 +11,20 @@
     <fieldset class="form-section">
       <legend>Identification</legend>
       <label class="form-row">
-        <span>Slug (kebab-case; becomes /work/{slug}.html)</span>
-        <input type="text" name="slug" required pattern="[a-z0-9](?:[a-z0-9-]{0,80}[a-z0-9])?" value="<%= it.entry.slug %>" />
+        <span>Slug (URL-safe identifier — lowercase letters, digits, dashes; becomes /work/{slug}.html)</span>
+        <input type="text" name="slug" required pattern="[a-z0-9](?:[a-z0-9-]{0,80}[a-z0-9])?" value="<%= it.entry.slug %>" title="Lowercase letters, digits, and dashes only. Cannot start or end with a dash." />
       </label>
       <label class="form-row">
         <span>Title</span>
         <input type="text" name="title" required maxlength="200" value="<%= it.entry.title %>" />
       </label>
       <label class="form-row">
-        <span>Kicker (shown above the title on cards; e.g. "Open source · Eval")</span>
-        <input type="text" name="kicker" maxlength="100" value="<%= it.entry.kicker || '' %>" />
+        <span>Kicker — small text shown above the title on cards (e.g. "Open source · Eval")</span>
+        <input type="text" name="kicker" maxlength="100" value="<%= it.entry.kicker || '' %>" title="Category-style label rendered just above the card title" />
       </label>
       <label class="form-row">
-        <span>Eyebrow (shown above the H1 on the detail page; usually same as kicker)</span>
-        <input type="text" name="eyebrow" maxlength="100" value="<%= it.entry.eyebrow || '' %>" />
+        <span>Eyebrow — small text shown above the H1 on the detail page (usually same as kicker)</span>
+        <input type="text" name="eyebrow" maxlength="100" value="<%= it.entry.eyebrow || '' %>" title="The card uses Kicker, the detail page uses Eyebrow — usually identical" />
       </label>
       <label class="form-row">
         <span>Lede (one-sentence summary; shown on cards and as the detail-page lede)</span>

@@ -144,17 +144,17 @@ function featuredPreviewSrcdoc(featuredStyle) {
         </div>
         <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>" class="menu-row-form">
           <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-          <input type="text" name="label" required maxlength="50" value="<%= m.label %>" placeholder="Label" />
-          <input type="text" name="href" required maxlength="250" value="<%= m.href %>" placeholder="work/ or https://…" />
-          <select name="parent_id" title="Make this item a submenu child of …">
+          <input type="text" name="label" required maxlength="50" value="<%= m.label %>" placeholder="Label" title="Visible link text" />
+          <input type="text" name="href" required maxlength="250" value="<%= m.href %>" placeholder="work/ or https://…" title="Destination — relative path (work/, about.html, …) or full https:// URL" />
+          <select name="parent_id" title="Pick a parent to make this a submenu child. One level of nesting.">
             <option value="">— top level —</option>
             <% it.parents.forEach(function(p){ if (p.id !== m.id) { %>
             <option value="<%= p.id %>" <%= m.parent_id === p.id ? "selected" : "" %>>↳ <%= p.label %></option>
             <% } }); %>
           </select>
-          <label class="cb"><input type="checkbox" name="open_new_tab" value="1" <%= m.open_new_tab ? "checked" : "" %> /> new tab</label>
-          <label class="cb"><input type="checkbox" name="is_visible" value="1" <%= m.is_visible ? "checked" : "" %> /> visible</label>
-          <label class="cb cb-featured"><input type="checkbox" name="is_featured" value="1" <%= m.is_featured ? "checked" : "" %> /> ★ featured</label>
+          <label class="cb" title="Opens the link in a new browser tab. Recommended for external sites."><input type="checkbox" name="open_new_tab" value="1" <%= m.open_new_tab ? "checked" : "" %> /> new tab</label>
+          <label class="cb" title="Hide from the public site without deleting it"><input type="checkbox" name="is_visible" value="1" <%= m.is_visible ? "checked" : "" %> /> visible</label>
+          <label class="cb cb-featured" title="Apply the Featured style to this item (set the style in the Featured style tab)"><input type="checkbox" name="is_featured" value="1" <%= m.is_featured ? "checked" : "" %> /> ★ featured</label>
           <button type="submit" class="btn btn-ghost btn-sm">Save</button>
         </form>
         <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/delete" class="inline" onsubmit="return confirm('Delete this menu item? Any children will be deleted too.')">

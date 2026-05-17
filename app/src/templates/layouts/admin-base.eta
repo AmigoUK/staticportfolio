@@ -46,6 +46,7 @@ const adminBase = it.adminBase || "/admin";
       <a href="<%= adminBase %>/menu/" data-section="menu">Menu</a>
       <a href="<%= adminBase %>/fonts/" data-section="fonts">Fonts</a>
       <a href="<%= adminBase %>/settings/" data-section="settings">Settings</a>
+      <a href="<%= adminBase %>/help/" data-section="help" class="admin-nav-help">Help</a>
     </nav>
     <div class="admin-sidebar-footer">
       <form class="admin-publish-inline" method="post" action="<%= adminBase %>/publish">

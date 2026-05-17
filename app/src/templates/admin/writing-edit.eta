@@ -19,8 +19,8 @@
     </label>
 
     <label class="form-row">
-      <span>Dek (one-sentence summary; shown on the post list and as the lede)</span>
-      <textarea name="dek" rows="2" maxlength="500"><%= it.post.dek || '' %></textarea>
+      <span>Dek — one-sentence subtitle / hook shown on the post list and under the title (journalism term)</span>
+      <textarea name="dek" rows="2" maxlength="500" title="A short hook line shown under the post title. Think of it as the article's subtitle."><%= it.post.dek || '' %></textarea>
     </label>
 
     <label class="form-row">

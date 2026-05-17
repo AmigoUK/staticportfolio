@@ -18,6 +18,7 @@ import adminWorkRoutes from "./routes/admin-work.js";
 import adminWritingRoutes from "./routes/admin-writing.js";
 import adminMenuRoutes from "./routes/admin-menu.js";
 import adminTokensRoutes from "./routes/admin-tokens.js";
+import adminHelpRoutes from "./routes/admin-help.js";
 import adminPublishRoutes from "./routes/admin-publish.js";
 import { seedPresets } from "./services/themes.js";
 import { seedDefaults } from "./services/settings.js";
@@ -122,6 +123,7 @@ export async function buildServer() {
   await app.register(adminWritingRoutes);
   await app.register(adminMenuRoutes);
   await app.register(adminTokensRoutes);
+  await app.register(adminHelpRoutes);
   await app.register(adminPublishRoutes);
   await app.register(adminPagesRoutes);
 
