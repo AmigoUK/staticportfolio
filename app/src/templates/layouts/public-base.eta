@@ -53,6 +53,7 @@ function renderMenuItem(m) {
   <link rel="stylesheet" href="<%= prefix %>assets/css/site.css" />
   <script src="<%= prefix %>assets/js/theme.js"></script>
   <script src="<%= prefix %>assets/js/nav.js" defer></script>
+  <script src="<%= prefix %>assets/js/code-copy.js" defer></script>
 </head>
 <body>
   <header class="site-header">
