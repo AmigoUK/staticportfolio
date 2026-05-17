@@ -8,13 +8,13 @@
     "node": ">=20.11"
   },
   "scripts": {
-    "dev": "node --watch app/src/server.js",
-    "start": "node app/src/server.js",
-    "test": "node --test app/src/**/*.test.js",
-    "create-admin": "node scripts/create-admin.js",
-    "reset-password": "node scripts/reset-password.js",
-    "seed": "node seed/seed-from-static.js",
-    "publish": "node scripts/publish.js"
+    "dev": "node --env-file=.env --watch app/src/server.js",
+    "start": "node --env-file=.env app/src/server.js",
+    "test": "bash -c 'shopt -s globstar; node --test --test-reporter=spec --test-concurrency=1 app/src/**/*.test.js'",
+    "create-admin": "node --env-file=.env scripts/create-admin.js",
+    "reset-password": "node --env-file=.env scripts/reset-password.js",
+    "seed": "node --env-file=.env seed/seed-from-static.js",
+    "publish": "node --env-file=.env scripts/publish.js"
   },
   "dependencies": {
     "@fastify/cookie": "^9.3.1",

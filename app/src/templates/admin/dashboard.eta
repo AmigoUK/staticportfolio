@@ -1,0 +1,40 @@
+<% layout("/layouts/admin-base", { title: "Dashboard", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<section class="dash">
+  <h1>Dashboard</h1>
+  <p class="dash-lede">Signed in as <strong><%= it.user.username %></strong>.</p>
+  <div class="dash-grid">
+    <a class="dash-tile" href="<%= it.adminBase %>/pages/">
+      <h2>Pages</h2>
+      <p>About, Now, Contact, 404.</p>
+    </a>
+    <a class="dash-tile" href="<%= it.adminBase %>/work/">
+      <h2>Work</h2>
+      <p>Selected projects with covers, tags, and structured bodies.</p>
+    </a>
+    <a class="dash-tile" href="<%= it.adminBase %>/writing/">
+      <h2>Writing</h2>
+      <p>Long-form posts with publish state and date.</p>
+    </a>
+    <a class="dash-tile" href="<%= it.adminBase %>/media/">
+      <h2>Media library</h2>
+      <p>Upload, re-encode, alt text, attribution.</p>
+    </a>
+    <a class="dash-tile" href="<%= it.adminBase %>/themes/">
+      <h2>Themes</h2>
+      <p>Edit the active palette or clone a preset.</p>
+    </a>
+    <a class="dash-tile" href="<%= it.adminBase %>/fonts/">
+      <h2>Typography</h2>
+      <p>Pick from bundled families plus system stacks.</p>
+    </a>
+    <a class="dash-tile" href="<%= it.adminBase %>/settings/">
+      <h2>Settings</h2>
+      <p>Site title, social links, contact.</p>
+    </a>
+  </div>
+  <form class="dash-publish" method="post" action="<%= it.adminBase %>/publish">
+    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+    <button type="submit" class="btn btn-primary">Publish site</button>
+    <p class="dash-publish-hint">Regenerates the public/ directory from the current database.</p>
+  </form>
+</section>

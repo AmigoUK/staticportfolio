@@ -1,0 +1,39 @@
+<%
+const title = it.title || "Admin";
+const user = it.user || null;
+const adminBase = it.adminBase || "/admin";
+%><!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title><%= title %> — Portfolio CMS</title>
+  <link rel="stylesheet" href="<%= adminBase %>/static/admin.css" />
+</head>
+<body class="admin">
+  <% if (user) { %>
+  <header class="admin-header">
+    <a href="<%= adminBase %>/" class="admin-brand">Portfolio CMS</a>
+    <nav class="admin-nav" aria-label="Primary">
+      <a href="<%= adminBase %>/">Dashboard</a>
+      <a href="<%= adminBase %>/pages/">Pages</a>
+      <a href="<%= adminBase %>/work/">Work</a>
+      <a href="<%= adminBase %>/writing/">Writing</a>
+      <a href="<%= adminBase %>/media/">Media</a>
+      <a href="<%= adminBase %>/themes/">Themes</a>
+      <a href="<%= adminBase %>/fonts/">Fonts</a>
+      <a href="<%= adminBase %>/settings/">Settings</a>
+    </nav>
+    <form class="admin-logout" method="post" action="<%= adminBase %>/logout">
+      <input type="hidden" name="_csrf" value="<%= it.csrfToken || '' %>" />
+      <button type="submit" class="btn btn-ghost">Log out (<%= user.username %>)</button>
+    </form>
+  </header>
+  <% } %>
+  <main class="admin-main">
+    <%~ it.body %>
+  </main>
+</body>
+</html>
