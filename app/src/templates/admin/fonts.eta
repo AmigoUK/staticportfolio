@@ -1,0 +1,84 @@
+<% layout("/layouts/admin-base", { title: "Typography", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<section class="page">
+  <header class="page-head">
+    <h1>Typography</h1>
+    <p>Pick the sans and mono families. Bundled fonts are self-hosted (WOFF2 ships with the site, no external CDN). System options use the OS-native stack with no extra downloads.</p>
+  </header>
+
+  <% if (it.flash === "saved") { %>
+  <p class="flash flash-ok">Fonts saved. Click Publish to regenerate the public site with the new fonts.</p>
+  <% } %>
+
+  <form method="post" action="<%= it.adminBase %>/fonts/">
+    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+
+    <fieldset class="form-section">
+      <legend>Sans family</legend>
+      <% it.sansFonts.forEach(function(f){ %>
+      <label class="font-option">
+        <input type="radio" name="sans_id" value="<%= f.id %>" <%= f.is_active ? "checked" : "" %> />
+        <span class="font-meta">
+          <span class="font-family"><%= f.family %></span>
+          <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : "System stack" %></span>
+        </span>
+        <span class="font-preview font-preview-<%= f.source %>" data-family-css='<%= f.source === "system" ? f.fallback_stack : "\"" + f.family + "\", " + f.fallback_stack %>'>
+          The quick brown fox jumps over the lazy dog 0123456789
+        </span>
+      </label>
+      <% }); %>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Mono family</legend>
+      <% it.monoFonts.forEach(function(f){ %>
+      <label class="font-option">
+        <input type="radio" name="mono_id" value="<%= f.id %>" <%= f.is_active ? "checked" : "" %> />
+        <span class="font-meta">
+          <span class="font-family"><%= f.family %></span>
+          <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : "System stack" %></span>
+        </span>
+        <span class="font-preview font-preview-<%= f.source %> font-preview-mono" data-family-css='<%= f.source === "system" ? f.fallback_stack : "\"" + f.family + "\", " + f.fallback_stack %>'>
+          const tokens_per_second = 42; // for the publish loop
+        </span>
+      </label>
+      <% }); %>
+    </fieldset>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save font choices</button>
+    </div>
+  </form>
+</section>
+
+<style>
+/* Locally @font-face the bundled fonts so the preview renders in the actual face. */
+<% it.sansFonts.concat(it.monoFonts).forEach(function(f){
+  if (f.source === "bundled") {
+    f.files.forEach(function(file){ %>
+@font-face {
+  font-family: "<%= f.family %>";
+  src: url("<%= it.adminBase %>/static/fonts/<%= file.file %>") format("woff2");
+  font-weight: <%= file.weight %>;
+  font-style: normal;
+  font-display: swap;
+}
+<%  });
+  }
+}); %>
+.font-option { display: grid; grid-template-columns: 24px 200px 1fr; gap: 14px; align-items: center; padding: 10px 12px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); margin-bottom: 8px; background: var(--admin-bg-elevated); }
+.font-option:has(input:checked) { border-color: var(--admin-accent); }
+.font-meta { display: flex; flex-direction: column; gap: 2px; }
+.font-family { font-weight: 500; }
+.font-tag { font-size: 11px; color: var(--admin-fg-muted); text-transform: uppercase; letter-spacing: .04em; }
+.font-preview { font-size: 16px; line-height: 1.4; padding: 6px 0; color: var(--admin-fg); }
+.font-preview-mono { font-size: 14px; }
+</style>
+
+<script>
+(function(){
+  document.querySelectorAll(".font-preview").forEach(function(el){
+    var css = el.getAttribute("data-family-css");
+    if (css) el.style.fontFamily = css;
+  });
+})();
+</script>

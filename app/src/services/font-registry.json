@@ -1,0 +1,83 @@
+{
+  "sans": [
+    {
+      "family": "Geist",
+      "source": "bundled",
+      "weights": [400, 500, 700],
+      "files": [
+        { "weight": 400, "file": "geist-400.woff2" },
+        { "weight": 500, "file": "geist-500.woff2" },
+        { "weight": 700, "file": "geist-700.woff2" }
+      ],
+      "fallback_stack": "\"Inter\", system-ui, -apple-system, sans-serif"
+    },
+    {
+      "family": "Inter",
+      "source": "bundled",
+      "weights": [400, 500, 700],
+      "files": [
+        { "weight": 400, "file": "inter-400.woff2" },
+        { "weight": 500, "file": "inter-500.woff2" },
+        { "weight": 700, "file": "inter-700.woff2" }
+      ],
+      "fallback_stack": "system-ui, -apple-system, sans-serif"
+    },
+    {
+      "family": "IBM Plex Sans",
+      "source": "bundled",
+      "weights": [400, 500, 700],
+      "files": [
+        { "weight": 400, "file": "ibm-plex-sans-400.woff2" },
+        { "weight": 500, "file": "ibm-plex-sans-500.woff2" },
+        { "weight": 700, "file": "ibm-plex-sans-700.woff2" }
+      ],
+      "fallback_stack": "system-ui, -apple-system, sans-serif"
+    },
+    {
+      "family": "System Sans",
+      "source": "system",
+      "weights": [400, 500, 700],
+      "files": null,
+      "fallback_stack": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+    }
+  ],
+  "mono": [
+    {
+      "family": "Geist Mono",
+      "source": "bundled",
+      "weights": [400, 500],
+      "files": [
+        { "weight": 400, "file": "geist-mono-400.woff2" },
+        { "weight": 500, "file": "geist-mono-500.woff2" }
+      ],
+      "fallback_stack": "\"JetBrains Mono\", ui-monospace, monospace"
+    },
+    {
+      "family": "JetBrains Mono",
+      "source": "bundled",
+      "weights": [400, 500],
+      "files": [
+        { "weight": 400, "file": "jetbrains-mono-400.woff2" },
+        { "weight": 500, "file": "jetbrains-mono-500.woff2" }
+      ],
+      "fallback_stack": "ui-monospace, monospace"
+    },
+    {
+      "family": "IBM Plex Mono",
+      "source": "bundled",
+      "weights": [400, 500],
+      "files": [
+        { "weight": 400, "file": "ibm-plex-mono-400.woff2" },
+        { "weight": 500, "file": "ibm-plex-mono-500.woff2" }
+      ],
+      "fallback_stack": "ui-monospace, monospace"
+    },
+    {
+      "family": "System Mono",
+      "source": "system",
+      "weights": [400, 500],
+      "files": null,
+      "fallback_stack": "ui-monospace, SFMono-Regular, \"SF Mono\", Consolas, \"Liberation Mono\", Menlo, monospace"
+    }
+  ]
+}

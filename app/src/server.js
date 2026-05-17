@@ -11,8 +11,10 @@ import authRoutes from "./routes/auth.js";
 import adminPagesRoutes from "./routes/admin-pages.js";
 import adminThemesRoutes from "./routes/admin-themes.js";
 import adminSettingsRoutes from "./routes/admin-settings.js";
+import adminFontsRoutes from "./routes/admin-fonts.js";
 import { seedPresets } from "./services/themes.js";
 import { seedDefaults } from "./services/settings.js";
+import { seedFonts } from "./services/fonts.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -47,6 +49,7 @@ export async function buildServer() {
   getDb();
   seedPresets();
   seedDefaults();
+  seedFonts();
 
   app.addContentTypeParser(
     "application/x-www-form-urlencoded",
@@ -84,10 +87,16 @@ export async function buildServer() {
     prefix: `${ADMIN_BASE}/static/`,
     decorateReply: false,
   });
+  await app.register(staticPlugin, {
+    root: join(REPO_ROOT, "source-assets", "fonts"),
+    prefix: `${ADMIN_BASE}/static/fonts/`,
+    decorateReply: false,
+  });
 
   await app.register(authRoutes);
   await app.register(adminThemesRoutes);
   await app.register(adminSettingsRoutes);
+  await app.register(adminFontsRoutes);
   await app.register(adminPagesRoutes);
 
   app.get("/healthz", async () => ({ ok: true }));
