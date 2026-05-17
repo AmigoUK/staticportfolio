@@ -81,6 +81,9 @@ a:hover { text-decoration: underline; }
   overflow-y: auto;
 }
 .admin-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 9px 22px;
   font-size: 14px;
   color: var(--admin-fg-muted);
@@ -98,24 +101,21 @@ a:hover { text-decoration: underline; }
   border-left-color: var(--admin-accent);
   font-weight: 500;
 }
+.admin-nav .nav-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.85;
+  transition: opacity var(--transition);
+}
+.admin-nav a:hover .nav-icon,
+.admin-nav a.is-active .nav-icon {
+  opacity: 1;
+}
 .admin-nav-help {
   margin-top: auto;
   font-size: 13px;
   opacity: 0.85;
-}
-.admin-nav-help::before {
-  content: "?";
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  text-align: center;
-  line-height: 16px;
-  border-radius: 50%;
-  background: var(--admin-bg);
-  color: var(--admin-fg-muted);
-  margin-right: 8px;
-  font-size: 11px;
-  font-weight: 600;
 }
 .admin-sidebar-footer {
   padding: 14px 18px;
