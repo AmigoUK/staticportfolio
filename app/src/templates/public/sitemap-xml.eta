@@ -1,12 +1,13 @@
 <%
 const base = (it.site["site.base_url"] || "").replace(/\/+$/, "");
 const today = new Date().toISOString().slice(0, 10);
+const simplePages = (it.pages || []).filter((p) => p.slug !== "404" && p.published);
 %><?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc><%= base %>/</loc><lastmod><%= today %></lastmod></url>
-  <url><loc><%= base %>/about.html</loc><lastmod><%= today %></lastmod></url>
-  <url><loc><%= base %>/now.html</loc><lastmod><%= today %></lastmod></url>
-  <url><loc><%= base %>/contact.html</loc><lastmod><%= today %></lastmod></url>
+  <% simplePages.forEach(function(p){ %>
+  <url><loc><%= base %>/<%= p.slug %>.html</loc><lastmod><%= (p.updated_at || today).slice(0,10) %></lastmod></url>
+  <% }); %>
   <url><loc><%= base %>/work/</loc><lastmod><%= today %></lastmod></url>
   <% it.workEntries.forEach(function(w){ if (!w.is_disabled) { %>
   <url><loc><%= base %>/work/<%= w.slug %>.html</loc><lastmod><%= w.updated_at.slice(0,10) %></lastmod></url>

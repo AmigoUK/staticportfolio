@@ -1,12 +1,22 @@
-<% layout("/layouts/admin-base", { title: "Edit page — " + it.page.title, user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<%
+const mode = it.mode || (it.page.slug ? "edit" : "new");
+const isNew = mode === "new";
+%><% layout("/layouts/admin-base", { title: isNew ? "New page" : "Edit page — " + it.page.title, user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
 <section class="page">
   <header class="page-head">
     <p class="back-crumb"><a href="<%= it.adminBase %>/pages/">← Pages</a></p>
-    <h1>Edit page: <code><%= it.page.slug %></code></h1>
+    <h1><%= isNew ? "New page" : "Edit page" %><% if (!isNew) { %>: <code><%= it.page.slug %></code><% } %></h1>
   </header>
 
-  <form method="post" action="<%= it.adminBase %>/pages/<%= it.page.slug %>">
+  <form method="post" action="<%= isNew ? it.adminBase + "/pages/new" : it.adminBase + "/pages/" + it.page.slug %>">
     <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+
+    <% if (isNew) { %>
+    <label class="form-row">
+      <span>Slug — lowercase letters / digits / dashes; becomes <code>/{slug}.html</code></span>
+      <input type="text" name="slug" required pattern="[a-z0-9](?:[a-z0-9\-]{0,80}[a-z0-9])?" maxlength="82" placeholder="e.g. resume, projects, uses" value="<%= it.page.slug || '' %>" />
+    </label>
+    <% } %>
 
     <label class="form-row">
       <span>Title</span>
@@ -14,22 +24,22 @@
     </label>
 
     <label class="form-row">
-      <span>Meta description (shown in search results and og:description)</span>
+      <span>Meta description (shown in search results + og:description)</span>
       <input type="text" name="meta_description" maxlength="500" value="<%= it.page.meta_description || '' %>" />
     </label>
 
     <label class="form-row">
-      <span>Body — rich text. Formatting is sanitized server-side on save (whitelist: h2/h3/h4, p, lists, blockquote, code, links, images).</span>
+      <span>Body — rich text. Output is sanitized server-side.</span>
       <textarea name="body_html" data-rte rows="20"><%= it.page.body_html || '' %></textarea>
     </label>
 
     <label class="form-row form-row-inline">
       <input type="checkbox" name="published" value="1" <%= it.page.published ? "checked" : "" %> />
-      <span>Published (uncheck to keep the page out of the next publish)</span>
+      <span>Published (uncheck to keep it out of the next publish)</span>
     </label>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="submit" class="btn btn-primary"><%= isNew ? "Create" : "Save" %></button>
       <a class="btn btn-ghost" href="<%= it.adminBase %>/pages/">Cancel</a>
     </div>
   </form>

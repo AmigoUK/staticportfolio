@@ -1,24 +1,43 @@
 <% layout("/layouts/admin-base", { title: "Pages", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
 <section class="page">
   <header class="page-head">
-    <h1>Pages</h1>
-    <p>Edit the simple pages — about, now, contact, 404. Add or remove pages by editing the schema (the slug set is locked to known values).</p>
+    <div class="head-row">
+      <h1>Pages</h1>
+      <a class="btn btn-primary" href="<%= it.adminBase %>/pages/new">+ New page</a>
+    </div>
+    <p>Simple pages — system pages (about, now, contact, 404) cannot be deleted but can be edited. Any other page can be deleted. Slugs become URLs: <code>{slug}.html</code>.</p>
   </header>
 
-  <% if (it.flash === "saved") { %><p class="flash flash-ok">Page saved. Click <strong>Publish</strong> from the dashboard to regenerate the public site.</p><% } %>
+  <% if (it.flash === "saved") { %><p class="flash flash-ok">Page saved. Click <strong>Publish</strong> in the header to apply.</p><% } %>
+  <% if (it.flash === "created") { %><p class="flash flash-ok">Page created. Click <strong>Publish</strong> in the header to make it live.</p><% } %>
+  <% if (it.flash === "deleted") { %><p class="flash flash-ok">Page deleted. Click <strong>Publish</strong> to remove it from the public site.</p><% } %>
+  <% if (it.error) { %><p class="flash flash-warn"><%= it.error %></p><% } %>
 
   <table class="data-table">
     <thead><tr><th>Slug</th><th>Title</th><th>Updated</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody>
       <% it.pages.forEach(function(p){ %>
       <tr>
-        <td><code><%= p.slug %></code></td>
+        <td><code><%= p.slug %></code><% if (p.is_system) { %> <span class="tag-mini">system</span><% } %></td>
         <td><%= p.title %></td>
         <td><%= p.updated_at %></td>
         <td><%= p.published ? "Published" : "Draft" %></td>
-        <td><a class="btn btn-ghost" href="<%= it.adminBase %>/pages/<%= p.slug %>/edit">Edit</a></td>
+        <td class="actions">
+          <a class="btn btn-ghost" href="<%= it.adminBase %>/pages/<%= p.slug %>/edit">Edit</a>
+          <% if (!p.is_system) { %>
+          <form method="post" action="<%= it.adminBase %>/pages/<%= p.slug %>/delete" class="inline" onsubmit="return confirm('Delete this page? Cannot be undone.')">
+            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+            <button type="submit" class="btn btn-ghost btn-danger">Delete</button>
+          </form>
+          <% } %>
+        </td>
       </tr>
       <% }); %>
     </tbody>
   </table>
 </section>
+
+<style>
+.head-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.tag-mini { font-size: 11px; background: var(--admin-bg); padding: 2px 6px; border-radius: 3px; color: var(--admin-fg-muted); margin-left: 4px; }
+</style>

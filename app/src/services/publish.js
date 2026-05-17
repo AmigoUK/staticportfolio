@@ -178,7 +178,7 @@ async function runPublish(logger) {
   }
 
   // sitemap.xml + writing/feed.xml + robots.txt
-  const sitemap = await eta.renderAsync("public/sitemap-xml.eta", { site, workEntries, posts });
+  const sitemap = await eta.renderAsync("public/sitemap-xml.eta", { site, workEntries, posts, pages });
   writeFileSync(join(STAGING_DIR, "sitemap.xml"), sitemap);
   const rss = await eta.renderAsync("public/rss-xml.eta", { site, posts });
   writeFileSync(join(STAGING_DIR, "writing", "feed.xml"), rss);
