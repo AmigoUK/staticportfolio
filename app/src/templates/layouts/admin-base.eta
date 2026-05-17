@@ -11,6 +11,21 @@ const adminBase = it.adminBase || "/admin";
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; frame-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self';" />
   <title><%= title %> — Portfolio CMS</title>
+  <% if (user) { %>
+  <script>
+  /* Theme bootstrap — runs sync before paint so admin doesn't flash. */
+  (function(){
+    try {
+      var s = localStorage.getItem("jd.theme");
+      if (s !== "light" && s !== "dark") {
+        s = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.dataset.theme = s;
+    } catch(_) { /* private mode etc — ignore */ }
+  })();
+  </script>
+  <link rel="stylesheet" href="<%= adminBase %>/tokens.css" />
+  <% } %>
   <link rel="stylesheet" href="<%= adminBase %>/static/admin.css" />
 </head>
 <body class="admin <%= user ? 'admin-shell' : 'admin-unauthed' %>">
@@ -38,6 +53,11 @@ const adminBase = it.adminBase || "/admin";
         <input type="hidden" name="_csrf" value="<%= it.csrfToken || '' %>" />
         <button type="submit" class="btn btn-primary btn-publish" title="Regenerate the public site with current DB state">Publish</button>
       </form>
+      <button type="button" class="btn btn-ghost btn-block admin-theme-toggle" data-theme-toggle aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <span class="admin-theme-toggle-label">Theme</span>
+      </button>
       <form class="admin-logout" method="post" action="<%= adminBase %>/logout">
         <input type="hidden" name="_csrf" value="<%= it.csrfToken || '' %>" />
         <button type="submit" class="btn btn-ghost btn-block">Log out (<%= user.username %>)</button>
@@ -74,6 +94,16 @@ const adminBase = it.adminBase || "/admin";
       }
     });
     if (best) best.classList.add("is-active");
+
+    // Theme toggle in the sidebar footer.
+    var toggleBtn = document.querySelector(".admin-theme-toggle");
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", function () {
+        var next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem("jd.theme", next); } catch (_) {}
+      });
+    }
 
     // Render the publish-result banner from query params.
     var params = new URLSearchParams(location.search);

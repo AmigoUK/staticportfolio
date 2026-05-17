@@ -1,31 +1,32 @@
-/* Admin UI — distinct from the public site styles but built on the same tokens. */
+/* Admin UI uses the SAME theme tokens as the public site. /admin/tokens.css
+   (route) supplies --bg / --fg / --accent / etc. for whichever theme the user
+   has active, with light + dark variants on [data-theme]. Theme.js bootstrap
+   in admin-base.eta sets [data-theme] before paint.
+   The var(…, fallback) values below are last-resort defaults if the route
+   ever fails to respond. */
 :root {
-  --admin-bg: #fafaf8;
-  --admin-bg-elevated: #ffffff;
-  --admin-fg: #1a1a1c;
-  --admin-fg-muted: #5a5a5a;
-  --admin-border: #e5e3dc;
-  --admin-accent: #6d28d9;
-  --admin-accent-hover: #5b21b6;
+  --admin-bg:           var(--bg,           #fafaf8);
+  --admin-bg-elevated:  var(--bg-elevated,  #ffffff);
+  --admin-fg:           var(--fg,           #1a1a1c);
+  --admin-fg-muted:     var(--fg-muted,     #5a5a5a);
+  --admin-border:       var(--border,       #e5e3dc);
+  --admin-accent:       var(--accent,       #6d28d9);
+  --admin-accent-hover: var(--accent-hover, #5b21b6);
   --admin-error-bg: #fef2f2;
   --admin-error-fg: #991b1b;
   --admin-radius: 8px;
   --admin-radius-sm: 4px;
-  color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --admin-bg: #0f0e12;
-    --admin-bg-elevated: #17161c;
-    --admin-fg: #f5f4f0;
-    --admin-fg-muted: #a8a5a0;
-    --admin-border: #26242c;
-    --admin-accent: #a78bfa;
-    --admin-accent-hover: #c4b5fd;
+  :root:not([data-theme="light"]) {
     --admin-error-bg: #2a1212;
     --admin-error-fg: #fca5a5;
   }
+}
+:root[data-theme="dark"] {
+  --admin-error-bg: #2a1212;
+  --admin-error-fg: #fca5a5;
 }
 
 * { box-sizing: border-box; }
@@ -107,6 +108,17 @@ a:hover { text-decoration: underline; }
 .admin-publish-inline, .admin-logout { display: block; margin: 0; }
 .btn-publish { width: 100%; padding: 8px 14px; font-size: 13px; }
 .btn-block { width: 100%; }
+
+.admin-theme-toggle {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+}
+.admin-theme-toggle svg { width: 14px; height: 14px; }
+:root[data-theme="light"] .admin-theme-toggle .icon-sun { display: none; }
+:root[data-theme="dark"] .admin-theme-toggle .icon-moon { display: none; }
 
 /* Hamburger toggle for narrow viewports */
 .admin-sidebar-toggle-input { position: absolute; opacity: 0; pointer-events: none; }
