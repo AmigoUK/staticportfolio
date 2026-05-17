@@ -79,5 +79,47 @@
       "files": null,
       "fallback_stack": "ui-monospace, SFMono-Regular, \"SF Mono\", Consolas, \"Liberation Mono\", Menlo, monospace"
     }
+  ],
+  "header": [
+    {
+      "family": "Geist",
+      "source": "bundled",
+      "weights": [400, 500, 700],
+      "files": [
+        { "weight": 400, "file": "geist-400.woff2" },
+        { "weight": 500, "file": "geist-500.woff2" },
+        { "weight": 700, "file": "geist-700.woff2" }
+      ],
+      "fallback_stack": "\"Inter\", system-ui, -apple-system, sans-serif"
+    },
+    {
+      "family": "Inter",
+      "source": "bundled",
+      "weights": [400, 500, 700],
+      "files": [
+        { "weight": 400, "file": "inter-400.woff2" },
+        { "weight": 500, "file": "inter-500.woff2" },
+        { "weight": 700, "file": "inter-700.woff2" }
+      ],
+      "fallback_stack": "system-ui, -apple-system, sans-serif"
+    },
+    {
+      "family": "IBM Plex Sans",
+      "source": "bundled",
+      "weights": [400, 500, 700],
+      "files": [
+        { "weight": 400, "file": "ibm-plex-sans-400.woff2" },
+        { "weight": 500, "file": "ibm-plex-sans-500.woff2" },
+        { "weight": 700, "file": "ibm-plex-sans-700.woff2" }
+      ],
+      "fallback_stack": "system-ui, -apple-system, sans-serif"
+    },
+    {
+      "family": "System Sans",
+      "source": "system",
+      "weights": [400, 500, 700],
+      "files": null,
+      "fallback_stack": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+    }
   ]
 }

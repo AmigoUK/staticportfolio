@@ -30,7 +30,8 @@ export default async function adminFontsRoutes(app) {
     const csrfToken = await reply.generateCsrf();
     const sansFonts = listFonts("sans");
     const monoFonts = listFonts("mono");
-    const customCount = sansFonts.concat(monoFonts).filter((f) => f.source === "custom").length;
+    const headerFonts = listFonts("header");
+    const customCount = sansFonts.concat(monoFonts).concat(headerFonts).filter((f) => f.source === "custom").length;
     const requestedTab = String(req.query.tab || "picker");
     const activeTab = ["picker", "upload"].includes(requestedTab) ? requestedTab : "picker";
     return renderHtml(reply, "admin/fonts.eta", {
@@ -39,8 +40,10 @@ export default async function adminFontsRoutes(app) {
       csrfToken,
       sansFonts,
       monoFonts,
+      headerFonts,
       activeSans: getActiveFont("sans"),
       activeMono: getActiveFont("mono"),
+      activeHeader: getActiveFont("header"),
       customCount,
       activeTab,
       flash: req.query.msg || null,
@@ -52,6 +55,7 @@ export default async function adminFontsRoutes(app) {
     const body = req.body || {};
     if (body.sans_id) setActiveFont("sans", body.sans_id);
     if (body.mono_id) setActiveFont("mono", body.mono_id);
+    if (body.header_id) setActiveFont("header", body.header_id);
     reply.redirect(`${ADMIN_BASE}/fonts/?tab=picker&msg=saved`);
     return reply;
   });

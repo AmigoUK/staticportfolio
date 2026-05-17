@@ -41,9 +41,12 @@ function sanitizeWeight(raw) {
   return w;
 }
 
+const FONT_ROLES = ["sans", "mono", "header"];
+export { FONT_ROLES };
+
 function sanitizeRole(raw) {
-  if (raw !== "sans" && raw !== "mono") {
-    const e = new Error("Role must be 'sans' or 'mono'."); e.code = "BAD_ROLE"; throw e;
+  if (!FONT_ROLES.includes(raw)) {
+    const e = new Error("Role must be 'sans', 'mono', or 'header'."); e.code = "BAD_ROLE"; throw e;
   }
   return raw;
 }
@@ -143,20 +146,24 @@ export function getRegistry() {
   return registryCache;
 }
 
+const ROLE_TO_SETTING = { sans: "font_sans_id", mono: "font_mono_id", header: "font_header_id" };
+
 export function seedFonts() {
   const db = getDb();
-  const existing = db.prepare("SELECT COUNT(*) AS n FROM fonts").get().n;
   const registry = getRegistry();
   const insert = db.prepare(
     "INSERT OR IGNORE INTO fonts (family, role, weights_csv, source, files_json, fallback_stack, is_active) " +
       "VALUES (?, ?, ?, ?, ?, ?, ?)",
   );
   let inserted = 0;
-  for (const role of ["sans", "mono"]) {
-    const list = registry[role];
+  for (const role of FONT_ROLES) {
+    const list = registry[role] || [];
+    // Per-role "is this the first time we've seeded this role?" check —
+    // lets us add 'header' to an existing install that already has sans + mono.
+    const rowsAlreadyInRole = db.prepare("SELECT COUNT(*) AS n FROM fonts WHERE role = ?").get(role).n;
     for (let i = 0; i < list.length; i++) {
       const f = list[i];
-      const isDefault = i === 0 && existing === 0;
+      const isDefault = i === 0 && rowsAlreadyInRole === 0;
       const info = insert.run(
         f.family,
         role,
@@ -168,20 +175,24 @@ export function seedFonts() {
       );
       if (info.changes) inserted++;
     }
-  }
-  if (existing === 0) {
-    const sansRow = db.prepare("SELECT id FROM fonts WHERE role = 'sans' AND is_active = 1 LIMIT 1").get();
-    const monoRow = db.prepare("SELECT id FROM fonts WHERE role = 'mono' AND is_active = 1 LIMIT 1").get();
-    if (sansRow && getSettingNum("font_sans_id") === null) setSetting("font_sans_id", sansRow.id);
-    if (monoRow && getSettingNum("font_mono_id") === null) setSetting("font_mono_id", monoRow.id);
+    // If the active-id for this role isn't set yet, set it to whichever
+    // row currently carries is_active=1 (either marked just now, or pre-existing).
+    const settingKey = ROLE_TO_SETTING[role];
+    if (settingKey && getSettingNum(settingKey) === null) {
+      const activeRow = db.prepare("SELECT id FROM fonts WHERE role = ? AND is_active = 1 LIMIT 1").get(role);
+      if (activeRow) setSetting(settingKey, activeRow.id);
+    }
   }
   return inserted;
 }
 
 export function listFonts(role) {
   const db = getDb();
-  const sansActive = getSettingNum("font_sans_id");
-  const monoActive = getSettingNum("font_mono_id");
+  const activeByRole = {
+    sans: getSettingNum("font_sans_id"),
+    mono: getSettingNum("font_mono_id"),
+    header: getSettingNum("font_header_id"),
+  };
   const where = role ? "WHERE role = ?" : "";
   const params = role ? [role] : [];
   const rows = db
@@ -192,7 +203,7 @@ export function listFonts(role) {
   return rows.map((r) => ({
     ...r,
     files: r.files_json ? JSON.parse(r.files_json) : null,
-    is_active: r.role === "sans" ? r.id === sansActive : r.id === monoActive,
+    is_active: r.id === activeByRole[r.role],
   }));
 }
 
@@ -204,20 +215,23 @@ export function getFontById(id) {
 }
 
 export function getActiveFont(role) {
-  const key = role === "sans" ? "font_sans_id" : "font_mono_id";
+  const key = ROLE_TO_SETTING[role];
+  if (!key) return null;
   const id = getSettingNum(key);
   if (!id) return null;
   return getFontById(id);
 }
 
 export function setActiveFont(role, fontId) {
+  const key = ROLE_TO_SETTING[role];
+  if (!key) return null;
   const font = getFontById(fontId);
   if (!font || font.role !== role) return null;
   const db = getDb();
   db.transaction(() => {
     db.prepare("UPDATE fonts SET is_active = 0 WHERE role = ?").run(role);
     db.prepare("UPDATE fonts SET is_active = 1 WHERE id = ?").run(font.id);
-    setSetting(role === "sans" ? "font_sans_id" : "font_mono_id", font.id);
+    setSetting(key, font.id);
   })();
   return font;
 }

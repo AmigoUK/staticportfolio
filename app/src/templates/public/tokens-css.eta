@@ -6,6 +6,7 @@ function decl(map) {
 %>:root {
   --font-sans: <%~ it.sansFamilyCss %>;
   --font-mono: <%~ it.monoFamilyCss %>;
+  --font-header: <%~ it.headerFamilyCss %>;
 
   --fs-xs: 0.875rem;
   --fs-sm: 1rem;

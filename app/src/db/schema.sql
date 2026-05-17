@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS themes (
 CREATE TABLE IF NOT EXISTS fonts (
   id INTEGER PRIMARY KEY,
   family TEXT NOT NULL,
-  role TEXT NOT NULL CHECK(role IN ('sans','mono')),
+  role TEXT NOT NULL CHECK(role IN ('sans','mono','header')),
   weights_csv TEXT NOT NULL,
   source TEXT NOT NULL CHECK(source IN ('bundled','system','custom')),
   files_json TEXT,

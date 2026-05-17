@@ -8,13 +8,33 @@ const settings = await import("./settings.js");
 
 test("seedFonts inserts all registry entries and activates the first of each role", () => {
   const inserted = fonts.seedFonts();
-  assert.equal(inserted, 8);
+  // 4 sans + 4 mono + 4 header = 12 total. (sans-style families seeded into header too.)
+  assert.equal(inserted, 12);
   const sans = fonts.listFonts("sans");
   const mono = fonts.listFonts("mono");
+  const header = fonts.listFonts("header");
   assert.equal(sans.length, 4);
   assert.equal(mono.length, 4);
+  assert.equal(header.length, 4);
   assert.equal(sans.filter((f) => f.is_active).length, 1);
   assert.equal(mono.filter((f) => f.is_active).length, 1);
+  assert.equal(header.filter((f) => f.is_active).length, 1);
+});
+
+test("setActiveFont('header', id) requires a header-role row", () => {
+  const header = fonts.listFonts("header");
+  const target = header.find((f) => !f.is_active);
+  const updated = fonts.setActiveFont("header", target.id);
+  assert.equal(updated?.id, target.id);
+  assert.equal(fonts.listFonts("header").find((f) => f.is_active).id, target.id);
+
+  // Trying to set a mono-role row as header → null.
+  const monoFont = fonts.listFonts("mono")[0];
+  assert.equal(fonts.setActiveFont("header", monoFont.id), null);
+});
+
+test("FONT_ROLES export lists exactly sans, mono, header", () => {
+  assert.deepEqual([...fonts.FONT_ROLES].sort(), ["header", "mono", "sans"]);
 });
 
 test("seedFonts is idempotent", () => {

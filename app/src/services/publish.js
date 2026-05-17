@@ -55,15 +55,22 @@ async function runPublish(logger) {
   const theme = getActiveTheme();
   const activeSans = getActiveFont("sans");
   const activeMono = getActiveFont("mono");
+  const activeHeader = getActiveFont("header");
   const menu = listMenu();
   const menuStyle = site["menu.style"] || "underline-slide";
   const featuredStyle = site["featured.style"] || "star-prefix";
   if (!theme) throw new Error("No active theme — seed presets first.");
 
+  // Dedupe by (family + filename) so the same WOFF2 referenced by both sans
+  // and header rows doesn't emit duplicate @font-face declarations / file copies.
   const fontFaces = [];
-  for (const font of [activeSans, activeMono].filter(Boolean)) {
+  const seenFaces = new Set();
+  for (const font of [activeSans, activeMono, activeHeader].filter(Boolean)) {
     if ((font.source === "bundled" || font.source === "custom") && font.files) {
       for (const f of font.files) {
+        const key = font.family + "|" + f.file;
+        if (seenFaces.has(key)) continue;
+        seenFaces.add(key);
         fontFaces.push({ family: font.family, weight: f.weight, file: f.file, source: font.source, _font: font });
       }
     }
@@ -99,6 +106,7 @@ async function runPublish(logger) {
     theme,
     sansFamilyCss: familyCssValue(activeSans),
     monoFamilyCss: familyCssValue(activeMono),
+    headerFamilyCss: familyCssValue(activeHeader || activeSans),
     fontFaces,
   });
   writeFileSync(join(STAGING_DIR, "assets", "css", "tokens.css"), tokensCss);

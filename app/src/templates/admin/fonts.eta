@@ -63,6 +63,23 @@
           <% }); %>
         </fieldset>
 
+        <% var headerList = it.headerFonts || []; %>
+        <fieldset class="form-section">
+          <legend>Header family <span class="legend-hint">(applies to h1–h6)</span></legend>
+          <% headerList.forEach(function(f){ %>
+          <label class="font-option">
+            <input type="radio" name="header_id" value="<%= f.id %>" <%= f.is_active ? "checked" : "" %> />
+            <span class="font-meta">
+              <span class="font-family"><%= f.family %></span>
+              <span class="font-tag"><%= f.source === "bundled" ? "Bundled · " + f.files.length + " weights" : f.source === "custom" ? "Custom · " + f.files.length + " weights" : "System stack" %></span>
+            </span>
+            <span class="font-preview font-preview-<%= f.source %> font-preview-header" data-family-css='<%= f.source === "system" ? f.fallback_stack : "\"" + f.family + "\", " + f.fallback_stack %>'>
+              Selected work · 2024 — present
+            </span>
+          </label>
+          <% }); %>
+        </fieldset>
+
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Save font choices</button>
         </div>
@@ -84,6 +101,7 @@
             <select name="role" required>
               <option value="sans">Sans (for body text)</option>
               <option value="mono">Mono (for code blocks)</option>
+              <option value="header">Header (for h1–h6)</option>
             </select>
           </label>
           <label class="form-row">
@@ -111,7 +129,7 @@
       </fieldset>
 
       <%
-        var customs = it.sansFonts.concat(it.monoFonts).filter(function(f){ return f.source === "custom"; });
+        var customs = it.sansFonts.concat(it.monoFonts).concat(it.headerFonts || []).filter(function(f){ return f.source === "custom"; });
       %>
       <% if (customs.length) { %>
       <fieldset class="form-section">
@@ -143,7 +161,7 @@
 
 <style>
 /* Locally @font-face the bundled fonts so the preview renders in the actual face. */
-<% it.sansFonts.concat(it.monoFonts).forEach(function(f){
+<% it.sansFonts.concat(it.monoFonts).concat(it.headerFonts || []).forEach(function(f){
   if (f.source === "bundled" || f.source === "custom") {
     var basePath = f.source === "custom" ? it.adminBase + "/static/custom-fonts/" : it.adminBase + "/static/fonts/";
     f.files.forEach(function(file){ %>
@@ -183,6 +201,8 @@
 .font-tag { font-size: 11px; color: var(--admin-fg-muted); text-transform: uppercase; letter-spacing: .04em; }
 .font-preview { font-size: 16px; line-height: 1.4; padding: 6px 0; color: var(--admin-fg); }
 .font-preview-mono { font-size: 14px; }
+.font-preview-header { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.legend-hint { font-size: 12px; color: var(--admin-fg-muted); font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 6px; }
 
 /* Upload tab — custom font management list */
 .custom-fonts-list { display: flex; flex-direction: column; gap: 8px; }

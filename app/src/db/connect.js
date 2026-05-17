@@ -40,6 +40,7 @@ function applyMigrations(db) {
   ensureColumn("menu_items", "is_featured", "INTEGER NOT NULL DEFAULT 0");
   ensureColumn("media", "kind", "TEXT NOT NULL DEFAULT 'image'");
   widenFontsSourceCheck(db);
+  widenFontsRoleCheck(db);
 }
 
 // SQLite has no DROP CONSTRAINT; widening a CHECK means recreating the
@@ -56,6 +57,35 @@ function widenFontsSourceCheck(db) {
       "  id INTEGER PRIMARY KEY," +
       "  family TEXT NOT NULL," +
       "  role TEXT NOT NULL CHECK(role IN ('sans','mono'))," +
+      "  weights_csv TEXT NOT NULL," +
+      "  source TEXT NOT NULL CHECK(source IN ('bundled','system','custom'))," +
+      "  files_json TEXT," +
+      "  fallback_stack TEXT," +
+      "  is_active INTEGER NOT NULL DEFAULT 0," +
+      "  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+      "  UNIQUE(family, role)" +
+      ");" +
+      "INSERT INTO fonts_new SELECT id, family, role, weights_csv, source, files_json, fallback_stack, is_active, created_at FROM fonts;" +
+      "DROP TABLE fonts;" +
+      "ALTER TABLE fonts_new RENAME TO fonts;" +
+      "COMMIT;",
+  );
+}
+
+// Same pattern as widenFontsSourceCheck — but widening the role CHECK to
+// allow the new 'header' value. Idempotent: bails out if the new CHECK is
+// already present in sqlite_master.sql.
+function widenFontsRoleCheck(db) {
+  const row = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='fonts'").get();
+  if (!row || !row.sql) return;
+  if (row.sql.includes("'header'")) return; // already widened
+  if (!/CHECK\s*\(\s*role\s+IN\s*\(\s*['"]sans['"]\s*,\s*['"]mono['"]\s*\)\s*\)/i.test(row.sql)) return;
+  db["exec"](
+    "BEGIN;" +
+      "CREATE TABLE fonts_new (" +
+      "  id INTEGER PRIMARY KEY," +
+      "  family TEXT NOT NULL," +
+      "  role TEXT NOT NULL CHECK(role IN ('sans','mono','header'))," +
       "  weights_csv TEXT NOT NULL," +
       "  source TEXT NOT NULL CHECK(source IN ('bundled','system','custom'))," +
       "  files_json TEXT," +
