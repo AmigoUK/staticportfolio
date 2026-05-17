@@ -11,7 +11,6 @@ export default async function authRoutes(app) {
     }
     return renderHtml(reply, "admin/login.eta", {
       adminBase: ADMIN_BASE,
-      csrfToken: req.session?.csrfToken || "",
       error: null,
       username: "",
     });
@@ -31,7 +30,6 @@ export default async function authRoutes(app) {
         reply.code(401);
         return renderHtml(reply, "admin/login.eta", {
           adminBase: ADMIN_BASE,
-          csrfToken: req.session?.csrfToken || "",
           error: "Incorrect username or password.",
           username: typeof username === "string" ? username : "",
         });
@@ -46,12 +44,16 @@ export default async function authRoutes(app) {
     },
   );
 
-  app.post(`${ADMIN_BASE}/logout`, async (req, reply) => {
-    await new Promise((resolve) => {
-      if (!req.session) return resolve();
-      req.session.destroy(() => resolve());
-    });
-    reply.redirect(`${ADMIN_BASE}/login`);
-    return reply;
-  });
+  app.post(
+    `${ADMIN_BASE}/logout`,
+    { preHandler: app.csrfProtection },
+    async (req, reply) => {
+      await new Promise((resolve) => {
+        if (!req.session) return resolve();
+        req.session.destroy(() => resolve());
+      });
+      reply.redirect(`${ADMIN_BASE}/login`);
+      return reply;
+    },
+  );
 }

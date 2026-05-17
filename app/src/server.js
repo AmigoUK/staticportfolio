@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import cookie from "@fastify/cookie";
 import session from "@fastify/session";
+import csrfProtection from "@fastify/csrf-protection";
 import staticPlugin from "@fastify/static";
 import rateLimit from "@fastify/rate-limit";
 import { dirname, join, resolve } from "node:path";
@@ -65,6 +66,10 @@ export async function buildServer() {
       maxAge: 24 * 60 * 60 * 1000,
     },
     saveUninitialized: false,
+  });
+  await app.register(csrfProtection, {
+    sessionPlugin: "@fastify/session",
+    getToken: (req) => req.body?._csrf || req.headers["x-csrf-token"],
   });
   await app.register(rateLimit, { global: false });
 
