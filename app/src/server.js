@@ -40,6 +40,16 @@ function requireSecret() {
   return s;
 }
 
+function warnIfInsecureProd(log) {
+  if (process.env.NODE_ENV !== "production") return;
+  if (COOKIE_SECURE !== true && process.env.COOKIE_SECURE !== "1") {
+    log.warn("COOKIE_SECURE is not set in production — session cookie will travel over plaintext HTTP if the server is exposed without TLS.");
+  }
+  if (HOST !== "127.0.0.1" && HOST !== "localhost") {
+    log.warn(`HOST=${HOST} binds beyond loopback — confirm a reverse proxy (Apache/Nginx) is fronting the app and not exposing it directly.`);
+  }
+}
+
 export async function buildServer() {
   const app = Fastify({
     logger: { level: process.env.LOG_LEVEL || "info" },
@@ -123,6 +133,7 @@ export async function buildServer() {
 
 async function main() {
   const app = await buildServer();
+  warnIfInsecureProd(app.log);
   try {
     await app.listen({ port: PORT, host: HOST });
   } catch (err) {
