@@ -7,6 +7,7 @@ import { eta } from "../lib/render.js";
 import { mkdirSync, rmSync, renameSync, copyFileSync, existsSync, readdirSync, writeFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const APP_SRC = join(__dirname, "..");
@@ -114,6 +115,8 @@ async function runPublish(logger) {
     copyTree(legacyImgDir, join(STAGING_DIR, "assets", "img"));
   }
 
+  const webpMade = await generateWebpVariants(join(STAGING_DIR, "assets", "img"));
+
   const db_ = getDb();
   const pages = db_.prepare("SELECT * FROM pages WHERE published = 1").all();
   const workEntries = db_
@@ -126,6 +129,9 @@ async function runPublish(logger) {
 
   let pagesWritten = 0;
   const baseCtx = { site, menu, menuStyle, featuredStyle };
+  function writeHtmlFile(path, html) {
+    writeFileSync(path, rewriteImgsToPicture(html));
+  }
 
   // Home
   const featuredWork = workEntries.filter((w) => !w.is_disabled).slice(0, 3);
@@ -136,7 +142,7 @@ async function runPublish(logger) {
     workYearRange: workYearRange(workEntries),
     heroAvatarAlt: "Minimalist desk with laptop — avatar",
   });
-  writeFileSync(join(STAGING_DIR, "index.html"), home);
+  writeHtmlFile(join(STAGING_DIR, "index.html"), home);
   pagesWritten++;
 
   // Simple pages: about, now, contact, 404
@@ -145,37 +151,37 @@ async function runPublish(logger) {
       page.slug === "404" ? "public/error-404.eta" : "public/simple-page.eta",
       { ...baseCtx, page },
     );
-    writeFileSync(join(STAGING_DIR, `${page.slug}.html`), html);
+    writeHtmlFile(join(STAGING_DIR, `${page.slug}.html`), html);
     pagesWritten++;
   }
 
   // Ensure 404 is always generated even if no row exists
   if (!pages.find((p) => p.slug === "404")) {
     const html = await eta.renderAsync("public/error-404.eta", { ...baseCtx, page: { slug: "404", title: "Not found" } });
-    writeFileSync(join(STAGING_DIR, "404.html"), html);
+    writeHtmlFile(join(STAGING_DIR, "404.html"), html);
     pagesWritten++;
   }
 
   // Work
   const workIndexHtml = await eta.renderAsync("public/work-index.eta", { ...baseCtx, workEntries });
-  writeFileSync(join(STAGING_DIR, "work", "index.html"), workIndexHtml);
+  writeHtmlFile(join(STAGING_DIR, "work", "index.html"), workIndexHtml);
   pagesWritten++;
 
   for (const entry of workEntries) {
     if (entry.is_disabled) continue;
     const html = await eta.renderAsync("public/work-detail.eta", { ...baseCtx, entry });
-    writeFileSync(join(STAGING_DIR, "work", `${entry.slug}.html`), html);
+    writeHtmlFile(join(STAGING_DIR, "work", `${entry.slug}.html`), html);
     pagesWritten++;
   }
 
   // Writing
   const writingIndexHtml = await eta.renderAsync("public/writing-index.eta", { ...baseCtx, posts });
-  writeFileSync(join(STAGING_DIR, "writing", "index.html"), writingIndexHtml);
+  writeHtmlFile(join(STAGING_DIR, "writing", "index.html"), writingIndexHtml);
   pagesWritten++;
 
   for (const post of posts) {
     const html = await eta.renderAsync("public/writing-post.eta", { ...baseCtx, post });
-    writeFileSync(join(STAGING_DIR, "writing", `${post.slug}.html`), html);
+    writeHtmlFile(join(STAGING_DIR, "writing", `${post.slug}.html`), html);
     pagesWritten++;
   }
 
@@ -198,8 +204,8 @@ async function runPublish(logger) {
   renameSync(STAGING_DIR, PUBLIC_DIR);
   rmSync(PREV_DIR, { recursive: true, force: true });
 
-  logger.info?.(`publish ok: ${pagesWritten} pages, ${fontsCopied} fonts, ${mediaCopied} media files`);
-  return { pagesWritten, fontsCopied, mediaCopied };
+  logger.info?.(`publish ok: ${pagesWritten} pages, ${fontsCopied} fonts, ${mediaCopied} media files, ${webpMade} webp variants generated`);
+  return { pagesWritten, fontsCopied, mediaCopied, webpMade };
 }
 
 const db = () => getDb();
@@ -249,4 +255,48 @@ function copyTree(src, dst) {
       copyFileSync(s, d);
     }
   }
+}
+
+// Generate a sibling .webp for every .jpg/.jpeg/.png found under `dir`,
+// recursively. Skips files where the .webp already exists.
+async function generateWebpVariants(dir) {
+  if (!existsSync(dir)) return 0;
+  let made = 0;
+  const queue = [dir];
+  while (queue.length) {
+    const d = queue.pop();
+    for (const name of readdirSync(d)) {
+      const full = join(d, name);
+      const stat = statSync(full);
+      if (stat.isDirectory()) { queue.push(full); continue; }
+      if (!/\.(jpe?g|png)$/i.test(name)) continue;
+      const webpPath = full.replace(/\.(jpe?g|png)$/i, ".webp");
+      if (existsSync(webpPath)) continue;
+      try {
+        await sharp(full).webp({ quality: 82 }).toFile(webpPath);
+        made++;
+      } catch (e) {
+        // Tolerate broken images — skip them rather than break the publish.
+      }
+    }
+  }
+  return made;
+}
+
+// Wrap every <img src="X.jpg|.jpeg|.png"> in <picture> with a WebP source.
+// Skips external URLs and images already inside a <picture>.
+function rewriteImgsToPicture(html) {
+  // Pass-through any pre-existing <picture> blocks intact.
+  return html.replace(
+    /(<picture\b[\s\S]*?<\/picture>)|(<img\b([^>]*?)\bsrc=(["'])([^"']+\.(?:jpe?g|png))\4([^>]*?)\s*\/?>)/gi,
+    (match, picture, imgTag, before, _q, src, after) => {
+      if (picture) return picture;
+      if (!imgTag) return match;
+      if (/^https?:/i.test(src) || /^\/\//.test(src)) return imgTag;
+      const webp = src.replace(/\.(jpe?g|png)$/i, ".webp");
+      // Reconstruct the <img> tag cleanly to ensure it self-closes.
+      const cleanImg = `<img${before}src="${src}"${after} />`;
+      return `<picture><source srcset="${webp}" type="image/webp" />${cleanImg}</picture>`;
+    },
+  );
 }

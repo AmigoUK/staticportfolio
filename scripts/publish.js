@@ -11,7 +11,10 @@ async function main() {
   seedDefaults();
   seedFonts();
   const result = await publish({ logger: console });
-  console.log(`Published: ${result.pagesWritten} pages, ${result.fontsCopied} fonts, ${result.mediaCopied} media files.`);
+  console.log(
+    `Published: ${result.pagesWritten} pages, ${result.fontsCopied} fonts, ` +
+      `${result.mediaCopied} media files, ${result.webpMade ?? 0} new webp variants.`,
+  );
   closeDb();
 }
 
