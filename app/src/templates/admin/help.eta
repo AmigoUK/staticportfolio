@@ -6,16 +6,18 @@
     <ol class="lead-points">
       <li><strong>The left sidebar</strong> is the only menu — each item manages one kind of content or setting.</li>
       <li><strong>Changes save instantly to the database</strong> — but the live site only updates when you click <strong>Publish</strong> (bottom-left of the sidebar).</li>
-      <li><strong>Hover any field with a small <code>?</code></strong> for a quick explanation.</li>
+      <li><strong>Hover any field</strong> with explanatory text — most form fields have a tooltip.</li>
     </ol>
   </header>
 
   <nav class="help-toc" aria-label="On this page">
     <strong>On this page:</strong>
     <a href="#getting-started">Getting started</a> ·
-    <a href="#publish">The Publish flow</a> ·
+    <a href="#publish">Publish flow</a> ·
     <a href="#sections">Sections</a> ·
-    <a href="#editor">The rich-text editor</a> ·
+    <a href="#editor">Rich-text editor</a> ·
+    <a href="#public-features">Public site features</a> ·
+    <a href="#analytics">Analytics</a> ·
     <a href="#faq">FAQ</a> ·
     <a href="#troubleshooting">Troubleshooting</a> ·
     <a href="#backups">Backups</a>
@@ -24,154 +26,200 @@
   <article class="help-article">
 
   <h2 id="getting-started">Getting started</h2>
-  <p>Your first session usually goes:</p>
+  <p>A typical first session:</p>
   <ol>
     <li>Edit <strong>Settings</strong> to set your site title, brand, social links, and contact email.</li>
-    <li>Pick a <strong>Theme</strong> — clone &amp; edit a preset if you want custom colors.</li>
-    <li>Pick <strong>Fonts</strong> — one sans + one mono.</li>
+    <li>Pick a <strong>Theme</strong> — activate a preset, clone &amp; edit, or import a JSON theme.</li>
+    <li>Pick <strong>Fonts</strong> — one Sans, one Mono, one Header.</li>
+    <li>Tweak the <strong>Menu</strong> — items, hover style, featured style.</li>
     <li>Edit the four system <strong>Pages</strong> (about, now, contact, 404). Add custom pages with <strong>+ New page</strong>.</li>
     <li>Add a <strong>Work</strong> entry or a <strong>Writing</strong> post.</li>
-    <li>Adjust the <strong>Menu</strong> — drag-ish reorder with ↑↓, add a Résumé / external link, pick a hover style.</li>
-    <li>Click <strong>Publish</strong>. The public site regenerates from scratch (typically under 2 seconds).</li>
+    <li>Click <strong>Publish</strong>. The public site regenerates from scratch in under 2 seconds.</li>
   </ol>
 
   <h2 id="publish">How Publish works</h2>
-  <p>The public site is a directory of plain HTML files in <code>public/</code>. The admin app never serves them dynamically — Apache (or Tailscale Serve, or any static host) hands the files out as-is. So <em>nothing</em> you change in the admin appears live until Publish regenerates those files.</p>
-  <p>Publish is atomic — it writes the whole site into <code>public.next/</code>, then renames it onto <code>public/</code>. Visitors never see a half-rendered site.</p>
-  <p>When in doubt: <strong>save, then Publish.</strong></p>
+  <p>The public site is plain HTML files in <code>public/</code>. Apache (or Tailscale Serve) hands them out as-is — the admin app never serves them dynamically. So <em>nothing</em> you change in the admin appears live until Publish regenerates those files.</p>
+  <p>Publish is atomic — writes the whole site into <code>public.next/</code>, then renames it onto <code>public/</code>. Visitors never see a half-rendered site.</p>
+  <p><strong>Save → Publish.</strong> The Publish button is always at the bottom of the sidebar.</p>
 
   <h2 id="sections">Sidebar sections</h2>
 
   <h3 id="dashboard">Dashboard</h3>
-  <p>Tile shortcuts plus the Publish button (also always in the sidebar footer).</p>
+  <p>Tile shortcuts plus a Publish button. The header Publish button works from anywhere.</p>
 
   <h3 id="pages">Pages</h3>
   <p><em>Path: <code>/admin/pages/</code></em></p>
   <p>Standalone pages at the root of the site — <code>/about.html</code>, <code>/now.html</code>, <code>/contact.html</code>, <code>/404.html</code>, plus any custom slug you create.</p>
   <ul>
     <li><strong>System pages</strong> (about, now, contact, 404) can be edited but never deleted.</li>
-    <li><strong>+ New page</strong> creates a fresh page at <code>/your-slug.html</code>. Slug must be lowercase kebab-case.</li>
+    <li><strong>+ New page</strong> creates a fresh page at <code>/your-slug.html</code>. Slug must be lowercase letters, digits, dashes.</li>
     <li>Some slugs are blocked because they collide with generated paths: <code>admin</code>, <code>assets</code>, <code>index</code>, <code>work</code>, <code>writing</code>, <code>sitemap</code>, <code>robots</code>, <code>feed</code>, <code>favicon</code>, <code>uploads</code>, <code>static</code>.</li>
   </ul>
 
   <h3 id="work">Work</h3>
   <p><em>Path: <code>/admin/work/</code></em></p>
-  <p>Structured project cards. Top 3 (by sort order, non-disabled) appear on the home page. All non-disabled show on <code>/work/</code>. Each has a slug → <code>/work/&#123;slug&#125;.html</code>.</p>
-  <p>Fields: kicker (small text above the title on cards), eyebrow (small text above the H1 on the detail page), lede (one-sentence summary), article meta (small line under the lede), tags (comma-separated), cover image (from the media library or a legacy filename), body (rich text).</p>
-  <p><strong>Coming-soon mode:</strong> turn on <em>Disabled</em>. Renders a non-clickable card on <code>/work/</code>, no detail page generated.</p>
+  <p>Structured project cards at <code>/work/{slug}.html</code>. Top 3 (by sort order, non-disabled) appear on the home page. Disabled cards render a non-clickable "coming soon" placeholder on <code>/work/</code> with no detail page.</p>
 
   <h3 id="writing">Writing</h3>
   <p><em>Path: <code>/admin/writing/</code></em></p>
-  <p>Long-form posts at <code>/writing/&#123;slug&#125;.html</code>. The two most recently published also appear on the home page. Toggle <em>Published</em> off to keep something out of the public site (drafts).</p>
+  <p>Long-form posts at <code>/writing/{slug}.html</code>. The two most recently published also appear on the home page. Toggle <em>Published</em> off to keep something out of the public site (drafts).</p>
 
   <h3 id="media">Media</h3>
   <p><em>Path: <code>/admin/media/</code></em></p>
-  <p>Two upload forms:</p>
+  <p>Two upload forms side-by-side:</p>
   <ul>
-    <li><strong>Images</strong> — JPEG / PNG / WebP, ≤ 8 MB. Re-encoded to strip EXIF, compressed. WebP variant generated automatically on publish; the public site uses <code>&lt;picture&gt;</code> with a JPEG fallback.</li>
+    <li><strong>Images</strong> — JPEG / PNG / WebP, ≤ 8 MB. Re-encoded to strip EXIF, compressed. A WebP variant is generated automatically on publish so the public site can serve a smaller image to modern browsers (see <a href="#public-features">Public site features</a>).</li>
     <li><strong>Files</strong> — PDF / ZIP / MP3 / MP4, ≤ 32 MB. Stored as-is. Land at <code>/assets/files/</code> on publish.</li>
   </ul>
-  <p>Upload validation checks the file's actual content (magic bytes), not just the extension. Renaming <code>script.txt</code> to <code>script.jpg</code> won't fool it.</p>
+  <p>Upload validation checks the file's actual contents (not just the extension). Renaming <code>script.txt</code> to <code>script.jpg</code> won't fool it.</p>
 
   <h3 id="themes">Themes</h3>
   <p><em>Path: <code>/admin/themes/</code></em></p>
-  <p>5 shipped presets — Cream Light + Indigo Dark, Paper Light + Ink Dark, Solarized, Nord, Warm Sepia. Each defines 10 color tokens in light + dark variants.</p>
-  <p><strong>Presets are read-only.</strong> To customize: <em>Clone</em> beside the preset, then <em>Edit</em> the copy. Each color is a picker plus hex input, with a live iframe preview.</p>
-  <p><strong>Activate</strong> sets the active theme in the database. <strong>Publish</strong> regenerates <code>tokens.css</code> with the new colors.</p>
+  <p>5 shipped presets (Cream + Indigo, Paper + Ink, Solarized, Nord, Warm Sepia). Each defines 10 color tokens in light + dark variants.</p>
+  <ul>
+    <li><strong>Presets are read-only</strong> — clone, then edit the copy.</li>
+    <li><strong>+ New theme</strong> at the top-right creates a fresh blank custom theme.</li>
+    <li><strong>Import JSON…</strong> uploads a theme JSON file (the same shape Export produces).</li>
+    <li><strong>Export</strong> on any row downloads a JSON of that theme — share it, edit it offline, re-import.</li>
+    <li><strong>Activate</strong> sets the active theme in the database. <strong>Publish</strong> regenerates <code>tokens.css</code> with the new colors.</li>
+  </ul>
+  <p>The admin itself uses the active theme too — switch theme and the admin reskins on the next page load.</p>
 
   <h3 id="menu">Menu</h3>
   <p><em>Path: <code>/admin/menu/</code></em></p>
-  <p>Three tabs. <strong>Items</strong> is the default.</p>
+  <p>Three tabs.</p>
   <ul>
-    <li><strong>Items</strong> — add / edit / reorder / hide / delete nav links. Set a parent to nest as a submenu child (one level deep). Toggle ★ <em>featured</em> for the highlight treatment. <em>Visible</em> off hides without deleting.</li>
-    <li><strong>Hover style</strong> — pick one of 6 mouseover effects (underline slide, pill fill, spotlight glow, magnetic snap, bracket frame, background slide). Each tile renders a live preview.</li>
+    <li><strong>Items</strong> (default) — add / edit / reorder ↑↓ / hide / delete nav links. Set a parent to nest as a submenu child (one level deep). Toggle ★ <em>featured</em> for the highlight treatment. <em>Visible</em> off hides without deleting. Cap at 30 items.</li>
+    <li><strong>Hover style</strong> — pick one of 6 mouseover effects (underline slide, pill fill, spotlight glow, magnetic snap, bracket frame, background slide). Each card renders a live preview.</li>
     <li><strong>Featured style</strong> — pick one of 5 treatments that apply to ★ items: star prefix, solid pill, outline pill, thick underline, corner badge.</li>
   </ul>
-  <p>Both styles are independent and combine cleanly — e.g. bracket-frame hover + solid-pill featured.</p>
+  <p>Submenus on the public site open on hover and stay open for 3 seconds after you slide off (re-enter cancels the close). Clicking anywhere else or pressing Esc closes immediately.</p>
+  <p>On a narrow viewport (≤ 720 px), or when items can't fit on one line on desktop, the nav collapses into a hamburger button that slides the menu open.</p>
 
   <h3 id="fonts">Fonts</h3>
   <p><em>Path: <code>/admin/fonts/</code></em></p>
-  <p>Pick one sans family + one mono family. 6 bundled OFL-licensed families ship in the repo (Geist, Inter, IBM Plex Sans + the three mono variants). Plus 2 "System" stacks that use the OS-native fonts without any download.</p>
-  <p>Live preview shows each face. WOFF2 files for the active fonts are copied into <code>public/assets/fonts/</code> on publish — no external CDN.</p>
+  <p>Two tabs.</p>
+  <ul>
+    <li><strong>Picker</strong> (default) — three independent radio-card sections:
+      <ul>
+        <li><strong>Sans family</strong> — used for body text. Default: Geist.</li>
+        <li><strong>Mono family</strong> — used for code blocks. Default: Geist Mono.</li>
+        <li><strong>Header family</strong> — used for every <code>h1</code> through <code>h6</code>. Default: Geist.</li>
+      </ul>
+      6 bundled OFL-licensed families ship (Geist, Inter, IBM Plex Sans + their mono twins, plus JetBrains Mono) along with 2 system stacks.
+    </li>
+    <li><strong>Upload custom</strong> — drop a WOFF2 file (≤ 2 MB), name the family, pick a role (Sans / Mono / Header) and weight. Upload one file per weight; re-uploading the same family + weight replaces it.</li>
+  </ul>
 
   <h3 id="settings">Settings</h3>
   <p><em>Path: <code>/admin/settings/</code></em></p>
-  <p><strong>Site identity:</strong> title (in <code>&lt;title&gt;</code>), brand (header), tagline (header), home page lede.</p>
-  <p><strong>Contact + social:</strong> email, public base URL (used for absolute sitemap entries and og:image), GitHub / Hugging Face / LinkedIn / calendar URLs.</p>
+  <p>Three fieldsets:</p>
+  <ul>
+    <li><strong>Site identity</strong> — title (in <code>&lt;title&gt;</code>), brand (header), tagline, home page lede.</li>
+    <li><strong>Contact + social</strong> — email, public base URL (used for absolute sitemap entries and og:image), GitHub / Hugging Face / LinkedIn / calendar URLs.</li>
+    <li><strong>Analytics</strong> — Google Analytics 4 measurement ID. See <a href="#analytics">Analytics</a> below.</li>
+  </ul>
 
   <h2 id="editor">The rich-text editor</h2>
-  <p>Available wherever you see a body field (Pages, Work, Writing). Toolbar from left to right:</p>
+  <p>Available wherever there's a body field (Pages, Work, Writing). Toolbar from left to right:</p>
   <ul>
     <li><strong>B / I / U</strong> — bold, italic, underline.</li>
     <li><strong>H2 / H3 / P</strong> — headings and paragraphs.</li>
     <li><strong>•&nbsp;list / 1.&nbsp;list / “&nbsp;” / &lt;/&gt;</strong> — bulleted, numbered, blockquote, inline code.</li>
     <li><strong>Link</strong> — prompts for an http(s) or mailto URL.</li>
-    <li><strong>Insert ▾</strong> — drops down to four insertions:
+    <li><strong>Insert ▾</strong> dropdown:
       <ul>
-        <li><strong>Image</strong> — picks from your image library, inserts an <code>&lt;img&gt;</code>.</li>
+        <li><strong>Image</strong> — picks from your image library, inserts an <code>&lt;img&gt;</code>. On publish the editor's image becomes a <code>&lt;picture&gt;</code> with a WebP source automatically.</li>
         <li><strong>YouTube embed</strong> — paste any YouTube URL or 11-char video ID. Inserts a privacy-friendly <code>youtube-nocookie</code> iframe.</li>
-        <li><strong>Code block</strong> — inserts <code>&lt;pre&gt;&lt;code&gt;...&lt;/code&gt;&lt;/pre&gt;</code> for you to type into.</li>
+        <li><strong>Code block</strong> — inserts <code>&lt;pre&gt;&lt;code&gt;...&lt;/code&gt;&lt;/pre&gt;</code> for you to type into. Visitors get a one-click <strong>Copy</strong> button on the public page.</li>
         <li><strong>File download</strong> — picks from your file library, inserts a download link.</li>
       </ul>
     </li>
     <li><strong>Clear</strong> — strips formatting from the current selection.</li>
-    <li><strong>Source</strong> (right side) — toggles between visual and raw HTML. Useful for fine-tuning or pasting your own markup.</li>
+    <li><strong>Source</strong> (far right) — toggles between visual editor and raw HTML for fine-tuning or pasting your own markup.</li>
   </ul>
   <p>Everything saved is run through server-side sanitization. Disallowed tags (script, iframe from non-YouTube hosts, form, object, embed), event handlers (onclick, etc.), and inline styles are removed.</p>
+
+  <h2 id="public-features">Public-site features (automatic)</h2>
+  <p>These work without any per-page configuration. They're listed here so you understand what visitors see.</p>
+  <ul>
+    <li><strong>WebP images with fallback.</strong> Every image gets a <code>&lt;picture&gt;</code> with a WebP source on publish; old browsers fall back to the JPEG/PNG. Typical savings: 50–70%.</li>
+    <li><strong>Code-block copy button.</strong> Every <code>&lt;pre&gt;</code> shows a small "Copy" button on hover; tap-friendly on touch devices.</li>
+    <li><strong>Responsive hamburger nav.</strong> Below 720 px or when nav items don't fit on one line, the menu collapses behind a hamburger button.</li>
+    <li><strong>Sticky submenu.</strong> Hovering a parent opens its submenu; it stays open for 3 seconds after your cursor leaves. Click outside or press Esc to close immediately.</li>
+    <li><strong>Self-hosted fonts.</strong> No third-party CDN — all WOFF2 files are served from the same origin.</li>
+    <li><strong>Light + dark mode.</strong> The theme toggle in the header writes a preference to <code>localStorage</code>; it's also picked up by the admin.</li>
+    <li><strong>Strict Content-Security-Policy</strong> on every page — only same-origin scripts / styles / fonts, plus the YouTube embed host and (if you enabled it) the Google Analytics hosts.</li>
+  </ul>
+
+  <h2 id="analytics">Google Analytics</h2>
+  <p><em>Path: <code>/admin/settings/</code> → Analytics fieldset</em></p>
+  <p>Paste a GA4 measurement ID — format <code>G-</code> followed by 4–12 letters / digits (e.g. <code>G-ABC1234567</code>). Found in Google Analytics → Admin → Data Streams → Web stream details. Save → Publish.</p>
+  <p>When set, the public pages add Google's <code>gtag.js</code> script to <code>&lt;head&gt;</code> and the CSP relaxes to allow connections to <code>googletagmanager.com</code> and <code>google-analytics.com</code>. When empty, no analytics scripts ship at all and the CSP stays strict.</p>
+  <p>To disable tracking, clear the field and publish.</p>
 
   <h2 id="faq">FAQ</h2>
   <dl class="help-faq">
     <dt>How do I make my changes appear on the live site?</dt>
-    <dd>Click <strong>Publish</strong> in the bottom-left of the sidebar.</dd>
+    <dd>Click <strong>Publish</strong> at the bottom of the sidebar.</dd>
 
     <dt>How do I add a new page?</dt>
-    <dd><strong>Pages → + New page</strong>. Pick a slug (lowercase kebab-case), title, body. Save. Publish.</dd>
+    <dd><strong>Pages → + New page</strong>. Pick a slug, title, body. Save. Publish.</dd>
 
     <dt>How do I add the new page to the navigation menu?</dt>
     <dd><strong>Menu → Items → + Add</strong>. Set the href to <code>your-slug.html</code>. Save. Publish.</dd>
 
+    <dt>How do I make headings look different from body text?</dt>
+    <dd><strong>Fonts → Picker → Header family</strong> → pick a family different from your Sans → Save → Publish.</dd>
+
     <dt>How do I embed a YouTube video in a page?</dt>
-    <dd>In the page body editor, click <strong>Insert ▾ → YouTube embed</strong> and paste the URL.</dd>
+    <dd>In the editor, <strong>Insert ▾ → YouTube embed</strong>, paste the URL.</dd>
 
     <dt>How do I let visitors download a PDF?</dt>
     <dd><strong>Media → Upload file</strong>, then in any editor <strong>Insert ▾ → File download</strong> and pick it.</dd>
 
-    <dt>What's a "slug"?</dt>
-    <dd>The URL-safe version of a title. "About me" becomes <code>about-me</code>, and the page lives at <code>/about-me.html</code>.</dd>
+    <dt>How do I upload my own font?</dt>
+    <dd><strong>Fonts → Upload custom</strong>. WOFF2 only (≤ 2 MB). Family name + role (Sans / Mono / Header) + weight + file.</dd>
 
-    <dt>Can I customize a preset theme?</dt>
-    <dd>Yes — <strong>Themes → Clone</strong> beside it, then edit the copy. Presets themselves are read-only.</dd>
-
-    <dt>How do I switch light / dark mode?</dt>
-    <dd>Sun / moon button at the bottom of the sidebar. Affects both the admin and (on next page load) the public site, since they share the preference.</dd>
-
-    <dt>Can I undo a change?</dt>
-    <dd>Yes — restore from the daily backup at <code>/var/backups/portfolio-cms/portfolio-YYYY-MM-DD.db</code>. See <a href="#backups">Backups</a> below.</dd>
-
-    <dt>What's the difference between Pages and Work?</dt>
-    <dd>Pages are standalone (about, now, contact, custom). Work entries are structured project cards with covers and tags shown on <code>/work/</code> and the home page.</dd>
-
-    <dt>Why is the Delete button missing on some pages?</dt>
-    <dd>System pages (about, now, contact, 404) can't be deleted, only edited. The site depends on them.</dd>
+    <dt>How do I share a theme?</dt>
+    <dd><strong>Themes → Export</strong> on the row — downloads a JSON. Send it. The recipient uses <strong>Themes → Import JSON…</strong>.</dd>
 
     <dt>How do I see / edit the raw HTML the editor produced?</dt>
-    <dd>Click <strong>Source</strong> at the right of the editor toolbar. Click <strong>Visual</strong> to switch back.</dd>
+    <dd>Click <strong>Source</strong> at the right of the toolbar. Click <strong>Visual</strong> to switch back.</dd>
+
+    <dt>How do I enable Google Analytics?</dt>
+    <dd><strong>Settings → Analytics</strong>, paste your <code>G-…</code> ID, Save, Publish.</dd>
+
+    <dt>How do I make a menu item stand out?</dt>
+    <dd>In <strong>Menu → Items</strong>, toggle <em>★ featured</em> on the row. Switch to <strong>Menu → Featured style</strong> to pick how featured items render.</dd>
+
+    <dt>How do I create a submenu?</dt>
+    <dd>In <strong>Menu → Items</strong>, on the child row pick the parent from the "parent" dropdown. Nesting is limited to one level.</dd>
+
+    <dt>How do I switch light / dark mode?</dt>
+    <dd>Sun / moon button at the bottom of the sidebar — or on the public site, in the nav. Both share the preference.</dd>
+
+    <dt>Can I undo a change?</dt>
+    <dd>Yes — restore from the daily backup. See <a href="#backups">Backups</a>.</dd>
   </dl>
 
   <h2 id="troubleshooting">Troubleshooting</h2>
   <table class="help-table">
     <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
     <tbody>
-      <tr><td>My change doesn't show on the public site</td><td>You haven't published yet</td><td>Click <strong>Publish</strong> in the sidebar</td></tr>
+      <tr><td>Change doesn't show on the public site</td><td>You haven't published yet</td><td>Click <strong>Publish</strong> in the sidebar</td></tr>
       <tr><td>Theme Activate did nothing visible</td><td>Activate flips the database flag; Publish regenerates the CSS</td><td>Publish</td></tr>
-      <tr><td>Image rejected with "Unsupported or unrecognised format"</td><td>Not actually a JPEG / PNG / WebP — magic bytes don't match the extension</td><td>Re-export from your image tool</td></tr>
+      <tr><td>Hard-refresh needed to see changes</td><td>Browser cached old CSS/HTML</td><td>Ctrl+Shift+R (Cmd+Shift+R on Mac)</td></tr>
+      <tr><td>Image rejected with "Unsupported format"</td><td>Not actually a JPEG / PNG / WebP — file contents don't match the extension</td><td>Re-export from your image tool</td></tr>
       <tr><td>File rejected with "Unsupported file type"</td><td>Not PDF / ZIP / MP3 / MP4</td><td>Convert to one of those</td></tr>
-      <tr><td>Upload too large</td><td>&gt; 8 MB image or &gt; 32 MB file</td><td>Resize or compress</td></tr>
-      <tr><td>Theme Edit button missing</td><td>It's a preset (read-only)</td><td><strong>Clone</strong> first, then edit the copy</td></tr>
-      <tr><td>Slug rejected as "collides with a generated path"</td><td>You picked a reserved word (admin, work, writing, sitemap, robots, favicon, etc.)</td><td>Pick something else</td></tr>
+      <tr><td>Custom font upload rejected</td><td>Not a WOFF2 (wrong magic bytes), or it conflicts with a built-in family name</td><td>Convert to WOFF2 first (e.g. <a href="https://gwfh.mranftl.com/fonts" target="_blank" rel="noreferrer noopener">google-webfonts-helper</a>); pick a unique family name</td></tr>
+      <tr><td>Theme Edit button missing on a preset</td><td>Presets are read-only</td><td><strong>Clone</strong> the preset, then edit the copy</td></tr>
+      <tr><td>Slug rejected as "collides"</td><td>You picked a reserved word (admin, work, writing, sitemap, etc.)</td><td>Pick something else</td></tr>
       <tr><td>Menu item missing from the public site</td><td>Visible is off, or you haven't published</td><td>Toggle visible / Publish</td></tr>
       <tr><td>YouTube embed shows a blank frame</td><td>URL wasn't a valid YouTube link</td><td>Use a real watch URL or 11-char ID</td></tr>
-      <tr><td>Hard-refresh needed to see changes</td><td>Browser cached old CSS/HTML</td><td>Ctrl+Shift+R (Cmd+Shift+R on Mac)</td></tr>
+      <tr><td>Hamburger appears on desktop unexpectedly</td><td>Too many menu items for the available width</td><td>Hide one with <em>visible</em>=off, or remove it</td></tr>
+      <tr><td>Submenu vanishes too fast</td><td>You moved well past the menu area — cursor outside both parent and submenu for 3+ seconds</td><td>Re-enter the menu to cancel the auto-close</td></tr>
+      <tr><td>GA ID rejected on save</td><td>Format isn't <code>G-</code> plus 4–12 letters/digits</td><td>Check the ID in Google Analytics → Admin → Data Streams</td></tr>
       <tr><td>Login fails 5+ times</td><td>Rate-limited (5 attempts / 15 min)</td><td>Wait 15 minutes, or run <code>npm run reset-password</code> on the server</td></tr>
       <tr><td>Publish button shows 409</td><td>A publish is already running</td><td>Wait a few seconds, retry</td></tr>
     </tbody>
