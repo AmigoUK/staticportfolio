@@ -1,0 +1,24 @@
+<% layout("/layouts/admin-base", { title: "Pages", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
+<section class="page">
+  <header class="page-head">
+    <h1>Pages</h1>
+    <p>Edit the simple pages — about, now, contact, 404. Add or remove pages by editing the schema (the slug set is locked to known values).</p>
+  </header>
+
+  <% if (it.flash === "saved") { %><p class="flash flash-ok">Page saved. Click <strong>Publish</strong> from the dashboard to regenerate the public site.</p><% } %>
+
+  <table class="data-table">
+    <thead><tr><th>Slug</th><th>Title</th><th>Updated</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      <% it.pages.forEach(function(p){ %>
+      <tr>
+        <td><code><%= p.slug %></code></td>
+        <td><%= p.title %></td>
+        <td><%= p.updated_at %></td>
+        <td><%= p.published ? "Published" : "Draft" %></td>
+        <td><a class="btn btn-ghost" href="<%= it.adminBase %>/pages/<%= p.slug %>/edit">Edit</a></td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</section>

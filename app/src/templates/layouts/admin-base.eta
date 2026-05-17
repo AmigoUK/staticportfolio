@@ -3,7 +3,7 @@ const title = it.title || "Admin";
 const user = it.user || null;
 const adminBase = it.adminBase || "/admin";
 %><!doctype html>
-<html lang="en">
+<html lang="en" data-admin-base="<%= adminBase %>">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
