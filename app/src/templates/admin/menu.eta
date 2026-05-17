@@ -1,25 +1,29 @@
 <% layout("/layouts/admin-base", { title: "Menu", user: it.user, adminBase: it.adminBase, csrfToken: it.csrfToken }) %>
 <%
-const STYLE_DESCRIPTIONS = {
-  "underline-slide": "A 2px line slides under the label on hover and out on leave. Restrained, editorial.",
-  "pill-fill": "Items have rounded-chip hover backgrounds in the accent color. Modern, friendly.",
-  "spotlight-glow": "A soft halo blooms outward from each item on hover. Distinctive, slightly playful.",
-};
 const STYLE_LABELS = {
   "underline-slide": "Underline slide",
   "pill-fill": "Pill fill",
   "spotlight-glow": "Spotlight glow",
+  "magnetic-snap": "Magnetic snap",
+  "bracket-frame": "Bracket frame",
+  "bg-slide": "Background slide",
+};
+const STYLE_DESCRIPTIONS = {
+  "underline-slide": "A 2px line slides under the label on hover. Restrained, editorial.",
+  "pill-fill": "Rounded chip background fills with accent color on hover. Modern, friendly.",
+  "spotlight-glow": "Soft halo blooms outward from the label on hover. Distinctive, slightly playful.",
+  "magnetic-snap": "Item lifts upward 3px with a soft shadow on hover. Springy.",
+  "bracket-frame": "Brackets [ ] appear around the label on hover. Terminal-flavoured.",
+  "bg-slide": "A solid accent block slides up from below to fill the item. Bold.",
 };
 
-// Each preview is a self-contained iframe with the production menu CSS
-// inlined so the hover effects render exactly as they will on the live site.
 const PREVIEW_CSS = `
 :root { color-scheme: light dark;
   --fg: #18181b; --fg-muted: #5a5a5a; --accent: #7c3aed; --accent-hover: #6d28d9;
-  --accent-subtle: #ede9fe; --fg-on-accent: #ffffff; }
+  --accent-subtle: #ede9fe; --fg-on-accent: #ffffff; --border: #e5e1d8; --bg-elevated: #ffffff; }
 @media (prefers-color-scheme: dark) {
   :root { --fg: #f5f4f0; --fg-muted: #a8a5a0; --accent: #a78bfa; --accent-hover: #c4b5fd;
-    --accent-subtle: #2a1f4a; --fg-on-accent: #0f0e12; }
+    --accent-subtle: #2a1f4a; --fg-on-accent: #0f0e12; --border: #26242c; --bg-elevated: #17161c; }
 }
 html, body { margin: 0; padding: 14px 16px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; }
 .nav { display: flex; gap: 16px; align-items: center; }
@@ -38,6 +42,25 @@ html, body { margin: 0; padding: 14px 16px; font-family: -apple-system, BlinkMac
 .nav[data-menu-style="spotlight-glow"] a { padding: 4px 8px; border-radius: 4px; transition: color 220ms ease, box-shadow 220ms ease, text-shadow 220ms ease; }
 .nav[data-menu-style="spotlight-glow"] a:hover { color: var(--fg); box-shadow: 0 0 0 6px var(--accent-subtle); text-shadow: 0 0 8px var(--accent-subtle); }
 .nav[data-menu-style="spotlight-glow"] a[aria-current="page"] { color: var(--accent); }
+
+.nav[data-menu-style="magnetic-snap"] a { padding: 4px 8px; border-radius: 4px; transform: translateY(0); transition: transform 180ms cubic-bezier(.34,1.56,.64,1), color 160ms ease, box-shadow 180ms ease; }
+.nav[data-menu-style="magnetic-snap"] a:hover { color: var(--fg); transform: translateY(-3px); box-shadow: 0 4px 12px -4px rgba(0,0,0,0.35); }
+.nav[data-menu-style="magnetic-snap"] a[aria-current="page"] { color: var(--accent); }
+
+.nav[data-menu-style="bracket-frame"] a { padding: 4px 12px; position: relative; transition: color 160ms ease; font-family: ui-monospace, monospace; }
+.nav[data-menu-style="bracket-frame"] a::before, .nav[data-menu-style="bracket-frame"] a::after { content: ""; opacity: 0; position: absolute; top: 50%; transform: translateY(-50%); color: var(--accent); transition: opacity 160ms ease, content 0s; font-weight: 700; }
+.nav[data-menu-style="bracket-frame"] a::before { content: "["; left: 0; }
+.nav[data-menu-style="bracket-frame"] a::after { content: "]"; right: 0; }
+.nav[data-menu-style="bracket-frame"] a:hover { color: var(--fg); }
+.nav[data-menu-style="bracket-frame"] a:hover::before, .nav[data-menu-style="bracket-frame"] a:hover::after, .nav[data-menu-style="bracket-frame"] a[aria-current="page"]::before, .nav[data-menu-style="bracket-frame"] a[aria-current="page"]::after { opacity: 1; }
+.nav[data-menu-style="bracket-frame"] a[aria-current="page"] { color: var(--accent); }
+
+.nav[data-menu-style="bg-slide"] a { padding: 4px 10px; position: relative; overflow: hidden; isolation: isolate; transition: color 200ms ease; }
+.nav[data-menu-style="bg-slide"] a::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 100%; background: var(--accent); transform: translateY(100%); transition: transform 220ms cubic-bezier(.4,0,.2,1); z-index: -1; }
+.nav[data-menu-style="bg-slide"] a:hover { color: var(--fg-on-accent); }
+.nav[data-menu-style="bg-slide"] a:hover::before { transform: translateY(0); }
+.nav[data-menu-style="bg-slide"] a[aria-current="page"] { color: var(--fg-on-accent); }
+.nav[data-menu-style="bg-slide"] a[aria-current="page"]::before { transform: translateY(0); }
 `;
 function previewSrcdoc(style) {
   return "<!doctype html><html><head><style>" + PREVIEW_CSS + "</style></head><body>" +
@@ -50,7 +73,7 @@ function previewSrcdoc(style) {
 <section class="page">
   <header class="page-head">
     <h1>Menu</h1>
-    <p>Add / edit / reorder navigation items, and pick the hover style. Click <strong>Publish</strong> in the header to apply changes.</p>
+    <p>Manage navigation items, parents, the featured highlight, and the hover style. Click <strong>Publish</strong> in the header to apply.</p>
   </header>
 
   <% if (it.flash === "style-saved") { %><p class="flash flash-ok">Style saved. Click Publish in the header to apply.</p><% } %>
@@ -63,7 +86,7 @@ function previewSrcdoc(style) {
   <form method="post" action="<%= it.adminBase %>/menu/style" class="menu-style-form">
     <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
     <fieldset class="form-section">
-      <legend>Hover style</legend>
+      <legend>Hover style (6 options)</legend>
       <div class="menu-style-grid">
         <% it.styles.forEach(function(s){ %>
         <label class="menu-style-card">
@@ -83,31 +106,38 @@ function previewSrcdoc(style) {
   </form>
 
   <fieldset class="form-section">
-    <legend>Items (<%= it.items.length %>)</legend>
+    <legend>Items (<%= it.items.length %>) — children indent under their parent; submenus show on hover on the public site</legend>
     <% if (it.items.length === 0) { %>
     <p class="empty-cell">No items yet. Add one below.</p>
     <% } %>
     <% it.items.forEach(function(m, idx){ %>
-    <div class="menu-row">
+    <div class="menu-row <%= m.depth === 1 ? 'menu-row-child' : '' %> <%= m.is_featured ? 'menu-row-featured' : '' %>">
       <div class="menu-row-order">
         <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/up" class="inline">
           <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-          <button type="submit" class="btn btn-ghost btn-sm" <%= idx === 0 ? "disabled" : "" %> title="Move up">↑</button>
+          <button type="submit" class="btn btn-ghost btn-sm" title="Move up">↑</button>
         </form>
         <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/down" class="inline">
           <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-          <button type="submit" class="btn btn-ghost btn-sm" <%= idx === it.items.length - 1 ? "disabled" : "" %> title="Move down">↓</button>
+          <button type="submit" class="btn btn-ghost btn-sm" title="Move down">↓</button>
         </form>
       </div>
       <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>" class="menu-row-form">
         <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
         <input type="text" name="label" required maxlength="50" value="<%= m.label %>" placeholder="Label" />
         <input type="text" name="href" required maxlength="250" value="<%= m.href %>" placeholder="work/ or https://…" />
+        <select name="parent_id" title="Make this item a submenu child of …">
+          <option value="">— top level —</option>
+          <% it.parents.forEach(function(p){ if (p.id !== m.id) { %>
+          <option value="<%= p.id %>" <%= m.parent_id === p.id ? "selected" : "" %>>↳ <%= p.label %></option>
+          <% } }); %>
+        </select>
         <label class="cb"><input type="checkbox" name="open_new_tab" value="1" <%= m.open_new_tab ? "checked" : "" %> /> new tab</label>
         <label class="cb"><input type="checkbox" name="is_visible" value="1" <%= m.is_visible ? "checked" : "" %> /> visible</label>
+        <label class="cb cb-featured"><input type="checkbox" name="is_featured" value="1" <%= m.is_featured ? "checked" : "" %> /> ★ featured</label>
         <button type="submit" class="btn btn-ghost btn-sm">Save</button>
       </form>
-      <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/delete" class="inline" onsubmit="return confirm('Delete this menu item?')">
+      <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/delete" class="inline" onsubmit="return confirm('Delete this menu item? Any children will be deleted too.')">
         <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
         <button type="submit" class="btn btn-ghost btn-danger btn-sm">Delete</button>
       </form>
@@ -120,8 +150,15 @@ function previewSrcdoc(style) {
       <div class="menu-row-form">
         <input type="text" name="label" required maxlength="50" placeholder="Label (e.g. Résumé)" />
         <input type="text" name="href" required maxlength="250" placeholder="resume.html or https://…" />
+        <select name="parent_id">
+          <option value="">— top level —</option>
+          <% it.parents.forEach(function(p){ %>
+          <option value="<%= p.id %>">↳ <%= p.label %></option>
+          <% }); %>
+        </select>
         <label class="cb"><input type="checkbox" name="open_new_tab" value="1" /> new tab</label>
         <label class="cb"><input type="checkbox" name="is_visible" value="1" checked /> visible</label>
+        <label class="cb cb-featured"><input type="checkbox" name="is_featured" value="1" /> ★ featured</label>
         <button type="submit" class="btn btn-primary btn-sm">Add</button>
       </div>
     </form>
@@ -140,11 +177,16 @@ function previewSrcdoc(style) {
 
 .menu-row { display: grid; grid-template-columns: 64px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--admin-border); }
 .menu-row:last-of-type { border-bottom: 0; }
+.menu-row-child { padding-left: 28px; background: rgba(125,125,125,0.04); border-left: 2px solid var(--admin-accent); }
+.menu-row-child::before { content: "↳"; color: var(--admin-fg-muted); position: absolute; margin-left: -22px; font-size: 14px; }
+.menu-row-featured { background: linear-gradient(90deg, var(--admin-accent-subtle, rgba(168,139,250,0.08)) 0%, transparent 30%); }
 .menu-row-order { display: flex; gap: 4px; align-items: center; color: var(--admin-fg-muted); font-size: 12px; }
-.menu-row-form { display: grid; grid-template-columns: 1fr 2fr auto auto auto; gap: 8px; align-items: center; }
-.menu-row-form input[type="text"] { padding: 6px 8px; font-size: 13px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); }
+.menu-row-form { display: grid; grid-template-columns: 1fr 1.6fr 1fr auto auto auto auto; gap: 8px; align-items: center; }
+@media (max-width: 1100px) { .menu-row-form { grid-template-columns: 1fr; } }
+.menu-row-form input[type="text"], .menu-row-form select { padding: 6px 8px; font-size: 13px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); font-family: inherit; }
 .menu-row-form .cb { font-size: 12px; color: var(--admin-fg-muted); display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 .menu-row-form .cb input { margin: 0; }
+.cb-featured { color: var(--admin-accent); font-weight: 500; }
 .menu-row-new { background: var(--admin-bg-elevated); padding: 12px; margin-top: 12px; border-radius: var(--admin-radius); border: 1px dashed var(--admin-border); }
 .btn:disabled { opacity: 0.3; cursor: not-allowed; }
 </style>

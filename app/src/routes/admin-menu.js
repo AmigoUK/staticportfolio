@@ -2,6 +2,7 @@ import { requireAdmin } from "../lib/auth.js";
 import { renderHtml } from "../lib/render.js";
 import {
   listAllForAdmin,
+  listPotentialParents,
   getMenuItem,
   createMenuItem,
   updateMenuItem,
@@ -25,6 +26,7 @@ export default async function adminMenuRoutes(app) {
       user: req.currentUser,
       csrfToken,
       items: listAllForAdmin(),
+      parents: listPotentialParents(),
       activeStyle: getSetting("menu.style") || "underline-slide",
       styles: MENU_STYLES,
       flash: req.query.msg || null,
@@ -51,6 +53,8 @@ export default async function adminMenuRoutes(app) {
         href: body.href,
         open_new_tab: body.open_new_tab === "1" || body.open_new_tab === "on",
         is_visible: body.is_visible === undefined ? true : (body.is_visible === "1" || body.is_visible === "on"),
+        parent_id: body.parent_id || null,
+        is_featured: body.is_featured === "1" || body.is_featured === "on",
       });
       reply.redirect(`${ADMIN_BASE}/menu/?msg=created`);
     } catch (err) {
@@ -67,6 +71,8 @@ export default async function adminMenuRoutes(app) {
         href: body.href,
         open_new_tab: body.open_new_tab === "1" || body.open_new_tab === "on",
         is_visible: body.is_visible === "1" || body.is_visible === "on",
+        parent_id: body.parent_id || null,
+        is_featured: body.is_featured === "1" || body.is_featured === "on",
       });
       if (!updated) { reply.code(404); return "Not found."; }
       reply.redirect(`${ADMIN_BASE}/menu/?msg=saved`);

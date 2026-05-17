@@ -90,3 +90,83 @@ test("deleteMenuItem removes the row", () => {
   assert.ok(menu.deleteMenuItem(created.id));
   assert.equal(menu.getMenuItem(created.id), null);
 });
+
+test("MENU_STYLES exposes all 6 variants", () => {
+  assert.deepEqual(menu.MENU_STYLES.sort(), [
+    "bg-slide",
+    "bracket-frame",
+    "magnetic-snap",
+    "pill-fill",
+    "spotlight-glow",
+    "underline-slide",
+  ]);
+});
+
+test("createMenuItem accepts parent_id and is_featured", () => {
+  const parents = menu.listPotentialParents();
+  const work = parents.find((p) => p.label === "Work");
+  const child = menu.createMenuItem({
+    label: "Recent",
+    href: "work/",
+    parent_id: work.id,
+    is_featured: false,
+  });
+  assert.equal(child.parent_id, work.id);
+  assert.equal(child.is_featured, 0);
+
+  const featured = menu.createMenuItem({
+    label: "Hire me",
+    href: "https://example.com/hire",
+    is_featured: true,
+  });
+  assert.equal(featured.is_featured, 1);
+});
+
+test("createMenuItem rejects non-existent parent_id", () => {
+  assert.throws(() => menu.createMenuItem({ label: "Orphan", href: "x.html", parent_id: 9999 }), /Parent/);
+});
+
+test("createMenuItem rejects nesting deeper than 1 level", () => {
+  const top = menu.createMenuItem({ label: "Top", href: "top.html" });
+  const mid = menu.createMenuItem({ label: "Mid", href: "mid.html", parent_id: top.id });
+  assert.throws(
+    () => menu.createMenuItem({ label: "Bottom", href: "b.html", parent_id: mid.id }),
+    /one level/,
+  );
+});
+
+test("listMenu returns nested tree with children", () => {
+  const tree = menu.listMenu();
+  // Find a parent with children
+  const withKids = tree.find((t) => t.children.length > 0);
+  assert.ok(withKids, "expected at least one top-level item with children");
+  assert.ok(Array.isArray(withKids.children));
+  // Submenu children should NOT appear at the top level.
+  const childIds = new Set();
+  for (const t of tree) for (const c of t.children) childIds.add(c.id);
+  for (const t of tree) assert.equal(childIds.has(t.id), false);
+});
+
+test("updateMenuItem rejects making an item its own parent", () => {
+  const all = menu.listAllForAdmin();
+  const top = all.find((m) => m.depth === 0);
+  assert.throws(() => menu.updateMenuItem(top.id, { parent_id: top.id }), /own parent/);
+});
+
+test("updateMenuItem refuses to nest an item that already has children", () => {
+  const all = menu.listAllForAdmin();
+  const parent = all.find((m) => m.depth === 0 && m.label === "Top");
+  const anotherTop = all.find((m) => m.depth === 0 && m.id !== parent.id);
+  // 'parent' is already a parent (it has 'Mid' as its child). Cannot become a child itself.
+  assert.throws(() => menu.updateMenuItem(parent.id, { parent_id: anotherTop.id }), /children/);
+});
+
+test("listAllForAdmin places children directly under their parent with depth=1", () => {
+  const all = menu.listAllForAdmin();
+  for (let i = 0; i < all.length; i++) {
+    if (all[i].depth === 1) {
+      // The row just before must be either depth=0 (the parent) or depth=1 (a sibling)
+      assert.ok(i > 0 && all[i - 1].depth <= 1);
+    }
+  }
+});

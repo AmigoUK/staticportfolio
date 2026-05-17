@@ -74,6 +74,61 @@ code {
   text-decoration: none;
 }
 
+/* Submenu: dropdown shown on hover / focus-within, shared across all styles. */
+.nav-group {
+  position: relative;
+}
+.nav-parent::after {
+  content: " ▾";
+  font-size: 0.7em;
+  opacity: 0.65;
+  margin-left: 0.2em;
+}
+.nav-submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin: 4px 0 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  min-width: 180px;
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.35);
+  display: none;
+  z-index: 20;
+}
+.nav-submenu li { margin: 0; }
+.nav-submenu a {
+  display: block;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+  font-size: var(--fs-xs);
+}
+.nav-submenu a:hover, .nav-submenu a:focus-visible {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  text-decoration: none;
+}
+.nav-group:hover .nav-submenu,
+.nav-group:focus-within .nav-submenu {
+  display: block;
+}
+
+/* Featured marker — universal regardless of style. Each style variant can
+   tweak below if it wants to layer something special. */
+.nav .is-featured {
+  font-weight: 700;
+  color: var(--accent);
+}
+.nav .is-featured::before {
+  content: "★ ";
+  font-size: 0.85em;
+  color: var(--accent);
+}
+
 /* ---- Style: underline-slide ---- */
 .nav[data-menu-style="underline-slide"] a {
   position: relative;
@@ -138,6 +193,97 @@ code {
 }
 .nav[data-menu-style="spotlight-glow"] a[aria-current="page"] {
   color: var(--accent);
+}
+
+/* ---- Style: magnetic-snap ---- */
+.nav[data-menu-style="magnetic-snap"] a {
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transform: translateY(0);
+  transition: transform 180ms cubic-bezier(.34, 1.56, .64, 1), color var(--transition), box-shadow 180ms ease;
+}
+.nav[data-menu-style="magnetic-snap"] a:hover,
+.nav[data-menu-style="magnetic-snap"] a:focus-visible {
+  color: var(--fg);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.35);
+  text-decoration: none;
+}
+.nav[data-menu-style="magnetic-snap"] a[aria-current="page"] {
+  color: var(--accent);
+}
+
+/* ---- Style: bracket-frame ---- */
+.nav[data-menu-style="bracket-frame"] a {
+  padding: 4px 14px;
+  position: relative;
+  font-family: var(--font-mono);
+  transition: color var(--transition);
+}
+.nav[data-menu-style="bracket-frame"] a::before,
+.nav[data-menu-style="bracket-frame"] a::after {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity var(--transition);
+  font-weight: 700;
+}
+.nav[data-menu-style="bracket-frame"] a::before { content: "["; left: 0; }
+.nav[data-menu-style="bracket-frame"] a::after  { content: "]"; right: 0; }
+.nav[data-menu-style="bracket-frame"] a:hover,
+.nav[data-menu-style="bracket-frame"] a:focus-visible {
+  color: var(--fg);
+  text-decoration: none;
+}
+.nav[data-menu-style="bracket-frame"] a:hover::before,
+.nav[data-menu-style="bracket-frame"] a:hover::after,
+.nav[data-menu-style="bracket-frame"] a:focus-visible::before,
+.nav[data-menu-style="bracket-frame"] a:focus-visible::after,
+.nav[data-menu-style="bracket-frame"] a[aria-current="page"]::before,
+.nav[data-menu-style="bracket-frame"] a[aria-current="page"]::after {
+  opacity: 1;
+}
+.nav[data-menu-style="bracket-frame"] a[aria-current="page"] {
+  color: var(--accent);
+}
+
+/* ---- Style: bg-slide ---- */
+.nav[data-menu-style="bg-slide"] a {
+  padding: 4px 10px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--radius-sm);
+  transition: color 220ms ease;
+}
+.nav[data-menu-style="bg-slide"] a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  background: var(--accent);
+  transform: translateY(100%);
+  transition: transform 220ms cubic-bezier(.4, 0, .2, 1);
+  z-index: -1;
+}
+.nav[data-menu-style="bg-slide"] a:hover,
+.nav[data-menu-style="bg-slide"] a:focus-visible {
+  color: var(--fg-on-accent);
+  text-decoration: none;
+}
+.nav[data-menu-style="bg-slide"] a:hover::before,
+.nav[data-menu-style="bg-slide"] a:focus-visible::before {
+  transform: translateY(0);
+}
+.nav[data-menu-style="bg-slide"] a[aria-current="page"] {
+  color: var(--fg-on-accent);
+}
+.nav[data-menu-style="bg-slide"] a[aria-current="page"]::before {
+  transform: translateY(0);
 }
 
 .theme-toggle {

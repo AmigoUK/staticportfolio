@@ -10,13 +10,23 @@ const ogImage = it_.ogImage || ((it_.site["site.base_url"] || "") + "/" + prefix
 const currentPath = it_.currentPath || "";
 const menu = it_.menu || [];
 const menuStyle = it_.menuStyle || "underline-slide";
-function renderMenuItem(m) {
+function renderMenuLink(m, extraClass = "") {
   const external = /^(https?:|mailto:)/i.test(m.href);
   const href = external ? m.href : (prefix + m.href);
   const isActive = !external && m.href === currentPath;
   const target = m.open_new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
   const aria = isActive ? ' aria-current="page"' : '';
-  return `<a href="${href}"${target}${aria}>${m.label}</a>`;
+  const classes = [];
+  if (m.is_featured) classes.push("is-featured");
+  if (extraClass) classes.push(extraClass);
+  const cls = classes.length ? ` class="${classes.join(' ')}"` : '';
+  return `<a href="${href}"${cls}${target}${aria}>${m.label}</a>`;
+}
+function renderMenuItem(m) {
+  const hasChildren = Array.isArray(m.children) && m.children.length > 0;
+  if (!hasChildren) return renderMenuLink(m);
+  const childMarkup = m.children.map((c) => `<li>${renderMenuLink(c)}</li>`).join('');
+  return `<div class="nav-group">${renderMenuLink(m, 'nav-parent')}<ul class="nav-submenu" role="menu">${childMarkup}</ul></div>`;
 }
 %><!doctype html>
 <html lang="en">
