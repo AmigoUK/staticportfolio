@@ -22,6 +22,8 @@ export default async function adminMenuRoutes(app) {
 
   app.get(`${ADMIN_BASE}/menu/`, { preHandler: gate }, async (req, reply) => {
     const csrfToken = await reply.generateCsrf();
+    const requestedTab = String(req.query.tab || "items");
+    const activeTab = ["items", "hover", "featured"].includes(requestedTab) ? requestedTab : "items";
     return renderHtml(reply, "admin/menu.eta", {
       adminBase: ADMIN_BASE,
       user: req.currentUser,
@@ -32,6 +34,7 @@ export default async function adminMenuRoutes(app) {
       activeFeaturedStyle: getSetting("featured.style") || "star-prefix",
       styles: MENU_STYLES,
       featuredStyles: FEATURED_STYLES,
+      activeTab,
       flash: req.query.msg || null,
       error: req.query.err || null,
     });
@@ -44,18 +47,18 @@ export default async function adminMenuRoutes(app) {
       return reply;
     }
     setSetting("menu.style", style);
-    reply.redirect(`${ADMIN_BASE}/menu/?msg=style-saved`);
+    reply.redirect(`${ADMIN_BASE}/menu/?tab=hover&msg=style-saved`);
     return reply;
   });
 
   app.post(`${ADMIN_BASE}/menu/featured-style`, csrfPre, async (req, reply) => {
     const { style } = req.body || {};
     if (!FEATURED_STYLES.includes(style)) {
-      reply.redirect(`${ADMIN_BASE}/menu/?err=${encodeURIComponent("Unknown featured style.")}`);
+      reply.redirect(`${ADMIN_BASE}/menu/?tab=featured&err=${encodeURIComponent("Unknown featured style.")}`);
       return reply;
     }
     setSetting("featured.style", style);
-    reply.redirect(`${ADMIN_BASE}/menu/?msg=featured-style-saved`);
+    reply.redirect(`${ADMIN_BASE}/menu/?tab=featured&msg=featured-style-saved`);
     return reply;
   });
 

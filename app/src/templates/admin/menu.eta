@@ -114,111 +114,143 @@ function featuredPreviewSrcdoc(featuredStyle) {
   <% if (it.flash === "reordered") { %><p class="flash flash-ok">Order updated.</p><% } %>
   <% if (it.error) { %><p class="flash flash-warn"><%= it.error %></p><% } %>
 
-  <form method="post" action="<%= it.adminBase %>/menu/style" class="menu-style-form">
-    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-    <fieldset class="form-section">
-      <legend>Hover style (6 options)</legend>
-      <div class="menu-style-grid">
-        <% it.styles.forEach(function(s){ %>
-        <label class="menu-style-card">
-          <input type="radio" name="style" value="<%= s %>" <%= s === it.activeStyle ? "checked" : "" %> />
-          <div class="menu-style-meta">
-            <strong><%= STYLE_LABELS[s] %></strong>
-            <span><%= STYLE_DESCRIPTIONS[s] %></span>
-          </div>
-          <iframe class="menu-style-preview" loading="lazy" srcdoc="<%= previewSrcdoc(s) %>" title="<%= STYLE_LABELS[s] %> preview"></iframe>
-        </label>
-        <% }); %>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save hover style</button>
-      </div>
-    </fieldset>
-  </form>
+  <div class="tabs">
+    <input type="radio" name="menu-tab" id="menu-tab-items"    class="tabs-input" <%= it.activeTab === "items"    ? "checked" : "" %> />
+    <input type="radio" name="menu-tab" id="menu-tab-hover"    class="tabs-input" <%= it.activeTab === "hover"    ? "checked" : "" %> />
+    <input type="radio" name="menu-tab" id="menu-tab-featured" class="tabs-input" <%= it.activeTab === "featured" ? "checked" : "" %> />
 
-  <form method="post" action="<%= it.adminBase %>/menu/featured-style" class="menu-style-form">
-    <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-    <fieldset class="form-section">
-      <legend>Featured item style (5 options) — applies to every item with the ★ flag</legend>
-      <div class="menu-style-grid">
-        <% it.featuredStyles.forEach(function(s){ %>
-        <label class="menu-style-card">
-          <input type="radio" name="style" value="<%= s %>" <%= s === it.activeFeaturedStyle ? "checked" : "" %> />
-          <div class="menu-style-meta">
-            <strong><%= FEATURED_LABELS[s] %></strong>
-            <span><%= FEATURED_DESCRIPTIONS[s] %></span>
-          </div>
-          <iframe class="menu-style-preview" loading="lazy" srcdoc="<%= featuredPreviewSrcdoc(s) %>" title="<%= FEATURED_LABELS[s] %> preview"></iframe>
-        </label>
-        <% }); %>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save featured style</button>
-      </div>
-    </fieldset>
-  </form>
+    <nav class="tabs-strip" aria-label="Menu sections">
+      <label for="menu-tab-items"    class="tabs-tab">Items <span class="tabs-count"><%= it.items.length %></span></label>
+      <label for="menu-tab-hover"    class="tabs-tab">Hover style <span class="tabs-count"><%= it.styles.length %></span></label>
+      <label for="menu-tab-featured" class="tabs-tab">Featured style <span class="tabs-count"><%= it.featuredStyles.length %></span></label>
+    </nav>
 
-  <fieldset class="form-section">
-    <legend>Items (<%= it.items.length %>) — children indent under their parent; submenus show on hover on the public site</legend>
-    <% if (it.items.length === 0) { %>
-    <p class="empty-cell">No items yet. Add one below.</p>
-    <% } %>
-    <% it.items.forEach(function(m, idx){ %>
-    <div class="menu-row <%= m.depth === 1 ? 'menu-row-child' : '' %> <%= m.is_featured ? 'menu-row-featured' : '' %>">
-      <div class="menu-row-order">
-        <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/up" class="inline">
+    <section class="tabs-panel" data-tab="items">
+      <p class="tabs-hint">Children indent under their parent; submenus show on hover on the public site.</p>
+      <% if (it.items.length === 0) { %>
+      <p class="empty-cell">No items yet. Add one below.</p>
+      <% } %>
+      <% it.items.forEach(function(m, idx){ %>
+      <div class="menu-row <%= m.depth === 1 ? 'menu-row-child' : '' %> <%= m.is_featured ? 'menu-row-featured' : '' %>">
+        <div class="menu-row-order">
+          <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/up" class="inline">
+            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+            <button type="submit" class="btn btn-ghost btn-sm" title="Move up">↑</button>
+          </form>
+          <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/down" class="inline">
+            <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+            <button type="submit" class="btn btn-ghost btn-sm" title="Move down">↓</button>
+          </form>
+        </div>
+        <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>" class="menu-row-form">
           <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-          <button type="submit" class="btn btn-ghost btn-sm" title="Move up">↑</button>
+          <input type="text" name="label" required maxlength="50" value="<%= m.label %>" placeholder="Label" />
+          <input type="text" name="href" required maxlength="250" value="<%= m.href %>" placeholder="work/ or https://…" />
+          <select name="parent_id" title="Make this item a submenu child of …">
+            <option value="">— top level —</option>
+            <% it.parents.forEach(function(p){ if (p.id !== m.id) { %>
+            <option value="<%= p.id %>" <%= m.parent_id === p.id ? "selected" : "" %>>↳ <%= p.label %></option>
+            <% } }); %>
+          </select>
+          <label class="cb"><input type="checkbox" name="open_new_tab" value="1" <%= m.open_new_tab ? "checked" : "" %> /> new tab</label>
+          <label class="cb"><input type="checkbox" name="is_visible" value="1" <%= m.is_visible ? "checked" : "" %> /> visible</label>
+          <label class="cb cb-featured"><input type="checkbox" name="is_featured" value="1" <%= m.is_featured ? "checked" : "" %> /> ★ featured</label>
+          <button type="submit" class="btn btn-ghost btn-sm">Save</button>
         </form>
-        <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/down" class="inline">
+        <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/delete" class="inline" onsubmit="return confirm('Delete this menu item? Any children will be deleted too.')">
           <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-          <button type="submit" class="btn btn-ghost btn-sm" title="Move down">↓</button>
+          <button type="submit" class="btn btn-ghost btn-danger btn-sm">Delete</button>
         </form>
       </div>
-      <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>" class="menu-row-form">
-        <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-        <input type="text" name="label" required maxlength="50" value="<%= m.label %>" placeholder="Label" />
-        <input type="text" name="href" required maxlength="250" value="<%= m.href %>" placeholder="work/ or https://…" />
-        <select name="parent_id" title="Make this item a submenu child of …">
-          <option value="">— top level —</option>
-          <% it.parents.forEach(function(p){ if (p.id !== m.id) { %>
-          <option value="<%= p.id %>" <%= m.parent_id === p.id ? "selected" : "" %>>↳ <%= p.label %></option>
-          <% } }); %>
-        </select>
-        <label class="cb"><input type="checkbox" name="open_new_tab" value="1" <%= m.open_new_tab ? "checked" : "" %> /> new tab</label>
-        <label class="cb"><input type="checkbox" name="is_visible" value="1" <%= m.is_visible ? "checked" : "" %> /> visible</label>
-        <label class="cb cb-featured"><input type="checkbox" name="is_featured" value="1" <%= m.is_featured ? "checked" : "" %> /> ★ featured</label>
-        <button type="submit" class="btn btn-ghost btn-sm">Save</button>
-      </form>
-      <form method="post" action="<%= it.adminBase %>/menu/<%= m.id %>/delete" class="inline" onsubmit="return confirm('Delete this menu item? Any children will be deleted too.')">
-        <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-        <button type="submit" class="btn btn-ghost btn-danger btn-sm">Delete</button>
-      </form>
-    </div>
-    <% }); %>
+      <% }); %>
 
-    <form method="post" action="<%= it.adminBase %>/menu/new" class="menu-row menu-row-new">
-      <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
-      <div class="menu-row-order">+ new</div>
-      <div class="menu-row-form">
-        <input type="text" name="label" required maxlength="50" placeholder="Label (e.g. Résumé)" />
-        <input type="text" name="href" required maxlength="250" placeholder="resume.html or https://…" />
-        <select name="parent_id">
-          <option value="">— top level —</option>
-          <% it.parents.forEach(function(p){ %>
-          <option value="<%= p.id %>">↳ <%= p.label %></option>
+      <form method="post" action="<%= it.adminBase %>/menu/new" class="menu-row menu-row-new">
+        <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+        <div class="menu-row-order">+ new</div>
+        <div class="menu-row-form">
+          <input type="text" name="label" required maxlength="50" placeholder="Label (e.g. Résumé)" />
+          <input type="text" name="href" required maxlength="250" placeholder="resume.html or https://…" />
+          <select name="parent_id">
+            <option value="">— top level —</option>
+            <% it.parents.forEach(function(p){ %>
+            <option value="<%= p.id %>">↳ <%= p.label %></option>
+            <% }); %>
+          </select>
+          <label class="cb"><input type="checkbox" name="open_new_tab" value="1" /> new tab</label>
+          <label class="cb"><input type="checkbox" name="is_visible" value="1" checked /> visible</label>
+          <label class="cb cb-featured"><input type="checkbox" name="is_featured" value="1" /> ★ featured</label>
+          <button type="submit" class="btn btn-primary btn-sm">Add</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="tabs-panel" data-tab="hover">
+      <p class="tabs-hint">Applies to every menu item. Click <strong>Publish</strong> after saving to regenerate the public site.</p>
+      <form method="post" action="<%= it.adminBase %>/menu/style" class="menu-style-form">
+        <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+        <div class="menu-style-grid">
+          <% it.styles.forEach(function(s){ %>
+          <label class="menu-style-card">
+            <input type="radio" name="style" value="<%= s %>" <%= s === it.activeStyle ? "checked" : "" %> />
+            <div class="menu-style-meta">
+              <strong><%= STYLE_LABELS[s] %></strong>
+              <span><%= STYLE_DESCRIPTIONS[s] %></span>
+            </div>
+            <iframe class="menu-style-preview" loading="lazy" srcdoc="<%= previewSrcdoc(s) %>" title="<%= STYLE_LABELS[s] %> preview"></iframe>
+          </label>
           <% }); %>
-        </select>
-        <label class="cb"><input type="checkbox" name="open_new_tab" value="1" /> new tab</label>
-        <label class="cb"><input type="checkbox" name="is_visible" value="1" checked /> visible</label>
-        <label class="cb cb-featured"><input type="checkbox" name="is_featured" value="1" /> ★ featured</label>
-        <button type="submit" class="btn btn-primary btn-sm">Add</button>
-      </div>
-    </form>
-  </fieldset>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save hover style</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="tabs-panel" data-tab="featured">
+      <p class="tabs-hint">Applies to every item with the ★ flag turned on (set per-item under <strong>Items</strong>).</p>
+      <form method="post" action="<%= it.adminBase %>/menu/featured-style" class="menu-style-form">
+        <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+        <div class="menu-style-grid">
+          <% it.featuredStyles.forEach(function(s){ %>
+          <label class="menu-style-card">
+            <input type="radio" name="style" value="<%= s %>" <%= s === it.activeFeaturedStyle ? "checked" : "" %> />
+            <div class="menu-style-meta">
+              <strong><%= FEATURED_LABELS[s] %></strong>
+              <span><%= FEATURED_DESCRIPTIONS[s] %></span>
+            </div>
+            <iframe class="menu-style-preview" loading="lazy" srcdoc="<%= featuredPreviewSrcdoc(s) %>" title="<%= FEATURED_LABELS[s] %> preview"></iframe>
+          </label>
+          <% }); %>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save featured style</button>
+        </div>
+      </form>
+    </section>
+  </div>
 </section>
 
 <style>
+/* Tabs — CSS-only via hidden radios; default tab pre-checked server-side. */
+.tabs > .tabs-input { position: absolute; opacity: 0; pointer-events: none; }
+.tabs-strip { display: flex; gap: 4px; border-bottom: 1px solid var(--admin-border); margin: 8px 0 20px; }
+.tabs-tab { padding: 10px 18px; font-size: 14px; font-weight: 500; color: var(--admin-fg-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 160ms ease, border-color 160ms ease; }
+.tabs-tab:hover { color: var(--admin-fg); }
+.tabs-count { font-size: 11px; color: var(--admin-fg-muted); background: var(--admin-bg-elevated); border: 1px solid var(--admin-border); padding: 0 6px; border-radius: 10px; margin-left: 4px; vertical-align: middle; }
+#menu-tab-items:checked    ~ .tabs-strip [for="menu-tab-items"],
+#menu-tab-hover:checked    ~ .tabs-strip [for="menu-tab-hover"],
+#menu-tab-featured:checked ~ .tabs-strip [for="menu-tab-featured"] {
+  color: var(--admin-accent);
+  border-bottom-color: var(--admin-accent);
+}
+.tabs-panel { display: none; }
+#menu-tab-items:checked    ~ .tabs-panel[data-tab="items"],
+#menu-tab-hover:checked    ~ .tabs-panel[data-tab="hover"],
+#menu-tab-featured:checked ~ .tabs-panel[data-tab="featured"] {
+  display: block;
+}
+.tabs-hint { font-size: 13px; color: var(--admin-fg-muted); margin: 0 0 16px; }
+
 .menu-style-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
 .menu-style-card { display: flex; flex-direction: column; gap: 8px; padding: 14px; background: var(--admin-bg); border: 1px solid var(--admin-border); border-radius: var(--admin-radius); cursor: pointer; }
 .menu-style-card:has(input:checked) { border-color: var(--admin-accent); box-shadow: 0 0 0 1px var(--admin-accent) inset; }
