@@ -113,7 +113,8 @@ code {
   text-decoration: none;
 }
 .nav-group:hover .nav-submenu,
-.nav-group:focus-within .nav-submenu {
+.nav-group:focus-within .nav-submenu,
+.nav-group.is-open .nav-submenu {
   display: block;
 }
 
