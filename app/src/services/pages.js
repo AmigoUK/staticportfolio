@@ -37,7 +37,7 @@ function validateSlug(raw, { allowReserved = false } = {}) {
 export function listPages() {
   const db = getDb();
   return db.prepare(
-    "SELECT id, slug, title, meta_description, updated_at, published FROM pages ORDER BY " +
+    "SELECT id, slug, title, meta_description, updated_at, published, published_at FROM pages ORDER BY " +
       "CASE slug WHEN 'about' THEN 0 WHEN 'now' THEN 1 WHEN 'contact' THEN 2 WHEN '404' THEN 99 ELSE 50 END, slug",
   ).all().map((p) => ({ ...p, is_system: UNDELETABLE_SLUGS.has(p.slug) }));
 }
@@ -56,7 +56,7 @@ export function isSystemPage(slug) {
   return UNDELETABLE_SLUGS.has(String(slug));
 }
 
-function createPageInternal({ slug, title, meta_description, body_html, published = 1 }, opts = {}) {
+function createPageInternal({ slug, title, meta_description, body_html, published = 1, published_at = null }, opts = {}) {
   const cleanSlug = validateSlug(slug, opts);
   const db = getDb();
   if (db.prepare("SELECT 1 FROM pages WHERE slug = ?").get(cleanSlug)) {
@@ -64,7 +64,7 @@ function createPageInternal({ slug, title, meta_description, body_html, publishe
   }
   const cleanHtml = sanitize(body_html || "");
   db.prepare(
-    "INSERT INTO pages (slug, title, meta_description, body_json, body_html, published) VALUES (?, ?, ?, ?, ?, ?)",
+    "INSERT INTO pages (slug, title, meta_description, body_json, body_html, published, published_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
   ).run(
     cleanSlug,
     String(title || cleanSlug).slice(0, 200),
@@ -72,6 +72,7 @@ function createPageInternal({ slug, title, meta_description, body_html, publishe
     wrapBodyJson(cleanHtml),
     cleanHtml,
     published ? 1 : 0,
+    published_at || null,
   );
   return getPageBySlug(cleanSlug);
 }
@@ -80,20 +81,21 @@ export function createPage(input) {
   return createPageInternal(input);
 }
 
-export function updatePage(slug, { title, meta_description, body_html, published }) {
+export function updatePage(slug, { title, meta_description, body_html, published, published_at }) {
   const existing = getPageBySlug(slug);
   if (!existing) return null;
   const cleanHtml = sanitize(body_html || "");
   const db = getDb();
   db.prepare(
     "UPDATE pages SET title = ?, meta_description = ?, body_json = ?, body_html = ?, published = ?, " +
-      "updated_at = CURRENT_TIMESTAMP WHERE slug = ?",
+      "published_at = ?, updated_at = CURRENT_TIMESTAMP WHERE slug = ?",
   ).run(
     String(title ?? existing.title).slice(0, 200),
     String(meta_description ?? existing.meta_description ?? "").slice(0, 500),
     wrapBodyJson(cleanHtml),
     cleanHtml,
     published !== undefined ? (published ? 1 : 0) : existing.published,
+    published_at !== undefined ? (published_at || null) : existing.published_at,
     existing.slug,
   );
   return getPageBySlug(existing.slug);

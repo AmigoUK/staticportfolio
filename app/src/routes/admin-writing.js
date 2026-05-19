@@ -1,6 +1,12 @@
 import { requireAdmin } from "../lib/auth.js";
 import { renderHtml } from "../lib/render.js";
 import { listPosts, getPostById, createPost, updatePost, deletePost } from "../services/posts.js";
+import { derivePublishFields, statusFromRow, isoToDatetimeLocal } from "../lib/publish-status.js";
+
+function decorate(row) {
+  if (!row) return row;
+  return { ...row, status: statusFromRow(row), published_at_local: isoToDatetimeLocal(row.published_at) };
+}
 
 const ADMIN_BASE = process.env.ADMIN_BASE_PATH || "/admin";
 
@@ -20,7 +26,7 @@ export default async function adminWritingRoutes(app) {
     const csrfToken = await reply.generateCsrf();
     return renderHtml(reply, "admin/writing-edit.eta", {
       adminBase: ADMIN_BASE, user: req.currentUser, csrfToken,
-      post: { id: null, slug: "", title: "", dek: "", body_html: "", meta_description: "", published: 0, published_at: new Date().toISOString().slice(0, 10) },
+      post: { id: null, slug: "", title: "", dek: "", body_html: "", meta_description: "", published: 0, published_at: null, status: "draft", published_at_local: "" },
       mode: "new",
     });
   });
@@ -30,7 +36,7 @@ export default async function adminWritingRoutes(app) {
     if (!post) { reply.code(404); return "Not found."; }
     const csrfToken = await reply.generateCsrf();
     return renderHtml(reply, "admin/writing-edit.eta", {
-      adminBase: ADMIN_BASE, user: req.currentUser, csrfToken, post, mode: "edit",
+      adminBase: ADMIN_BASE, user: req.currentUser, csrfToken, post: decorate(post), mode: "edit",
     });
   });
 
@@ -65,13 +71,14 @@ export default async function adminWritingRoutes(app) {
 }
 
 function normalize(body) {
+  const { published, published_at } = derivePublishFields(body);
   return {
     slug: body.slug,
     title: body.title,
     dek: body.dek,
     body_html: body.body_html,
     meta_description: body.meta_description,
-    published: body.published === "1" || body.published === "on",
-    published_at: body.published_at || null,
+    published,
+    published_at,
   };
 }

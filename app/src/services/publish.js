@@ -28,19 +28,26 @@ export async function publish({ logger = console } = {}) {
   }
   publishing = true;
   const db = getDb();
+  // Write timestamps as ISO-8601 UTC (matching published_at on content rows)
+  // so autopublish.js can lex-compare finished_at against published_at safely.
+  const startIso = new Date().toISOString();
   const logRow = db
-    .prepare("INSERT INTO publish_log (started_at, status) VALUES (CURRENT_TIMESTAMP, 'running') RETURNING id")
-    .get();
+    .prepare("INSERT INTO publish_log (started_at, status) VALUES (?, 'running') RETURNING id")
+    .get(startIso);
   try {
     const result = await runPublish(logger);
     db.prepare(
-      "UPDATE publish_log SET finished_at = CURRENT_TIMESTAMP, status = 'ok', message = ? WHERE id = ?",
-    ).run(`Wrote ${result.pagesWritten} pages, ${result.fontsCopied} fonts, ${result.mediaCopied} media files.`, logRow.id);
+      "UPDATE publish_log SET finished_at = ?, status = 'ok', message = ? WHERE id = ?",
+    ).run(
+      new Date().toISOString(),
+      `Wrote ${result.pagesWritten} pages, ${result.fontsCopied} fonts, ${result.mediaCopied} media files.`,
+      logRow.id,
+    );
     return result;
   } catch (err) {
     db.prepare(
-      "UPDATE publish_log SET finished_at = CURRENT_TIMESTAMP, status = 'error', message = ? WHERE id = ?",
-    ).run(err.message, logRow.id);
+      "UPDATE publish_log SET finished_at = ?, status = 'error', message = ? WHERE id = ?",
+    ).run(new Date().toISOString(), err.message, logRow.id);
     throw err;
   } finally {
     publishing = false;
@@ -145,14 +152,26 @@ async function runPublish(logger) {
   const webpMade = await generateWebpVariants(join(STAGING_DIR, "assets", "img"));
 
   const db_ = getDb();
-  const pages = db_.prepare("SELECT * FROM pages WHERE published = 1").all();
+  // Scheduled rows (published=1 with a future published_at) stay hidden until
+  // their moment passes. NULL published_at means "publish immediately" — the
+  // historical default for pages/work that pre-date scheduling.
+  const now = new Date().toISOString();
+  const pages = db_
+    .prepare("SELECT * FROM pages WHERE published = 1 AND (published_at IS NULL OR published_at <= @now)")
+    .all({ now });
   const workEntries = db_
-    .prepare("SELECT * FROM work_entries WHERE published = 1 ORDER BY sort_order, id")
-    .all()
+    .prepare(
+      "SELECT * FROM work_entries WHERE published = 1 AND (published_at IS NULL OR published_at <= @now) " +
+        "ORDER BY sort_order, id",
+    )
+    .all({ now })
     .map(decorateWork);
   const posts = db_
-    .prepare("SELECT * FROM posts WHERE published = 1 ORDER BY published_at DESC")
-    .all();
+    .prepare(
+      "SELECT * FROM posts WHERE published = 1 AND (published_at IS NULL OR published_at <= @now) " +
+        "ORDER BY published_at DESC",
+    )
+    .all({ now });
 
   let pagesWritten = 0;
   const baseCtx = { site, menu, menuStyle, featuredStyle };

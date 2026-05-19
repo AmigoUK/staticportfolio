@@ -16,12 +16,15 @@
   <table class="data-table">
     <thead><tr><th>Slug</th><th>Title</th><th>Updated</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody>
-      <% it.pages.forEach(function(p){ %>
+      <% it.pages.forEach(function(p){
+        const status = !p.published ? "draft" :
+          (p.published_at && Date.parse(p.published_at) > Date.now() ? "scheduled" : "published");
+      %>
       <tr>
         <td><code><%= p.slug %></code><% if (p.is_system) { %> <span class="tag-mini">system</span><% } %></td>
         <td><%= p.title %></td>
         <td><%= p.updated_at %></td>
-        <td><%= p.published ? "Published" : "Draft" %></td>
+        <td><% if (status === "scheduled") { %>Scheduled for <%= new Date(p.published_at).toLocaleString() %><% } else if (status === "published") { %>Published<% } else { %>Draft<% } %></td>
         <td class="actions">
           <a class="btn btn-ghost" href="<%= it.adminBase %>/pages/<%= p.slug %>/edit">Edit</a>
           <% if (!p.is_system) { %>

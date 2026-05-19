@@ -86,12 +86,16 @@
         <input type="number" name="sort_order" min="0" max="1000" value="<%= it.entry.sort_order %>" />
       </label>
       <label class="form-row">
-        <span>Published date (YYYY-MM-DD)</span>
-        <input type="date" name="published_at" value="<%= (it.entry.published_at || '').slice(0,10) %>" />
+        <span>Status</span>
+        <select name="status" data-status-select>
+          <option value="draft" <%= it.entry.status === "draft" ? "selected" : "" %>>Draft — hidden from /work/</option>
+          <option value="published" <%= it.entry.status === "published" ? "selected" : "" %>>Published — visible on the next publish</option>
+          <option value="scheduled" <%= it.entry.status === "scheduled" ? "selected" : "" %>>Scheduled — appears automatically at a chosen time</option>
+        </select>
       </label>
-      <label class="form-row form-row-inline">
-        <input type="checkbox" name="published" value="1" <%= it.entry.published ? "checked" : "" %> />
-        <span>Published</span>
+      <label class="form-row" data-status-when>
+        <span>Publish at (your local time)</span>
+        <input type="datetime-local" name="published_at" value="<%= it.entry.published_at_local || '' %>" />
       </label>
       <label class="form-row form-row-inline">
         <input type="checkbox" name="is_disabled" value="1" <%= it.entry.is_disabled ? "checked" : "" %> />
@@ -107,9 +111,24 @@
 </section>
 
 <script src="<%= it.adminBase %>/static/mini-rte.js"></script>
+<script>
+  (function () {
+    const sel = document.querySelector("[data-status-select]");
+    const when = document.querySelector("[data-status-when]");
+    if (!sel || !when) return;
+    const whenInput = when.querySelector("input");
+    function sync() {
+      const scheduled = sel.value === "scheduled";
+      when.style.opacity = scheduled ? "1" : "0.7";
+      whenInput.required = scheduled;
+    }
+    sel.addEventListener("change", sync);
+    sync();
+  })();
+</script>
 
 <style>
 .form-help { padding: 10px 12px; background: var(--admin-bg); border-radius: var(--admin-radius-sm); color: var(--admin-fg-muted); font-size: 13px; }
 select { width: 100%; padding: 8px 10px; font-size: 14px; font-family: inherit; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); }
-input[type="number"], input[type="date"] { width: 220px; padding: 8px 10px; font-size: 14px; font-family: inherit; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); }
+input[type="number"], input[type="date"], input[type="datetime-local"] { width: 260px; padding: 8px 10px; font-size: 14px; font-family: inherit; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); }
 </style>

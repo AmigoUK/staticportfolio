@@ -39,6 +39,7 @@ function applyMigrations(db) {
   ensureColumn("menu_items", "parent_id", "INTEGER");
   ensureColumn("menu_items", "is_featured", "INTEGER NOT NULL DEFAULT 0");
   ensureColumn("media", "kind", "TEXT NOT NULL DEFAULT 'image'");
+  ensureColumn("pages", "published_at", "TEXT");
   widenFontsSourceCheck(db);
   widenFontsRoleCheck(db);
   renameWritingMenuToBlog(db);

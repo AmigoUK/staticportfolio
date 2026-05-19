@@ -1,0 +1,17 @@
+# Systemd timer: poll every 5 minutes for scheduled content whose moment has
+# passed and re-run the publish pipeline if any is due. RandomizedDelaySec
+# avoids hammering the disk on the exact 5-minute mark. Persistent=true
+# catches up if the box was off when a slot passed.
+
+[Unit]
+Description=Portfolio CMS auto-publish (scheduled content)
+Requires=portfolio-cms-autopublish.service
+
+[Timer]
+OnCalendar=*:0/5
+RandomizedDelaySec=30
+Persistent=true
+Unit=portfolio-cms-autopublish.service
+
+[Install]
+WantedBy=timers.target

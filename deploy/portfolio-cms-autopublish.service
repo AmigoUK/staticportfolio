@@ -1,0 +1,25 @@
+# Systemd unit: republishes the public site if any scheduled row's
+# published_at moment has passed since the last successful publish.
+#
+# Triggered by portfolio-cms-autopublish.timer (every 5 minutes). Can also
+# be invoked manually:
+#
+#   sudo systemctl start portfolio-cms-autopublish.service
+#   journalctl -u portfolio-cms-autopublish -n 50 --no-pager
+#
+# Cheap when nothing is due — the script exits without invoking publish.
+
+[Unit]
+Description=Portfolio CMS — auto-publish scheduled content
+After=portfolio-cms.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/var/www/html/staticportfolio
+ExecStart=/usr/bin/npm run autopublish
+User=root
+Group=root
+Environment=NODE_ENV=production
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=portfolio-cms-autopublish

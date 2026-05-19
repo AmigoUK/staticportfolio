@@ -15,12 +15,15 @@
   <table class="data-table">
     <thead><tr><th>Sort</th><th>Slug</th><th>Title</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
     <tbody>
-      <% it.work.forEach(function(w){ %>
+      <% it.work.forEach(function(w){
+        const status = !w.published ? "draft" :
+          (w.published_at && Date.parse(w.published_at) > Date.now() ? "scheduled" : "published");
+      %>
       <tr>
         <td><%= w.sort_order %></td>
         <td><code><%= w.slug %></code></td>
         <td><%= w.title %><% if (w.is_disabled) { %> <span class="tag-mini">disabled</span><% } %></td>
-        <td><%= w.published ? "Published" : "Draft" %></td>
+        <td><% if (status === "scheduled") { %>Scheduled for <%= new Date(w.published_at).toLocaleString() %><% } else if (status === "published") { %>Published<% } else { %>Draft<% } %></td>
         <td><%= w.updated_at %></td>
         <td class="actions">
           <a class="btn btn-ghost" href="<%= it.adminBase %>/work/<%= w.id %>/edit">Edit</a>

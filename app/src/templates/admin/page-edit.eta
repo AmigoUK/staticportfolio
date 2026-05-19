@@ -33,10 +33,21 @@ const isNew = mode === "new";
       <textarea name="body_html" data-rte rows="20"><%= it.page.body_html || '' %></textarea>
     </label>
 
-    <label class="form-row form-row-inline">
-      <input type="checkbox" name="published" value="1" <%= it.page.published ? "checked" : "" %> />
-      <span>Published (uncheck to keep it out of the next publish)</span>
-    </label>
+    <fieldset class="form-section">
+      <legend>Publication</legend>
+      <label class="form-row">
+        <span>Status</span>
+        <select name="status" data-status-select>
+          <option value="draft" <%= it.page.status === "draft" ? "selected" : "" %>>Draft — hidden from the public site</option>
+          <option value="published" <%= it.page.status === "published" ? "selected" : "" %>>Published — live on the next publish</option>
+          <option value="scheduled" <%= it.page.status === "scheduled" ? "selected" : "" %>>Scheduled — appears automatically at a chosen time</option>
+        </select>
+      </label>
+      <label class="form-row" data-status-when>
+        <span>Publish at (your local time; only used when status is Scheduled)</span>
+        <input type="datetime-local" name="published_at" value="<%= it.page.published_at_local || '' %>" />
+      </label>
+    </fieldset>
 
     <div class="form-actions">
       <button type="submit" class="btn btn-primary"><%= isNew ? "Create" : "Save" %></button>
@@ -46,3 +57,22 @@ const isNew = mode === "new";
 </section>
 
 <script src="<%= it.adminBase %>/static/mini-rte.js"></script>
+<script>
+  (function () {
+    const sel = document.querySelector("[data-status-select]");
+    const when = document.querySelector("[data-status-when]");
+    if (!sel || !when) return;
+    const whenInput = when.querySelector("input");
+    function sync() {
+      const scheduled = sel.value === "scheduled";
+      when.style.opacity = scheduled ? "1" : "0.55";
+      whenInput.required = scheduled;
+    }
+    sel.addEventListener("change", sync);
+    sync();
+  })();
+</script>
+
+<style>
+input[type="datetime-local"] { width: 260px; padding: 8px 10px; font-size: 14px; font-family: inherit; border: 1px solid var(--admin-border); border-radius: var(--admin-radius-sm); background: var(--admin-bg); color: var(--admin-fg); }
+</style>

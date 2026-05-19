@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS pages (
   body_json TEXT NOT NULL,
   body_html TEXT NOT NULL,
   published INTEGER NOT NULL DEFAULT 1,
+  published_at TEXT,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

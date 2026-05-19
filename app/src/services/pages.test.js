@@ -73,3 +73,28 @@ test("listPages marks system pages with is_system", () => {
   const resume = list.find((p) => p.slug === "resume");
   assert.equal(resume?.is_system, false);
 });
+
+test("createPage stores published_at when given", () => {
+  const future = "2030-01-01T00:00:00.000Z";
+  const p = pages.createPage({ slug: "future-page", title: "F", published: 1, published_at: future });
+  assert.equal(p.published_at, future);
+});
+
+test("createPage defaults published_at to null", () => {
+  const p = pages.createPage({ slug: "now-page", title: "N" });
+  assert.equal(p.published_at, null);
+});
+
+test("updatePage can set and clear published_at", () => {
+  pages.createPage({ slug: "togglable", title: "T" });
+  const scheduled = pages.updatePage("togglable", { published: 1, published_at: "2030-06-01T12:00:00.000Z" });
+  assert.equal(scheduled.published_at, "2030-06-01T12:00:00.000Z");
+  const cleared = pages.updatePage("togglable", { published: 1, published_at: null });
+  assert.equal(cleared.published_at, null);
+});
+
+test("updatePage preserves published_at when field omitted", () => {
+  pages.createPage({ slug: "preserve", title: "P", published_at: "2030-01-01T00:00:00.000Z" });
+  const updated = pages.updatePage("preserve", { title: "P2" });
+  assert.equal(updated.published_at, "2030-01-01T00:00:00.000Z");
+});

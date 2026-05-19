@@ -15,6 +15,7 @@
     "reset-password": "node --env-file=.env scripts/reset-password.js",
     "seed": "node --env-file=.env seed/seed-from-static.js",
     "publish": "node --env-file=.env scripts/publish.js",
+    "autopublish": "node --env-file=.env scripts/autopublish.js",
     "backup": "node --env-file=.env scripts/backup.js"
   },
   "dependencies": {
